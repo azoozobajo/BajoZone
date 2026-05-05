@@ -1,0 +1,2210 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BajoZone — لوحة التحكم</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Tajawal:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="icon" type="image/png" href="../assets/images/logo-bajo.png">
+  <style>
+    body { background:#0e0e0e; }
+    .upzone { border:2px dashed rgba(255,255,255,.13);padding:24px;text-align:center;cursor:pointer;position:relative;transition:border-color .3s; }
+    .upzone:hover { border-color:var(--gold); }
+    .upzone input[type=file] { position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%; }
+    .upzone-txt { color:var(--warm-mid);font-size:.85rem; }
+    .up-prev { max-width:180px;max-height:140px;object-fit:cover;display:none;margin:10px auto 0; }
+    select.fi option { background:#1a1a1a; color:#f2f1ed; }
+    select.fi option:checked { background:#2a2a2a; }
+    .donut-wrap { display:flex;align-items:center;gap:28px;flex-wrap:wrap;padding:8px 0; }
+    .donut-svg-wrap { flex-shrink:0; }
+    .donut-svg { width:170px;height:170px;display:block; }
+    .donut-center-num { font-family:'Space Mono',monospace;font-size:24px;fill:#f2f1ed;text-anchor:middle;font-weight:700; }
+    .donut-center-lbl { font-family:'Tajawal',sans-serif;font-size:11px;fill:#b0a99a;text-anchor:middle; }
+    .donut-legend { display:flex;flex-direction:column;gap:10px;flex:1;min-width:130px; }
+    .donut-legend-item { display:flex;align-items:center;gap:10px;font-size:.84rem; }
+    .donut-dot { width:11px;height:11px;border-radius:50%;flex-shrink:0; }
+    .donut-legend-name { flex:1;color:#e8e7e3; }
+    .donut-legend-val { font-family:'Space Mono',monospace;font-size:.75rem;color:#c8a86e;font-weight:700; }
+    .tag-box { border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);padding:8px 10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;cursor:text;position:relative;min-height:44px; }
+    .tag-box:focus-within { border-color:var(--gold); }
+    .tag-chips-wrap { display:contents; }
+    .tag-chip-admin { background:rgba(200,168,110,.13);border:1px solid rgba(200,168,110,.28);color:#c8a86e;font-size:.75rem;padding:3px 8px;display:inline-flex;align-items:center;gap:5px; }
+    .tag-chip-admin button { background:none;border:none;color:inherit;cursor:pointer;padding:0;line-height:1;font-size:1rem; }
+    .tag-field { background:none;border:none;color:#f2f1ed;font-family:Tajawal,sans-serif;font-size:.9rem;outline:none;min-width:120px;flex:1;padding:2px 4px; }
+    .tag-suggestions { position:absolute;top:calc(100% + 2px);right:0;left:0;z-index:9999;background:#1c1c1c;border:1px solid rgba(255,255,255,.12);max-height:200px;overflow-y:auto;list-style:none;padding:4px 0;margin:0; }
+    .tag-suggestions li { padding:8px 14px;cursor:pointer;font-size:.88rem;color:#f2f1ed;font-family:Tajawal,sans-serif; }
+    .tag-suggestions li:hover,.tag-suggestions li.active { background:rgba(200,168,110,.15);color:#c8a86e; }
+    .tag-suggestions li.new-tag { color:#7ec87e; }
+  </style>
+</head>
+<body class="admin-body">
+
+<!-- ═══════ LOGIN ═══════ -->
+<div id="login-screen" class="login-wrap">
+  <div class="login-box">
+    <div class="login-logo">
+      <img src="../assets/images/logo-bajo.png" alt="BajoZone" onerror="this.style.display='none'">
+      <h2>BAJOZONE — ADMIN</h2>
+    </div>
+    <div class="fg"><label class="fl">اسم المستخدم</label>
+      <input type="text" id="li-u" class="fi" placeholder="username" autocomplete="username">
+    </div>
+    <div class="fg"><label class="fl">كلمة المرور</label>
+      <input type="password" id="li-p" class="fi" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn btn-fill" id="li-btn" style="width:100%;padding:13px;font-size:.95rem;">دخول إلى لوحة التحكم</button>
+    <div id="li-err" style="display:none;color:#ff6b6b;font-size:.84rem;text-align:center;margin-top:12px;">اسم المستخدم أو كلمة المرور غير صحيحة</div>
+  </div>
+</div>
+
+<!-- ═══════ DASHBOARD ═══════ -->
+<div id="dashboard" style="display:none;">
+  <div class="a-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="a-sidebar">
+      <div class="a-sidebar-logo">
+        <img src="../assets/images/logo-bajo.png" alt="" onerror="this.style.display='none'">
+        <span>ADMIN — BAJOZONE</span>
+      </div>
+      <div class="a-nav-group">
+        <div class="a-nav-group-lbl">لوحة التحكم</div>
+        <button class="a-nav-btn" id="nav-overview">📊 نظرة عامة</button>
+      </div>
+      <div class="a-nav-group">
+        <div class="a-nav-group-lbl">المحتوى</div>
+        <button class="a-nav-btn" id="nav-programs">📺 البرامج</button>
+        <button class="a-nav-btn" id="nav-articles">✍ المواضيع</button>
+        <button class="a-nav-btn" id="nav-tags">🏷 التاقات</button>
+        <button class="a-nav-btn" id="nav-resources">🗂 المكتبة الرقمية</button>
+      </div>
+      <div class="a-nav-group">
+        <div class="a-nav-group-lbl">الصفحات</div>
+        <button class="a-nav-btn" id="nav-sabout">📝 إعرف عني</button>
+      </div>
+      <div class="a-nav-group">
+        <div class="a-nav-group-lbl">الإعدادات</div>
+        <button class="a-nav-btn" id="nav-sgeneral">⚙️ إعدادات عامة</button>
+        <button class="a-nav-btn" id="nav-sticker">📰 الشريط المتحرك</button>
+        <button class="a-nav-btn" id="nav-spopup">🔔 البوب أب</button>
+        <button class="a-nav-btn" id="nav-ssocial">🔗 وسائل التواصل</button>
+        <button class="a-nav-btn" id="nav-ssec">🔒 الأمان</button>
+      </div>
+      <div class="a-sidebar-spacer"></div>
+      <div class="a-sidebar-bottom">
+        <button class="a-nav-btn" id="nav-site">🌐 عرض الموقع</button>
+        <button class="a-nav-btn" id="nav-logout">↩ تسجيل الخروج</button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="a-main">
+      <div class="a-topbar">
+        <h1 class="a-page-title" id="pg-title">نظرة عامة</h1>
+        <div class="a-actions">
+          <button class="btn btn-ghost" id="btn-site" style="padding:8px 18px;font-size:.8rem;">🌐 الموقع</button>
+          <button class="btn btn-fill" id="btn-add" style="display:none;padding:9px 22px;font-size:.84rem;">+ إضافة</button>
+        </div>
+      </div>
+      <div id="main-content"></div>
+    </main>
+  </div>
+</div>
+
+<!-- ═══════ ARTICLE MODAL ═══════ -->
+<div class="overlay" id="modal-article">
+  <div class="modal">
+    <div class="modal-hd">
+      <span class="modal-hd-title" id="modal-article-title">موضوع جديد</span>
+      <button class="modal-x" id="modal-article-close">×</button>
+    </div>
+    <div class="modal-bd">
+      <input type="hidden" id="f-art-id">
+      <div class="tabs" id="art-tabs">
+        <button class="tab-btn on" data-tab="art-ar">عربي 🇸🇦</button>
+        <button class="tab-btn" data-tab="art-en">English 🇬🇧</button>
+        <button class="tab-btn" data-tab="art-meta">إعدادات</button>
+      </div>
+
+      <div class="tc on" id="art-ar">
+        <div class="fg"><label class="fl">العنوان (عربي)</label>
+          <input id="f-art-title-ar" class="fi" dir="rtl" placeholder="عنوان المقال بالعربية">
+        </div>
+        <div class="fg"><label class="fl">المقتطف (عربي)</label>
+          <textarea id="f-art-exc-ar" class="fi" rows="3" dir="rtl" placeholder="ملخص قصير..."></textarea>
+        </div>
+        <div class="fg"><label class="fl">المحتوى (عربي)</label>
+          <div class="rte-bar" id="rte-ar-bar">
+            <button class="rte-btn" data-cmd="bold" data-ed="rte-ar"><b>B</b></button>
+            <button class="rte-btn" data-cmd="italic" data-ed="rte-ar"><i>I</i></button>
+            <button class="rte-btn" data-cmd="underline" data-ed="rte-ar"><u>U</u></button>
+            <span class="rte-sep"></span>
+            <button class="rte-btn" data-cmd="formatBlock" data-val="h2" data-ed="rte-ar">H2</button>
+            <button class="rte-btn" data-cmd="formatBlock" data-val="h3" data-ed="rte-ar">H3</button>
+            <button class="rte-btn" data-cmd="formatBlock" data-val="p" data-ed="rte-ar">¶</button>
+            <span class="rte-sep"></span>
+            <button class="rte-btn" data-cmd="justifyRight" data-ed="rte-ar">⇒</button>
+            <button class="rte-btn" data-cmd="justifyCenter" data-ed="rte-ar">≡</button>
+            <button class="rte-btn" data-cmd="justifyLeft" data-ed="rte-ar">⇐</button>
+            <span class="rte-sep"></span>
+            <button class="rte-btn" data-cmd="insertUnorderedList" data-ed="rte-ar">• قائمة</button>
+            <button class="rte-btn" data-cmd="insertOrderedList" data-ed="rte-ar">1. مرقم</button>
+            <span class="rte-sep"></span>
+            <button class="rte-btn" data-action="link" data-ed="rte-ar">🔗 رابط</button>
+            <button class="rte-btn" data-action="image" data-ed="rte-ar">🖼 صورة</button>
+            <button class="rte-btn" data-action="video" data-ed="rte-ar">▶ فيديو</button>
+            <button class="rte-btn rte-callout-btn" data-action="callout" data-ed="rte-ar">Callout</button>
+            <span class="rte-sep"></span>
+            <select class="fi" data-ed="rte-ar" data-action="fontSize" style="padding:3px 8px;height:auto;font-size:.75rem;width:auto;">
+              <option value="">حجم الخط</option>
+              <option value="1">صغير جداً</option><option value="3">عادي</option>
+              <option value="5">كبير</option><option value="7">كبير جداً</option>
+            </select>
+          </div>
+          <div class="rte-body" id="rte-ar" contenteditable="true" dir="rtl" spellcheck="false"></div>
+        </div>
+      </div>
+
+      <div class="tc" id="art-en">
+        <div class="fg"><label class="fl">Title (English)</label>
+          <input id="f-art-title-en" class="fi" dir="ltr" placeholder="Article title in English">
+        </div>
+        <div class="fg"><label class="fl">Excerpt (English)</label>
+          <textarea id="f-art-exc-en" class="fi" rows="3" dir="ltr" placeholder="Short summary..."></textarea>
+        </div>
+        <div class="fg"><label class="fl">Content (English)</label>
+          <div class="rte-bar" id="rte-en-bar">
+            <button class="rte-btn" data-cmd="bold" data-ed="rte-en"><b>B</b></button>
+            <button class="rte-btn" data-cmd="italic" data-ed="rte-en"><i>I</i></button>
+            <button class="rte-btn" data-cmd="underline" data-ed="rte-en"><u>U</u></button>
+            <span class="rte-sep"></span>
+            <button class="rte-btn" data-cmd="formatBlock" data-val="h2" data-ed="rte-en">H2</button>
+            <button class="rte-btn" data-cmd="formatBlock" data-val="h3" data-ed="rte-en">H3</button>
+            <button class="rte-btn" data-cmd="formatBlock" data-val="p" data-ed="rte-en">¶</button>
+            <span class="rte-sep"></span>
+            <button class="rte-btn" data-cmd="justifyLeft" data-ed="rte-en">⇐</button>
+            <button class="rte-btn" data-cmd="justifyCenter" data-ed="rte-en">≡</button>
+            <button class="rte-btn" data-cmd="justifyRight" data-ed="rte-en">⇒</button>
+            <span class="rte-sep"></span>
+            <button class="rte-btn" data-cmd="insertUnorderedList" data-ed="rte-en">• List</button>
+            <button class="rte-btn" data-cmd="insertOrderedList" data-ed="rte-en">1. List</button>
+            <span class="rte-sep"></span>
+            <button class="rte-btn" data-action="link" data-ed="rte-en">🔗 Link</button>
+            <button class="rte-btn" data-action="image" data-ed="rte-en">🖼 Image</button>
+            <button class="rte-btn" data-action="video" data-ed="rte-en">▶ Video</button>
+            <button class="rte-btn rte-callout-btn" data-action="callout" data-ed="rte-en">Callout</button>
+          </div>
+          <div class="rte-body" id="rte-en" contenteditable="true" dir="ltr" spellcheck="false"></div>
+        </div>
+      </div>
+
+      <div class="tc" id="art-meta">
+        <div class="fr">
+          <div class="fg"><label class="fl">تاريخ النشر</label>
+            <input type="date" id="f-art-date" class="fi">
+          </div>
+          <div class="fg"><label class="fl">وقت القراءة (دقائق)</label>
+            <input type="number" id="f-art-readtime" class="fi" min="1" placeholder="5">
+          </div>
+        </div>
+        <div class="fr">
+          <div class="fg"><label class="fl">الحالة</label>
+            <select id="f-art-published" class="fi">
+              <option value="true">منشور — يظهر للزوار</option>
+              <option value="false">مسودة — مخفي</option>
+            </select>
+          </div>
+          <div class="fg"><label class="fl">نوع العرض</label>
+            <select id="f-art-featured" class="fi">
+              <option value="true">مميز — يظهر في الرئيسية</option>
+              <option value="false">عادي</option>
+            </select>
+          </div>
+        </div>
+        <div class="fg"><label class="fl">البرنامج</label>
+          <select id="f-art-program" class="fi">
+            <option value="">-- بدون برنامج --</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">التاقات</label>
+          <div class="tag-box" id="tag-box" onclick="ge('tag-input')?.focus()">
+            <div class="tag-chips-wrap" id="f-art-tags-display"></div>
+            <input type="text" id="tag-input" class="tag-field" placeholder="اكتب تاق واضغط Enter..." autocomplete="off" dir="rtl">
+            <ul class="tag-suggestions" id="tag-suggestions" style="display:none;"></ul>
+          </div>
+          <input type="hidden" id="f-art-tags-val" value="[]">
+        </div>
+        <div class="fg"><label class="fl">رابط يوتيوب (اختياري)</label>
+          <input id="f-art-youtube" class="fi" dir="ltr" placeholder="https://youtube.com/watch?v=...">
+        </div>
+        <div class="fg"><label class="fl">رابط فيديو مرفوع (اختياري)</label>
+          <input id="f-art-videourl" class="fi" dir="ltr" placeholder="assets/videos/...">
+        </div>
+        <div class="fg"><label class="fl">صورة الموضوع</label>
+          <div class="upzone" id="art-upzone">
+            <input type="file" id="art-file" accept="image/*">
+            <div class="upzone-txt">📁 انقر أو اسحب لرفع صورة</div>
+          </div>
+          <input type="hidden" id="f-art-image">
+          <img id="art-img-prev" class="up-prev">
+        </div>
+        <div class="fg">
+          <label class="fl" style="display:flex;align-items:center;justify-content:space-between;">
+            <span>المصادر</span>
+            <button type="button" class="ibtn" onclick="adminAddSource()">+ إضافة مصدر</button>
+          </label>
+          <div id="f-art-sources-list" style="display:flex;flex-direction:column;gap:8px;margin-top:8px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" id="modal-article-cancel" style="padding:9px 22px;">إلغاء</button>
+      <button class="btn btn-fill" id="modal-article-save" style="padding:9px 30px;">حفظ الموضوع ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ PROGRAM MODAL ═══════ -->
+<div class="overlay" id="modal-program">
+  <div class="modal">
+    <div class="modal-hd">
+      <span class="modal-hd-title" id="modal-program-title">برنامج جديد</span>
+      <button class="modal-x" id="modal-program-close">×</button>
+    </div>
+    <div class="modal-bd">
+      <input type="hidden" id="f-prog-id">
+      <div class="tabs" id="prog-tabs">
+        <button class="tab-btn on" data-tab="prog-ar">عربي 🇸🇦</button>
+        <button class="tab-btn" data-tab="prog-en">English 🇬🇧</button>
+        <button class="tab-btn" data-tab="prog-meta">إعدادات</button>
+      </div>
+      <div class="tc on" id="prog-ar">
+        <div class="fg"><label class="fl">اسم البرنامج (عربي)</label><input id="f-prog-na" class="fi" dir="rtl" placeholder="مفاهيم رياضية"></div>
+        <div class="fg"><label class="fl">وصف قصير (عربي)</label><textarea id="f-prog-sda" class="fi" rows="2" dir="rtl" placeholder="جملة أو جملتان..."></textarea></div>
+        <div class="fg"><label class="fl">الوصف الكامل (عربي)</label><textarea id="f-prog-da" class="fi" rows="4" dir="rtl"></textarea></div>
+      </div>
+      <div class="tc" id="prog-en">
+        <div class="fg"><label class="fl">Program Name (English)</label><input id="f-prog-ne" class="fi" dir="ltr" placeholder="Sports Concepts"></div>
+        <div class="fg"><label class="fl">Short Description (English)</label><textarea id="f-prog-sde" class="fi" rows="2" dir="ltr"></textarea></div>
+        <div class="fg"><label class="fl">Full Description (English)</label><textarea id="f-prog-de" class="fi" rows="4" dir="ltr"></textarea></div>
+      </div>
+      <div class="tc" id="prog-meta">
+        <div class="fr">
+          <div class="fg"><label class="fl">Slug (URL)</label><input id="f-prog-slug" class="fi" dir="ltr" placeholder="sports-concepts"></div>
+          <div class="fg"><label class="fl">لون مميز (Accent Color)</label><input id="f-prog-color" class="fi" type="color" value="#c8a86e" style="height:42px;padding:4px;"></div>
+        </div>
+        <div class="fr">
+          <div class="fg"><label class="fl">ترتيب الظهور</label><input id="f-prog-order" class="fi" type="number" min="1" placeholder="1"></div>
+          <div class="fg"><label class="fl">الحالة</label>
+            <select id="f-prog-active" class="fi">
+              <option value="true">ظاهر</option>
+              <option value="false">مخفي</option>
+            </select>
+          </div>
+        </div>
+        <div class="fg"><label class="fl">شعار البرنامج (Logo)</label>
+          <input id="f-prog-logo" class="fi" dir="ltr" placeholder="assets/images/prog-logo.png">
+          <div class="upzone" style="margin-top:8px;"><input type="file" id="prog-logo-file" accept="image/*"><div class="upzone-txt">📁 ارفع الشعار مباشرة</div></div>
+          <img id="prog-logo-prev" class="up-prev">
+        </div>
+        <div class="fg"><label class="fl">صورة غلاف البرنامج (Cover)</label>
+          <div class="upzone"><input type="file" id="prog-cover-file" accept="image/*"><div class="upzone-txt">📁 ارفع صورة الغلاف</div></div>
+          <input type="hidden" id="f-prog-cover">
+          <img id="prog-cover-prev" class="up-prev">
+        </div>
+        <div class="fr" style="gap:24px;margin-top:4px;">
+          <div class="fg" style="flex:none;">
+            <label class="fl">برنامج مميز</label>
+            <div class="tog-wrap"><label class="tog"><input type="checkbox" id="f-prog-featured"><span class="tog-sl"></span></label></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" id="modal-program-cancel" style="padding:9px 22px;">إلغاء</button>
+      <button class="btn btn-fill" id="modal-program-save" style="padding:9px 30px;">حفظ البرنامج ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ TAG MODAL ═══════ -->
+<div class="overlay" id="modal-tag">
+  <div class="modal sm">
+    <div class="modal-hd">
+      <span class="modal-hd-title">تاق</span>
+      <button class="modal-x" id="modal-tag-close">×</button>
+    </div>
+    <div class="modal-bd">
+      <input type="hidden" id="f-tag-id">
+      <div class="fg"><label class="fl">اسم التاق</label><input id="f-tag-name" class="fi" dir="rtl" placeholder="اكتشاف المواهب"></div>
+      <div class="fg"><label class="fl">Slug (URL)</label><input id="f-tag-slug" class="fi" dir="ltr" placeholder="talent-identification"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" id="modal-tag-cancel" style="padding:9px 22px;">إلغاء</button>
+      <button class="btn btn-fill" id="modal-tag-save" style="padding:9px 30px;">حفظ ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ RESOURCE MODAL ═══════ -->
+<div class="overlay" id="modal-resource">
+  <div class="modal">
+    <div class="modal-hd">
+      <span class="modal-hd-title" id="modal-resource-title">مورد جديد</span>
+      <button class="modal-x" id="modal-resource-close">×</button>
+    </div>
+    <div class="modal-bd">
+      <input type="hidden" id="f-res-id">
+      <div class="tabs" id="res-tabs">
+        <button class="tab-btn on" data-tab="res-ar">عربي 🇸🇦</button>
+        <button class="tab-btn" data-tab="res-en">English 🇬🇧</button>
+        <button class="tab-btn" data-tab="res-details">تفاصيل</button>
+        <button class="tab-btn" data-tab="res-meta">إعدادات</button>
+      </div>
+
+      <!-- TAB: Arabic -->
+      <div class="tc on" id="res-ar">
+        <div class="fg"><label class="fl">العنوان (عربي)</label><input id="f-res-ta" class="fi" dir="rtl" placeholder="عنوان المورد بالعربية"></div>
+        <div class="fg"><label class="fl">وصف مختصر (عربي)</label><textarea id="f-res-sda" class="fi" rows="2" dir="rtl" placeholder="جملة أو جملتان..."></textarea></div>
+        <div class="fg"><label class="fl">الوصف الكامل (عربي)</label><textarea id="f-res-da" class="fi" rows="4" dir="rtl"></textarea></div>
+        <div class="fg"><label class="fl">ملخص باجو زون (سطر لكل نقطة)</label>
+          <textarea id="f-res-summary" class="fi" rows="4" dir="rtl" placeholder="يشرح ظاهرة...&#10;يقدم حلاً عملياً...&#10;مبني على بيانات..."></textarea>
+        </div>
+        <div class="fg"><label class="fl">لماذا يهم هذا المورد؟ (سطر لكل نقطة)</label>
+          <textarea id="f-res-why" class="fi" rows="3" dir="rtl" placeholder="مصدر موثوق من...&#10;يساعد على توحيد..."></textarea>
+        </div>
+      </div>
+
+      <!-- TAB: English -->
+      <div class="tc" id="res-en">
+        <div class="fg"><label class="fl">Title (English)</label><input id="f-res-te" class="fi" dir="ltr" placeholder="Resource title in English"></div>
+        <div class="fg"><label class="fl">Short Description (English)</label><textarea id="f-res-sde" class="fi" rows="2" dir="ltr"></textarea></div>
+        <div class="fg"><label class="fl">Full Description (English)</label><textarea id="f-res-de" class="fi" rows="4" dir="ltr"></textarea></div>
+      </div>
+
+      <!-- TAB: Details -->
+      <div class="tc" id="res-details">
+        <div class="fg"><label class="fl">الجمهور المستهدف</label>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 0;">
+            ${[['coach','مدرب'],['scout','كشاف'],['player','لاعب'],['parent','ولي أمر'],['club','نادٍ'],['researcher','باحث'],['fan','مهتم']].map(([v,l])=>`
+            <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:.82rem;color:var(--warm-mid);">
+              <input type="checkbox" class="res-audience" value="${v}"> ${l}
+            </label>`).join('')}
+          </div>
+        </div>
+        <div class="fg"><label class="fl">المجال</label>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 0;">
+            ${[['talent_identification','اكتشاف المواهب'],['player_development','تطوير اللاعبين'],['coaching','التدريب'],['analysis','التحليل'],['physical','الإعداد البدني'],['nutrition','التغذية'],['sports_psychology','علم النفس الرياضي'],['management','الإدارة الرياضية'],['parent','ولي الأمر'],['other','أخرى']].map(([v,l])=>`
+            <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:.82rem;color:var(--warm-mid);">
+              <input type="checkbox" class="res-field" value="${v}"> ${l}
+            </label>`).join('')}
+          </div>
+        </div>
+        <div class="fg"><label class="fl">الكلمات المفتاحية (tags) — افصل بفاصلة</label>
+          <input id="f-res-tags" class="fi" dir="ltr" placeholder="FIFA, talent, LTAD, youth">
+        </div>
+      </div>
+
+      <!-- TAB: Settings -->
+      <div class="tc" id="res-meta">
+        <div class="fr">
+          <div class="fg"><label class="fl">نوع المورد</label>
+            <select id="f-res-type" class="fi" onchange="toggleResDocSubtype()">
+              <option value="scientific_study">دراسة علمية</option>
+              <option value="official_document">وثيقة رسمية</option>
+              <option value="practical_guide">دليل عملي</option>
+              <option value="template">نموذج</option>
+            </select>
+          </div>
+          <div class="fg"><label class="fl">اللغة</label>
+            <select id="f-res-lang" class="fi">
+              <option value="ar">عربي</option>
+              <option value="en">English</option>
+              <option value="de">Deutsch</option>
+              <option value="es">Español</option>
+              <option value="other">أخرى</option>
+            </select>
+          </div>
+        </div>
+        <div class="fg" id="res-subtype-wrap" style="display:none;">
+          <label class="fl">نوع الوثيقة الرسمية</label>
+          <select id="f-res-subtype" class="fi">
+            <option value="">-- اختر --</option>
+            <option value="official_report">تقرير رسمي</option>
+            <option value="strategic_plan">خطة استراتيجية</option>
+            <option value="development_program">برنامج تطوير</option>
+            <option value="regulation">لائحة</option>
+            <option value="guideline">دليل إرشادي</option>
+            <option value="presentation">عرض تعريفي</option>
+            <option value="official_stats">إحصائية رسمية</option>
+            <option value="business_model">نموذج عمل</option>
+          </select>
+        </div>
+        <div class="fr">
+          <div class="fg"><label class="fl">نوع الوصول</label>
+            <select id="f-res-access" class="fi">
+              <option value="direct_download">تحميل مباشر</option>
+              <option value="external_link">رابط خارجي</option>
+              <option value="source_only">المصدر فقط</option>
+            </select>
+          </div>
+          <div class="fg"><label class="fl">حقوق الاستخدام</label>
+            <select id="f-res-rights" class="fi">
+              <option value="free">مجاني</option>
+              <option value="creative_commons">Creative Commons</option>
+              <option value="official_publication">نشر رسمي</option>
+              <option value="permission_required">يتطلب إذناً</option>
+              <option value="source_link_only">ذكر المصدر فقط</option>
+            </select>
+          </div>
+        </div>
+        <div class="fr">
+          <div class="fg"><label class="fl">Slug (URL)</label><input id="f-res-slug" class="fi" dir="ltr" placeholder="resource-slug"></div>
+        </div>
+        <div class="fr">
+          <div class="fg"><label class="fl">المؤلف / الجهة</label><input id="f-res-author" class="fi" dir="rtl" placeholder="FIFA / اسم المؤلف"></div>
+          <div class="fg"><label class="fl">الناشر</label><input id="f-res-pub" class="fi" dir="rtl"></div>
+        </div>
+        <div class="fr">
+          <div class="fg"><label class="fl">سنة النشر</label><input id="f-res-year" class="fi" type="number" placeholder="2024" min="1900" max="2099"></div>
+          <div class="fg"><label class="fl">الصفحات</label><input id="f-res-pages" class="fi" type="number" placeholder="80" min="0"></div>
+          <div class="fg"><label class="fl">حجم الملف</label><input id="f-res-size" class="fi" dir="ltr" placeholder="3.2 MB"></div>
+        </div>
+        <div class="fg"><label class="fl">رابط المصدر الأصلي</label><input id="f-res-src" class="fi" dir="ltr" placeholder="https://..."></div>
+        <div class="fg"><label class="fl">رابط التحميل</label><input id="f-res-dl" class="fi" dir="ltr" placeholder="https://... أو اتركه فارغاً"></div>
+        <div class="fg"><label class="fl">صورة الغلاف</label>
+          <div class="upzone"><input type="file" id="res-cover-file" accept="image/*"><div class="upzone-txt">📁 انقر لرفع صورة الغلاف</div></div>
+          <input type="hidden" id="f-res-cover">
+          <img id="res-cover-prev" class="up-prev">
+        </div>
+        <div class="fr" style="gap:24px;margin-top:8px;">
+          <div class="fg" style="flex:none;">
+            <label class="fl">مورد مميز</label>
+            <div class="tog-wrap"><label class="tog"><input type="checkbox" id="f-res-featured"><span class="tog-sl"></span></label></div>
+          </div>
+          <div class="fg" style="flex:none;">
+            <label class="fl">منشور</label>
+            <div class="tog-wrap"><label class="tog"><input type="checkbox" id="f-res-published" checked><span class="tog-sl"></span></label></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" id="modal-resource-cancel" style="padding:9px 22px;">إلغاء</button>
+      <button class="btn btn-fill" id="modal-resource-save" style="padding:9px 30px;">حفظ المورد ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ CONFIRM DELETE MODAL ═══════ -->
+<div class="overlay" id="modal-del">
+  <div class="modal sm">
+    <div class="modal-hd">
+      <span class="modal-hd-title">تأكيد الحذف</span>
+      <button class="modal-x" id="modal-del-close">×</button>
+    </div>
+    <div class="modal-bd">
+      <p style="color:var(--off-white);margin-bottom:8px;">هل أنت متأكد من حذف هذا العنصر؟</p>
+      <p style="color:#ff6b6b;font-size:.84rem;">لا يمكن التراجع عن هذا الإجراء.</p>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" id="modal-del-cancel" style="padding:9px 22px;">إلغاء</button>
+      <button class="btn btn-fill" id="modal-del-confirm" style="padding:9px 30px;background:#ff6b6b;color:#fff;">حذف نهائياً</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   BajoZone Admin Panel — Clean rewrite, no name conflicts
+   ============================================================ */
+'use strict';
+
+// ── DB ────────────────────────────────────────
+let DB = null;
+const LS_KEY = 'bz_db_v8';
+let currentSection = 'overview';
+let pendingDeleteFn = null;
+
+async function dbLoad() {
+  const saved = localStorage.getItem(LS_KEY);
+  if (saved) {
+    try { DB = JSON.parse(saved); } catch(e) { DB = null; }
+  }
+  if (DB) return;
+  try {
+    const res = await fetch('../data/db.json?t=' + Date.now());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    DB = await res.json();
+    localStorage.setItem(LS_KEY, JSON.stringify(DB));
+  } catch (_) {
+    if (!DB) {
+      DB = {
+        settings: { site_name_ar:'باجو زون', site_name_en:'BajoZone', social:{} },
+        programs: [], articles: [], books: [], categories: [], tags: [], resources: [],
+        admin: { username:'bajo', password:'BajoZone2025!' }
+      };
+    }
+  }
+}
+
+function dbSave() {
+  if (!DB) return;
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify(DB));
+  } catch(e) {
+    if (e.name === 'QuotaExceededError' || e.code === 22) {
+      showAdminToast('❌ التخزين ممتلئ! حاول حذف صور قديمة أو تقليل حجم الصورة.', true);
+    } else {
+      showAdminToast('❌ فشل الحفظ: ' + e.message, true);
+    }
+    return;
+  }
+  fetch('../api/save.php', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', 'X-Admin-Token': sessionStorage.getItem('bzt')||'' },
+    body: JSON.stringify(DB)
+  }).catch(() => {});
+  showToast('تم الحفظ بنجاح ✓', 'ok');
+}
+
+// ── Auth ──────────────────────────────────────
+function doLogin() {
+  const u = gv('li-u');
+  const p = gv('li-p');
+  if (u === DB?.admin?.username && p === DB?.admin?.password) {
+    sessionStorage.setItem('bzt', btoa(u + ':' + Date.now()));
+    ge('login-screen').style.display = 'none';
+    ge('dashboard').style.display = 'block';
+    goSection('overview');
+  } else {
+    const err = ge('li-err');
+    err.style.display = 'block';
+    setTimeout(() => err.style.display = 'none', 3000);
+  }
+}
+
+// ── Section Navigation ────────────────────────
+const SECTION_TITLES = {
+  overview:'نظرة عامة', programs:'البرامج', articles:'المواضيع',
+  tags:'التاقات', resources:'المكتبة الرقمية', sabout:'إعرف عني',
+  sgeneral:'الإعدادات العامة', sticker:'الشريط المتحرك', spopup:'البوب أب',
+  ssocial:'وسائل التواصل', ssec:'الأمان'
+};
+
+const SECTION_RENDERERS = {
+  overview: renderOverview, programs: renderAdminPrograms, articles: renderArticles,
+  tags: renderAdminTags,
+  resources: renderAdminResources, sabout: renderSAbout,
+  sgeneral: renderSGeneral, sticker: renderSTicker, spopup: renderSPopup,
+  ssocial: renderSSocial, ssec: renderSSec
+};
+
+function goSection(name) {
+  currentSection = name;
+  ge('pg-title').textContent = SECTION_TITLES[name] || name;
+  // Update active nav button
+  document.querySelectorAll('.a-nav-btn').forEach(b => b.classList.remove('on'));
+  const activeBtn = ge('nav-' + name);
+  if (activeBtn) activeBtn.classList.add('on');
+  // Show/hide add button
+  const addBtn = ge('btn-add');
+  addBtn.style.display = ['programs','articles','tags','resources'].includes(name) ? '' : 'none';
+  // Render section
+  SECTION_RENDERERS[name]?.();
+}
+
+// ── Modals ────────────────────────────────────
+function modalOpen(id) {
+  const el = ge('modal-' + id);
+  if (el) el.classList.add('open');
+}
+
+function modalClose(id) {
+  const el = ge('modal-' + id);
+  if (el) el.classList.remove('open');
+}
+
+// Close modals when clicking backdrop
+document.querySelectorAll('.overlay').forEach(el => {
+  el.addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
+  });
+});
+
+// ── Tabs ──────────────────────────────────────
+function initTabs(containerId) {
+  const container = ge(containerId);
+  if (!container) return;
+  container.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const tabId = this.dataset.tab;
+      // Deactivate all tabs in this container
+      container.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('on'));
+      // Find and deactivate all tc siblings (go up to modal-bd)
+      const modalBd = this.closest('.modal-bd');
+      if (modalBd) modalBd.querySelectorAll('.tc').forEach(t => t.classList.remove('on'));
+      // Activate clicked
+      this.classList.add('on');
+      const pane = ge(tabId);
+      if (pane) pane.classList.add('on');
+    });
+  });
+}
+
+function switchTab(containerId, tabId) {
+  const container = ge(containerId);
+  if (!container) return;
+  container.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.toggle('on', b.dataset.tab === tabId);
+  });
+  const modalBd = container.closest('.modal-bd') || container.parentElement;
+  modalBd.querySelectorAll('.tc').forEach(t => t.classList.remove('on'));
+  const pane = ge(tabId);
+  if (pane) pane.classList.add('on');
+}
+
+// ── Rich Text Editor ──────────────────────────
+function initRTE(barId, editorId) {
+  const bar = ge(barId);
+  const editor = ge(editorId);
+  if (!bar || !editor) return;
+
+  bar.querySelectorAll('.rte-btn').forEach(btn => {
+    btn.addEventListener('mousedown', function(e) {
+      e.preventDefault(); // Don't lose editor focus
+      const ed = ge(this.dataset.ed || editorId);
+      const cmd = this.dataset.cmd;
+      const val = this.dataset.val || null;
+      const action = this.dataset.action;
+
+      if (action === 'link') {
+        const url = prompt('أدخل الرابط:', 'https://');
+        if (url) { ed.focus(); document.execCommand('createLink', false, url); }
+      } else if (action === 'image') {
+        const url = prompt('رابط الصورة (URL):');
+        if (url) { ed.focus(); document.execCommand('insertImage', false, url); }
+      } else if (action === 'video') {
+        const url = prompt('رابط يوتيوب:');
+        if (url) {
+          const m = url.match(/(?:youtu\.be\/|v=)([^&\s]+)/);
+          if (m) {
+            const html = `<iframe width="100%" height="380" src="https://www.youtube.com/embed/${m[1]}" frameborder="0" allowfullscreen style="display:block;margin:12px 0;"></iframe>`;
+            ed.focus(); document.execCommand('insertHTML', false, html);
+          }
+        }
+      } else if (action === 'callout') {
+        const sample = ed.dir === 'rtl'
+          ? 'اكتب هنا الاقتباس أو الإحصائية المهمة...'
+          : 'Write the highlighted quote or statistic here...';
+        const html = `<p>:::callout<br>${sample}<br>:::</p>`;
+        ed.focus();
+        document.execCommand('insertHTML', false, html);
+      } else if (cmd) {
+        ed.focus();
+        document.execCommand(cmd, false, val);
+      }
+    });
+  });
+
+  // Font size select
+  const sizeSelect = bar.querySelector('select[data-action="fontSize"]');
+  if (sizeSelect) {
+    sizeSelect.addEventListener('change', function() {
+      if (!this.value) return;
+      const ed = ge(this.dataset.ed || editorId);
+      ed.focus(); document.execCommand('fontSize', false, this.value);
+      this.value = '';
+    });
+  }
+}
+
+// ── Image Upload ──────────────────────────────
+function compressImage(file, maxW, maxH, quality, cb) {
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+      if (h > maxH) { w = Math.round(w * maxH / h); h = maxH; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      cb(null, canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => cb('فشل قراءة الصورة');
+    img.src = ev.target.result;
+  };
+  reader.onerror = () => cb('فشل قراءة الملف');
+  reader.readAsDataURL(file);
+}
+
+function initUpload(inputId, prevId, hiddenId) {
+  const input = ge(inputId);
+  if (!input) return;
+  input.addEventListener('change', function() {
+    const file = this.files[0];
+    if (!file) return;
+
+    // Show loading state
+    const upzone = input.closest('.upzone');
+    const txt = upzone?.querySelector('.upzone-txt');
+    const origTxt = txt?.textContent || '';
+    if (txt) txt.innerHTML = '<span style="color:#c8a86e;">⏳ جاري معالجة الصورة...</span>';
+    input.disabled = true;
+
+    compressImage(file, 1400, 1400, 0.82, (err, dataUrl) => {
+      input.disabled = false;
+      if (txt) txt.textContent = origTxt;
+
+      if (err) {
+        showAdminToast('خطأ في الصورة: ' + err, true);
+        return;
+      }
+
+      // Check size after compression (~4MB safe limit)
+      if (dataUrl.length > 4 * 1024 * 1024) {
+        showAdminToast('الصورة كبيرة جداً حتى بعد الضغط. جرّب صورة أصغر.', true);
+        return;
+      }
+
+      const prev = ge(prevId);
+      if (prev) { prev.src = dataUrl; prev.style.display = 'block'; }
+      ge(hiddenId).value = dataUrl;
+      if (txt) txt.innerHTML = '<span style="color:#4caf50;">✓ تم تحميل الصورة</span>';
+      setTimeout(() => { if (txt) txt.textContent = origTxt; }, 2500);
+    });
+  });
+}
+
+function showAdminToast(msg, isError = false) {
+  const el = document.createElement('div');
+  el.style.cssText = `position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:${isError?'#c0392b':'#1a1a1a'};color:#fff;padding:12px 28px;font-size:.9rem;z-index:9999;border:1px solid ${isError?'#e74c3c':'rgba(255,255,255,.15)'};font-family:Tajawal,sans-serif;`;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+// ── Sections ──────────────────────────────────
+function getAnalytics() {
+  const raw = localStorage.getItem('bz_analytics_v1');
+  try { return raw ? JSON.parse(raw) : {}; } catch (_) { return {}; }
+}
+function num(v) { return Number(v || 0).toLocaleString('en-US'); }
+function articleShareTotal(analytics, id) {
+  return Object.values(analytics.articleShares?.[id] || {}).reduce((sum, val) => sum + (val || 0), 0);
+}
+function dashRangeDays() {
+  const value = localStorage.getItem('bz_dash_range') || 'all';
+  return value === 'all' ? null : Number(value);
+}
+function filteredEvents(analytics, days = dashRangeDays()) {
+  const events = Array.isArray(analytics.events) ? analytics.events : [];
+  if (!days) return events;
+  const cutoff = Date.now() - (days * 24 * 60 * 60 * 1000);
+  return events.filter(e => {
+    const t = e.at ? new Date(e.at).getTime() : 0;
+    return t && t >= cutoff;
+  });
+}
+function eventCount(events, type) {
+  return events.filter(e => e.type === type).length;
+}
+function eventArticleViews(analytics, events) {
+  if (!events.length) return analytics.articleViews || {};
+  return events.filter(e => e.type === 'article_view' && e.articleId).reduce((acc, e) => {
+    acc[e.articleId] = (acc[e.articleId] || 0) + 1;
+    return acc;
+  }, {});
+}
+function eventArticleShares(analytics, events) {
+  if (!events.length) return analytics.articleShares || {};
+  return events.filter(e => e.type === 'share' && e.articleId).reduce((acc, e) => {
+    if (!acc[e.articleId]) acc[e.articleId] = {};
+    acc[e.articleId][e.channel] = (acc[e.articleId][e.channel] || 0) + 1;
+    return acc;
+  }, {});
+}
+function shareTotalFromMap(map, id) {
+  return Object.values(map?.[id] || {}).reduce((sum, val) => sum + (val || 0), 0);
+}
+function channelCounts(analytics, events) {
+  if (!events.length) return analytics.shareCounts || {};
+  return events.filter(e => e.type === 'share').reduce((acc, e) => {
+    const key = e.channel || 'unknown';
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+}
+function eventBookDownloads(analytics, events) {
+  if (!events.length) return analytics.bookDownloads || {};
+  return events.filter(e => e.type === 'book_download' && e.bookId).reduce((acc, e) => {
+    acc[e.bookId] = (acc[e.bookId] || 0) + 1;
+    return acc;
+  }, {});
+}
+function monthKey(dateValue) {
+  const d = dateValue ? new Date(dateValue) : null;
+  if (!d || Number.isNaN(d.getTime())) return 'غير محدد';
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+function renderOverview() {
+  const analytics = getAnalytics();
+  const range = localStorage.getItem('bz_dash_range') || 'all';
+  const events = filteredEvents(analytics);
+  const viewsMap = eventArticleViews(analytics, events);
+  const sharesMap = eventArticleShares(analytics, events);
+  const bookDownloads = eventBookDownloads(analytics, events);
+  const channels = channelCounts(analytics, events);
+  const articles = DB.articles || [];
+  const books = DB.books || [];
+  const totalShares = Object.values(channels).reduce((sum,val) => sum + (val||0), 0);
+  const periodViews = events.length ? eventCount(events, 'pageview') : (analytics.pageviews || 0);
+  const periodSessions = events.length ? eventCount(events, 'session') : (analytics.sessions || 0);
+  const topRows = articles
+    .map(a => ({ article: a, views: viewsMap?.[a.id] || 0, shares: sharesMap?.[a.id] || {} }))
+    .sort((a,b) => (b.views + shareTotalFromMap(sharesMap, b.article.id)) - (a.views + shareTotalFromMap(sharesMap, a.article.id)))
+    .slice(0, 8);
+  const topFiveViews = articles
+    .map(a => ({ article: a, views: viewsMap?.[a.id] || 0 }))
+    .sort((a,b) => b.views - a.views)
+    .slice(0, 5);
+  const topBookDownloads = books
+    .map(b => ({ book: b, downloads: bookDownloads?.[b.id] || 0 }))
+    .sort((a,b) => b.downloads - a.downloads)
+    .slice(0, 5);
+  const latestArticles = [...articles]
+    .sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0))
+    .slice(0, 6);
+  const monthlyCounts = {};
+  articles.forEach(a => { const key = monthKey(a.date); monthlyCounts[key] = (monthlyCounts[key] || 0) + 1; });
+  const monthBars = Object.entries(monthlyCounts).sort(([a],[b]) => a.localeCompare(b)).slice(-12);
+  const maxMonth = Math.max(1, ...monthBars.map(([,v]) => v));
+  const progCounts = {};
+  articles.forEach(a => {
+    const prog = (DB.programs||[]).find(p => p.id === a.program_id);
+    const name = prog ? (prog.name_ar || prog.name_en) : 'بدون برنامج';
+    progCounts[name] = (progCounts[name] || 0) + 1;
+  });
+  const catRows = Object.entries(progCounts).sort(([,a],[,b]) => b - a);
+
+  // ── Donut chart SVG ──────────────────────────
+  const DONUT_COLORS = ['#c8a86e','#5a9e7a','#6e8ec8','#c86e9e','#9ec86e','#c8905a','#8e6ec8'];
+  const donutTotal = catRows.reduce((s,[,v]) => s + v, 0) || 1;
+  const R = 70, CIRC = +(2 * Math.PI * R).toFixed(2);
+  let cumLen = 0;
+  const donutSegs = catRows.map(([,v], i) => {
+    const segLen = Math.max(0.5, (v / donutTotal) * CIRC - 2);
+    const offset = +(CIRC / 4 - cumLen).toFixed(2);
+    cumLen += (v / donutTotal) * CIRC;
+    return `<circle cx="100" cy="100" r="${R}" fill="none" stroke="${DONUT_COLORS[i % DONUT_COLORS.length]}" stroke-width="30" stroke-dasharray="${segLen.toFixed(2)} ${(CIRC - segLen).toFixed(2)}" stroke-dashoffset="${offset}"/>`;
+  }).join('');
+  const donutLegend = catRows.map(([name, v], i) =>
+    `<div class="donut-legend-item"><span class="donut-dot" style="background:${DONUT_COLORS[i % DONUT_COLORS.length]}"></span><span class="donut-legend-name">${esc(name)}</span><span class="donut-legend-val">${num(v)}</span></div>`
+  ).join('');
+
+  const shareBreakdown = ['instagram','x','whatsapp','facebook','linkedin','copy','pdf']
+    .map(k => `<span class="mini-pill">${k.toUpperCase()} <b>${num(channels?.[k] || 0)}</b></span>`).join('');
+  const bestArticle = topRows[0]?.article;
+  const bestCategory = catRows[0]?.[0] || 'لا يوجد بعد';
+  const strongestChannel = Object.entries(channels).sort(([,a],[,b]) => b - a)[0]?.[0] || 'لا يوجد بعد';
+  const rangeLabel = range === 'all' ? 'كل الوقت' : `آخر ${range} يوم`;
+  ge('main-content').innerHTML = `
+    <div class="dash-hero">
+      <div>
+        <div class="dash-kicker">لوحة القرار</div>
+        <h2>اتجاهات المحتوى والتفاعل</h2>
+        <p>قراءة سريعة لما ينشر، وما يُقرأ، وأين يتفاعل الزوار مع مقالات BajoZone.</p>
+      </div>
+      <div class="dash-range" role="group" aria-label="Dashboard range">
+        ${[['all','كل الوقت'],['7','7 أيام'],['30','30 يوم'],['90','90 يوم']].map(([value,label]) => `
+          <button class="${range === value ? 'on' : ''}" type="button" onclick="setDashRange('${value}')">${label}</button>
+        `).join('')}
+      </div>
+    </div>
+    <div class="stats-row-admin">
+      <div class="stat-box-admin"><div class="stat-box-num">${num(articles.length)}</div><div class="stat-box-lbl">المقالات</div></div>
+      <div class="stat-box-admin"><div class="stat-box-num">${num(books.length)}</div><div class="stat-box-lbl">الكتب</div></div>
+      <div class="stat-box-admin"><div class="stat-box-num">${num(periodSessions)}</div><div class="stat-box-lbl">Sessions / Visits - ${rangeLabel}</div></div>
+      <div class="stat-box-admin"><div class="stat-box-num">${num(periodViews)}</div><div class="stat-box-lbl">Pageviews - ${rangeLabel}</div></div>
+      <div class="stat-box-admin"><div class="stat-box-num">${num(totalShares)}</div><div class="stat-box-lbl">مرات المشاركة</div></div>
+    </div>
+    <div class="dash-insights">
+      <div><span>أقوى مقال</span><strong>${bestArticle ? esc(bestArticle.title_ar || bestArticle.title_en) : 'لا توجد بيانات بعد'}</strong></div>
+      <div><span>أكثر برنامج نشراً</span><strong>${esc(catRows[0]?.[0] || 'لا يوجد بعد')}</strong></div>
+      <div><span>أقوى قناة مشاركة</span><strong>${strongestChannel.toUpperCase()}</strong></div>
+    </div>
+    <div class="dash-grid">
+      <div class="a-card">
+        <div class="a-card-title">المقالات المنشورة حسب الشهر</div>
+        <div class="bar-chart">
+          ${monthBars.length ? monthBars.map(([m,v]) => `
+            <div class="bar-row"><span>${m}</span><div><i style="width:${Math.max(8, (v / maxMonth) * 100)}%"></i></div><b>${num(v)}</b></div>
+          `).join('') : `<div class="dash-empty">لا توجد بيانات نشر حتى الآن</div>`}
+        </div>
+      </div>
+      <div class="a-card">
+        <div class="a-card-title">توزيع المواضيع على البرامج</div>
+        ${catRows.length ? `
+        <div class="donut-wrap">
+          <div class="donut-svg-wrap">
+            <svg viewBox="0 0 200 200" class="donut-svg">
+              <circle cx="100" cy="100" r="70" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="30"/>
+              ${donutSegs}
+              <text x="100" y="96" class="donut-center-num">${num(donutTotal)}</text>
+              <text x="100" y="115" class="donut-center-lbl">موضوع</text>
+            </svg>
+          </div>
+          <div class="donut-legend">${donutLegend}</div>
+        </div>` : `<div class="dash-empty">لا توجد مواضيع حتى الآن</div>`}
+      </div>
+    </div>
+    <div class="a-card">
+      <div class="a-card-title">تفصيل المشاركات حسب المنصة</div>
+      <div class="share-pills">${shareBreakdown}</div>
+    </div>
+    <div class="a-card">
+      <div class="a-card-title">أكثر خمس مقالات مشاهدة</div>
+      <div class="rank-list">
+        ${topFiveViews.length ? topFiveViews.map((row, idx) => `
+          <div class="rank-item">
+            <span class="rank-num">${idx + 1}</span>
+            <div><strong>${esc(row.article.title_ar || row.article.title_en || '—')}</strong><small>${esc(row.article.category_ar || 'غير مصنف')}</small></div>
+            <b>${num(row.views)}</b>
+          </div>
+        `).join('') : `<div class="dash-empty">لا توجد مشاهدات مقالات حتى الآن</div>`}
+      </div>
+    </div>
+    <div class="a-card">
+      <div class="a-card-title">أكثر كتب تحميلاً</div>
+      <div class="rank-list">
+        ${topBookDownloads.length ? topBookDownloads.map((row, idx) => `
+          <div class="rank-item">
+            <span class="rank-num">${idx + 1}</span>
+            <div><strong>${esc(row.book.title_ar || row.book.title_en || '—')}</strong><small>${row.book.available ? 'متاح' : 'قريباً'}</small></div>
+            <b>${num(row.downloads)}</b>
+          </div>
+        `).join('') : `<div class="dash-empty">لا توجد تحميلات كتب حتى الآن</div>`}
+      </div>
+    </div>
+    <div class="a-card">
+      <div class="a-card-title">آخر المقالات المنشورة
+        <button class="ibtn" style="font-size:.72rem;" onclick="goSection('articles')">عرض الكل</button>
+      </div>
+      <table class="a-table">
+        <thead><tr><th>العنوان</th><th>القسم</th><th>تاريخ النشر</th><th>مشاهدات</th><th>مشاركات</th><th></th></tr></thead>
+        <tbody>
+          ${latestArticles.map(a=>`<tr>
+            <td><strong>${esc(a.title_ar||'—')}</strong></td>
+            <td>${esc(a.category_ar||'—')}</td>
+            <td style="font-family:var(--ff-mono);font-size:.75rem;">${a.date||'—'}</td>
+            <td>${num(viewsMap?.[a.id] || 0)}</td>
+            <td>${num(shareTotalFromMap(sharesMap, a.id))}</td>
+            <td><button class="ibtn" data-edit-art="${a.id}">✏</button></td>
+          </tr>`).join('')||`<tr><td colspan="6" style="text-align:center;color:var(--warm-dark);padding:28px;">لا توجد مقالات بعد</td></tr>`}
+        </tbody>
+      </table>
+    </div>
+    <div class="a-card">
+      <div class="a-card-title">أكثر المقالات مشاهدة وتفاعلاً</div>
+      <table class="a-table">
+        <thead><tr><th>المقال</th><th>المشاهدات</th><th>IG</th><th>X</th><th>WA</th><th>FB</th><th>IN</th><th>نسخ</th><th>PDF</th><th>الإجمالي</th></tr></thead>
+        <tbody>
+          ${topRows.length ? topRows.map(row => {
+            const s = row.shares || {};
+            const total = shareTotalFromMap(sharesMap, row.article.id);
+            return `<tr>
+              <td><strong>${esc(row.article.title_ar || '—')}</strong><br><small style="color:var(--warm-dark);">${esc(row.article.category_ar || '')}</small></td>
+              <td>${num(row.views)}</td>
+              <td>${num(s.instagram)}</td>
+              <td>${num(s.x)}</td>
+              <td>${num(s.whatsapp)}</td>
+              <td>${num(s.facebook)}</td>
+              <td>${num(s.linkedin)}</td>
+              <td>${num(s.copy)}</td>
+              <td>${num(s.pdf)}</td>
+              <td><strong>${num(total)}</strong></td>
+            </tr>`;
+          }).join('') : `<tr><td colspan="10" style="text-align:center;color:var(--warm-dark);padding:28px;">لا توجد بيانات تفاعل حتى الآن</td></tr>`}
+        </tbody>
+      </table>
+    </div>
+    `;
+  bindEditBtns();
+}
+
+function setDashRange(value) {
+  localStorage.setItem('bz_dash_range', value);
+  renderOverview();
+}
+
+function renderArticles(opts = {}) {
+  const q       = (opts.q || '').toLowerCase();
+  const progFilter = opts.prog || '';
+  const statusFilter = opts.status || '';
+  let arts = (DB.articles || []).filter(a => {
+    if (q && !((a.title_ar||'') + (a.title_en||'')).toLowerCase().includes(q)) return false;
+    if (progFilter && a.program_id !== progFilter) return false;
+    if (statusFilter === 'published' && a.is_published === false) return false;
+    if (statusFilter === 'draft' && a.is_published !== false) return false;
+    return true;
+  });
+  const progOpts = (DB.programs||[]).sort((a,b)=>(a.sort_order||99)-(b.sort_order||99))
+    .map(p=>`<option value="${p.id}" ${progFilter===p.id?'selected':''}>${esc(p.name_ar)}</option>`).join('');
+
+  ge('main-content').innerHTML = `
+    <div class="a-card">
+      <div class="a-card-title">المواضيع (${arts.length} / ${DB.articles?.length||0})</div>
+      <div class="fr" style="gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+        <input id="art-search" class="fi" style="flex:1;min-width:160px;" placeholder="🔍 بحث في العنوان..." value="${esc(opts.q||'')}">
+        <select id="art-prog-filter" class="fi" style="min-width:140px;width:auto;">
+          <option value="">كل البرامج</option>${progOpts}
+        </select>
+        <select id="art-status-filter" class="fi" style="width:auto;">
+          <option value="" ${!statusFilter?'selected':''}>كل الحالات</option>
+          <option value="published" ${statusFilter==='published'?'selected':''}>منشور فقط</option>
+          <option value="draft" ${statusFilter==='draft'?'selected':''}>مسودة فقط</option>
+        </select>
+      </div>
+      <table class="a-table">
+        <thead><tr><th>العنوان</th><th>البرنامج</th><th>التاريخ</th><th>الحالة</th><th>مميز</th><th>إجراءات</th></tr></thead>
+        <tbody>
+          ${arts.map(a=>{
+            const prog = (DB.programs||[]).find(p=>p.id===a.program_id);
+            return `<tr>
+              <td>
+                <strong>${esc(a.title_ar||'—')}</strong>
+                <br><small style="color:var(--warm-dark);font-size:.75rem;">${esc(a.title_en||'')}</small>
+              </td>
+              <td>${prog ? esc(prog.name_ar) : '<span style="color:var(--warm-dark)">—</span>'}</td>
+              <td style="font-family:var(--ff-mono);font-size:.75rem;">${a.date||'—'}</td>
+              <td><span class="badge ${a.is_published!==false?'g':'d'}">${a.is_published!==false?'منشور':'مسودة'}</span></td>
+              <td><span class="badge ${a.featured?'g':'d'}">${a.featured?'★ مميز':'—'}</span></td>
+              <td>
+                <div class="actions">
+                  <button class="ibtn" data-edit-art="${a.id}">✏ تعديل</button>
+                  <button class="ibtn red" data-del-art="${a.id}">🗑</button>
+                </div>
+              </td>
+            </tr>`;
+          }).join('')||`<tr><td colspan="6" style="text-align:center;color:var(--warm-dark);padding:32px;">لا توجد مواضيع مطابقة</td></tr>`}
+        </tbody>
+      </table>
+    </div>`;
+
+  const getOpts = () => ({
+    q: ge('art-search').value,
+    prog: ge('art-prog-filter').value,
+    status: ge('art-status-filter').value
+  });
+  ge('art-search').addEventListener('input', () => renderArticles(getOpts()));
+  ge('art-prog-filter').addEventListener('change', () => renderArticles(getOpts()));
+  ge('art-status-filter').addEventListener('change', () => renderArticles(getOpts()));
+  bindEditBtns();
+}
+
+// ── Resources Admin ───────────────────────────
+const RES_TYPE_LABELS = {
+  scientific_study: 'دراسة علمية',
+  official_document: 'وثيقة رسمية',
+  practical_guide: 'دليل عملي',
+  template: 'نموذج'
+};
+const RES_ACCESS_LABELS = {
+  direct_download: 'تحميل مباشر',
+  external_link: 'رابط خارجي',
+  source_only: 'مصدر فقط',
+  free: 'مجاني'
+};
+
+window.toggleResDocSubtype = function() {
+  const type = ge('f-res-type')?.value;
+  const wrap = ge('res-subtype-wrap');
+  if (wrap) wrap.style.display = type === 'official_document' ? '' : 'none';
+};
+
+function renderAdminResources(opts = {}) {
+  const q = (opts.q || '').toLowerCase();
+  const typeFilter = opts.type || '';
+  let resources = (DB.resources || []).filter(r => {
+    if (q && !((r.title_ar||'') + (r.title_en||'')).toLowerCase().includes(q)) return false;
+    if (typeFilter && r.type !== typeFilter) return false;
+    return true;
+  });
+  const typeOpts = Object.entries(RES_TYPE_LABELS)
+    .map(([v,l]) => `<option value="${v}" ${typeFilter===v?'selected':''}>${l}</option>`).join('');
+
+  ge('main-content').innerHTML = `
+    <div class="a-card">
+      <div class="a-card-title">المكتبة الرقمية (${resources.length} / ${DB.resources?.length||0})</div>
+      <div class="fr" style="gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+        <input id="res-search" class="fi" style="flex:1;min-width:160px;" placeholder="🔍 بحث في العنوان..." value="${esc(opts.q||'')}">
+        <select id="res-type-filter" class="fi" style="width:auto;">
+          <option value="">كل الأنواع</option>${typeOpts}
+        </select>
+      </div>
+      <table class="a-table">
+        <thead><tr><th>العنوان</th><th>النوع</th><th>الجهة</th><th>السنة</th><th>اللغة</th><th>الوصول</th><th>مميز</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+        <tbody>
+          ${resources.map(r => `<tr>
+            <td>
+              <strong>${esc(r.title_ar || '—')}</strong>
+              <br><small style="color:var(--warm-dark);font-size:.75rem;">${esc(r.title_en || '')}</small>
+            </td>
+            <td><span class="badge g" style="font-size:.7rem;">${esc(RES_TYPE_LABELS[r.type] || r.type || '—')}</span></td>
+            <td style="font-size:.78rem;">${esc(r.author_or_org || '—')}</td>
+            <td style="font-family:var(--ff-mono);font-size:.75rem;">${r.publication_year || '—'}</td>
+            <td style="font-size:.75rem;">${esc(r.language || '—')}</td>
+            <td style="font-size:.72rem;">${esc(RES_ACCESS_LABELS[r.access_type] || r.access_type || '—')}</td>
+            <td style="text-align:center;">${r.is_featured ? '<span style="color:var(--gold)">★</span>' : '—'}</td>
+            <td><span class="badge ${r.is_published !== false ? 'g' : 'd'}">${r.is_published !== false ? 'منشور' : 'مسودة'}</span></td>
+            <td>
+              <div class="actions">
+                <button class="ibtn" data-edit-res="${r.id}">✏ تعديل</button>
+                <button class="ibtn red" data-del-res="${r.id}">🗑</button>
+              </div>
+            </td>
+          </tr>`).join('') || `<tr><td colspan="9" style="text-align:center;color:var(--warm-dark);padding:32px;">لا توجد موارد مطابقة</td></tr>`}
+        </tbody>
+      </table>
+    </div>`;
+
+  const getOpts = () => ({ q: ge('res-search').value, type: ge('res-type-filter').value });
+  ge('res-search').addEventListener('input', () => renderAdminResources(getOpts()));
+  ge('res-type-filter').addEventListener('change', () => renderAdminResources(getOpts()));
+  bindEditBtns();
+}
+
+function _setCheckboxGroup(selector, values) {
+  document.querySelectorAll(selector).forEach(cb => {
+    cb.checked = Array.isArray(values) && values.includes(cb.value);
+  });
+}
+function _getCheckboxGroup(selector) {
+  return Array.from(document.querySelectorAll(selector))
+    .filter(cb => cb.checked).map(cb => cb.value);
+}
+
+function openResourceModal(res) {
+  ge('modal-resource-title').textContent = res ? 'تعديل مورد' : 'إضافة مورد جديد';
+  ge('f-res-id').value            = res?.id || '';
+  ge('f-res-ta').value            = res?.title_ar || '';
+  ge('f-res-te').value            = res?.title_en || '';
+  ge('f-res-sda').value           = res?.short_description_ar || '';
+  ge('f-res-sde').value           = res?.short_description_en || '';
+  ge('f-res-da').value            = res?.full_description_ar || '';
+  ge('f-res-de').value            = res?.full_description_en || '';
+  ge('f-res-summary').value       = Array.isArray(res?.bajo_summary_ar) ? res.bajo_summary_ar.join('\n') : (res?.bajo_summary_ar || '');
+  ge('f-res-why').value           = Array.isArray(res?.why_it_matters_ar) ? res.why_it_matters_ar.join('\n') : (res?.why_it_matters_ar || '');
+  ge('f-res-tags').value          = Array.isArray(res?.tags) ? res.tags.join(', ') : (res?.tags || '');
+  ge('f-res-type').value          = res?.type || 'scientific_study';
+  ge('f-res-access').value        = res?.access_type || 'external_link';
+  ge('f-res-rights').value        = res?.rights || 'free';
+  ge('f-res-subtype').value       = res?.document_subtype || '';
+  ge('f-res-slug').value          = res?.slug || '';
+  ge('f-res-lang').value          = res?.language || 'en';
+  ge('f-res-author').value        = res?.author_or_org || '';
+  ge('f-res-pub').value           = res?.publisher || '';
+  ge('f-res-year').value          = res?.publication_year || '';
+  ge('f-res-pages').value         = res?.pages || '';
+  ge('f-res-size').value          = res?.file_size || '';
+  ge('f-res-src').value           = res?.source_url || '';
+  ge('f-res-dl').value            = res?.download_url || '';
+  ge('f-res-cover').value         = res?.cover_image || '';
+  ge('f-res-featured').checked    = !!res?.is_featured;
+  ge('f-res-published').checked   = res?.is_published !== false;
+  _setCheckboxGroup('.res-audience', res?.target_audience || []);
+  _setCheckboxGroup('.res-field',    res?.field || []);
+  const prev = ge('res-cover-prev');
+  if (res?.cover_image) { prev.src = res.cover_image.startsWith('data:') ? res.cover_image : '../' + res.cover_image; prev.style.display = 'block'; }
+  else prev.style.display = 'none';
+  toggleResDocSubtype();
+  switchTab('res-tabs', 'res-ar');
+  modalOpen('resource');
+}
+
+function saveResourceAdmin() {
+  const id   = ge('f-res-id').value;
+  const today = new Date().toISOString().split('T')[0];
+  const splitLines = v => v.trim().split('\n').map(s=>s.trim()).filter(Boolean);
+  const res = {
+    id:                   id || String(Date.now()),
+    title_ar:             gv('f-res-ta'),
+    title_en:             gv('f-res-te'),
+    short_description_ar: ge('f-res-sda').value.trim(),
+    short_description_en: ge('f-res-sde').value.trim(),
+    full_description_ar:  ge('f-res-da').value.trim(),
+    full_description_en:  ge('f-res-de').value.trim(),
+    bajo_summary_ar:      splitLines(ge('f-res-summary').value),
+    why_it_matters_ar:    splitLines(ge('f-res-why').value),
+    tags:                 ge('f-res-tags').value.split(',').map(t=>t.trim()).filter(Boolean),
+    type:                 ge('f-res-type').value,
+    document_subtype:     ge('f-res-type').value === 'official_document' ? ge('f-res-subtype').value : null,
+    access_type:          ge('f-res-access').value,
+    rights:               ge('f-res-rights').value,
+    slug:                 gv('f-res-slug') || slugify(gv('f-res-te') || gv('f-res-ta')),
+    language:             ge('f-res-lang').value,
+    author_or_org:        gv('f-res-author'),
+    publisher:            gv('f-res-pub'),
+    publication_year:     ge('f-res-year').value ? parseInt(ge('f-res-year').value) : null,
+    pages:                ge('f-res-pages').value ? parseInt(ge('f-res-pages').value) : null,
+    file_size:            gv('f-res-size'),
+    source_url:           gv('f-res-src'),
+    download_url:         gv('f-res-dl') || null,
+    cover_image:          gv('f-res-cover'),
+    target_audience:      _getCheckboxGroup('.res-audience'),
+    field:                _getCheckboxGroup('.res-field'),
+    is_featured:          ge('f-res-featured').checked,
+    is_published:         ge('f-res-published').checked,
+    updated_at:           today,
+    created_at:           id ? (DB.resources?.find(r=>r.id===id)?.created_at || today) : today
+  };
+  if (!DB.resources) DB.resources = [];
+  if (id) {
+    const idx = DB.resources.findIndex(r => r.id === id);
+    if (idx > -1) DB.resources[idx] = res; else DB.resources.unshift(res);
+  } else {
+    DB.resources.unshift(res);
+  }
+  dbSave();
+  modalClose('resource');
+  if (currentSection === 'resources') renderAdminResources();
+}
+
+function renderSGeneral() {
+  const s = DB.settings || {};
+  ge('main-content').innerHTML = `
+    <div class="a-card">
+      <div class="a-card-title">معلومات الموقع</div>
+      <div class="fr">
+        <div class="fg"><label class="fl">اسم الموقع (عربي)</label><input id="sg-na" class="fi" value="${esc(s.site_name_ar||'')}" dir="rtl"></div>
+        <div class="fg"><label class="fl">Site Name (English)</label><input id="sg-ne" class="fi" value="${esc(s.site_name_en||'')}" dir="ltr"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label class="fl">الشعار التعريفي (عربي)</label><input id="sg-ta" class="fi" value="${esc(s.tagline_ar||'')}" dir="rtl"></div>
+        <div class="fg"><label class="fl">Tagline (English)</label><input id="sg-te" class="fi" value="${esc(s.tagline_en||'')}" dir="ltr"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label class="fl">نبذة إعرف عني (عربي)</label><textarea id="sg-aa" class="fi" rows="4" dir="rtl">${esc(s.about_ar||'')}</textarea></div>
+        <div class="fg"><label class="fl">About Bajo (English)</label><textarea id="sg-ae" class="fi" rows="4" dir="ltr">${esc(s.about_en||'')}</textarea></div>
+      </div>
+    </div>
+    <div class="a-card">
+      <div class="a-card-title">الصور والهوية البصرية</div>
+      <div class="fr">
+        <div class="fg">
+          <label class="fl">شعار الموقع (Logo)</label>
+          <div class="upzone"><input type="file" id="sg-logo-file" accept="image/*"><div class="upzone-txt">📁 انقر لرفع الشعار</div></div>
+          <input type="hidden" id="sg-logo-val" value="${esc(s.logo||'')}">
+          <img id="sg-logo-prev" class="up-prev" ${s.logo?`src="../${s.logo}" style="display:block;"`:''}>
+        </div>
+        <div class="fg">
+          <label class="fl">صورة إعرف عني</label>
+          <div class="upzone"><input type="file" id="sg-abt-file" accept="image/*"><div class="upzone-txt">📁 انقر لرفع الصورة</div></div>
+          <input type="hidden" id="sg-abt-val" value="${esc(s.about_image||'')}">
+          <img id="sg-abt-prev" class="up-prev" ${s.about_image?`src="../${s.about_image}" style="display:block;"`:''}>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-fill" id="btn-save-sgeneral" style="padding:11px 36px;">حفظ الإعدادات ✓</button>`;
+
+  initUpload('sg-logo-file', 'sg-logo-prev', 'sg-logo-val');
+  initUpload('sg-abt-file', 'sg-abt-prev', 'sg-abt-val');
+
+  ge('btn-save-sgeneral').addEventListener('click', () => {
+    if (!DB.settings) DB.settings = {};
+    DB.settings.site_name_ar = gv('sg-na');
+    DB.settings.site_name_en = gv('sg-ne');
+    DB.settings.tagline_ar   = gv('sg-ta');
+    DB.settings.tagline_en   = gv('sg-te');
+    DB.settings.about_ar     = gv('sg-aa');
+    DB.settings.about_en     = gv('sg-ae');
+    const lv = gv('sg-logo-val'); if (lv) DB.settings.logo = lv;
+    const av = gv('sg-abt-val'); if (av) DB.settings.about_image = av;
+    dbSave();
+  });
+}
+
+const SOCIALS = [
+  {key:'whatsapp', icon:'💬', lbl:'واتساب',            ph:'+966 5XX XXX XXXX'},
+  {key:'email',    icon:'✉️', lbl:'البريد الإلكتروني', ph:'your@email.com'},
+  {key:'phone',    icon:'📞', lbl:'هاتف',              ph:'+966 5XX XXX XXXX'},
+  {key:'snapchat', icon:'👻', lbl:'سناب شات',          ph:'username'},
+  {key:'tiktok',   icon:'🎵', lbl:'تيك توك',           ph:'@username'},
+  {key:'facebook', icon:'📘', lbl:'فيسبوك',            ph:'page url or username'},
+  {key:'instagram',icon:'📷', lbl:'إنستقرام',          ph:'@username'},
+  {key:'twitter',  icon:'🐦', lbl:'تويتر / X',         ph:'@username'},
+];
+
+function renderSSocial() {
+  const s = DB.settings?.social || {};
+  ge('main-content').innerHTML = `
+    <div class="a-card">
+      <div class="a-card-title">قنوات التواصل الاجتماعي</div>
+      <p style="color:var(--warm-mid);font-size:.84rem;margin-bottom:20px;">فعّل القنوات المطلوبة وأدخل بياناتها. المُفعَّلة فقط ستظهر في الموقع.</p>
+      ${SOCIALS.map(sc=>`
+        <div class="social-row">
+          <div class="social-icon-box">${sc.icon}</div>
+          <div class="social-row-name">${sc.lbl}</div>
+          <input type="text" class="fi" id="sc-${sc.key}" value="${esc(s[sc.key]?.value||'')}" placeholder="${sc.ph}" dir="ltr">
+          <label class="tog">
+            <input type="checkbox" id="sc-vis-${sc.key}" ${s[sc.key]?.visible?'checked':''}>
+            <span class="tog-sl"></span>
+          </label>
+          <span class="tog-lbl" id="sc-lbl-${sc.key}" style="font-size:.75rem;color:var(--warm-dark);width:36px;">${s[sc.key]?.visible?'ظاهر':'مخفي'}</span>
+        </div>`).join('')}
+      <div style="margin-top:20px;">
+        <button class="btn btn-fill" id="btn-save-ssocial" style="padding:11px 36px;">حفظ ✓</button>
+      </div>
+    </div>`;
+
+  SOCIALS.forEach(sc => {
+    const vis = ge(`sc-vis-${sc.key}`);
+    const lbl = ge(`sc-lbl-${sc.key}`);
+    if (vis && lbl) {
+      vis.addEventListener('change', () => { lbl.textContent = vis.checked ? 'ظاهر' : 'مخفي'; });
+    }
+  });
+
+  ge('btn-save-ssocial').addEventListener('click', () => {
+    if (!DB.settings) DB.settings = {};
+    if (!DB.settings.social) DB.settings.social = {};
+    SOCIALS.forEach(sc => {
+      DB.settings.social[sc.key] = {
+        value: gv(`sc-${sc.key}`),
+        visible: ge(`sc-vis-${sc.key}`)?.checked || false
+      };
+    });
+    dbSave();
+  });
+}
+
+function renderSSec() {
+  ge('main-content').innerHTML = `
+    <div class="a-card" style="max-width:480px;">
+      <div class="a-card-title">تغيير بيانات الدخول</div>
+      <div class="fg"><label class="fl">اسم المستخدم الجديد</label><input id="sec-u" class="fi" value="${esc(DB.admin?.username||'')}"></div>
+      <div class="fg"><label class="fl">كلمة المرور الحالية</label><input type="password" id="sec-op" class="fi"></div>
+      <div class="fg"><label class="fl">كلمة المرور الجديدة</label><input type="password" id="sec-np" class="fi"></div>
+      <div class="fg"><label class="fl">تأكيد كلمة المرور</label><input type="password" id="sec-cp" class="fi"></div>
+      <p id="sec-err" style="display:none;color:#ff6b6b;font-size:.82rem;margin-bottom:12px;"></p>
+      <button class="btn btn-fill" id="btn-save-sec" style="padding:11px 32px;">حفظ التغييرات ✓</button>
+    </div>`;
+
+  ge('btn-save-sec').addEventListener('click', () => {
+    const op = gv('sec-op'), np = gv('sec-np'), cp = gv('sec-cp');
+    const errEl = ge('sec-err');
+    if (op !== DB.admin.password) {
+      errEl.textContent = 'كلمة المرور الحالية غير صحيحة'; errEl.style.display = 'block'; return;
+    }
+    if (np && np !== cp) {
+      errEl.textContent = 'كلمات المرور الجديدة غير متطابقة'; errEl.style.display = 'block'; return;
+    }
+    errEl.style.display = 'none';
+    DB.admin.username = gv('sec-u') || DB.admin.username;
+    if (np) DB.admin.password = np;
+    dbSave();
+  });
+}
+
+// ── Article Modal ─────────────────────────────
+function openArticleModal(article) {
+  const isNew = !article;
+  ge('modal-article-title').textContent = isNew ? 'إضافة موضوع جديد' : 'تعديل موضوع';
+  ge('f-art-id').value        = article?.id || '';
+  ge('f-art-title-ar').value  = article?.title_ar || '';
+  ge('f-art-title-en').value  = article?.title_en || '';
+  ge('f-art-exc-ar').value    = article?.excerpt_ar || '';
+  ge('f-art-exc-en').value    = article?.excerpt_en || '';
+  ge('rte-ar').innerHTML      = article?.content_ar || '';
+  ge('rte-en').innerHTML      = article?.content_en || '';
+  ge('f-art-date').value       = article?.date || new Date().toISOString().split('T')[0];
+  ge('f-art-published').value  = String(article?.is_published !== false);
+  ge('f-art-featured').value   = String(article?.featured || 'false');
+  ge('f-art-readtime').value   = article?.read_time || '';
+  ge('f-art-image').value     = article?.image || '';
+  ge('f-art-youtube').value   = article?.youtube_url || '';
+  ge('f-art-videourl').value  = article?.video_url || '';
+
+  // Populate program select
+  const progSel = ge('f-art-program');
+  progSel.innerHTML = '<option value="">-- بدون برنامج --</option>' +
+    (DB.programs||[]).filter(p=>p.is_active!==false).sort((a,b)=>(a.sort_order||99)-(b.sort_order||99))
+      .map(p=>`<option value="${p.id}" ${article?.program_id===p.id?'selected':''}>${esc(p.name_ar)}</option>`).join('');
+
+  // Tags
+  const currentTags = Array.isArray(article?.tags) ? [...article.tags] : [];
+  ge('f-art-tags-val').value = JSON.stringify(currentTags);
+  refreshTagChips();
+  initTagInput();
+
+  // Sources
+  const sources = Array.isArray(article?.sources) ? article.sources : [];
+  ge('f-art-sources-list').innerHTML = '';
+  sources.forEach(s => appendSourceRow(s));
+
+  // Image preview
+  const prev = ge('art-img-prev');
+  if (article?.image) { prev.src = article.image.startsWith('data:') ? article.image : '../' + article.image; prev.style.display = 'block'; }
+  else prev.style.display = 'none';
+
+  switchTab('art-tabs', 'art-ar');
+  modalOpen('article');
+}
+
+function saveArticle() {
+  const saveBtn = ge('modal-article-save');
+  const origLabel = saveBtn?.textContent || 'حفظ الموضوع ✓';
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '⏳ جاري الحفظ...'; }
+
+  const id = ge('f-art-id').value;
+  let tags = [];
+  try { tags = JSON.parse(ge('f-art-tags-val').value || '[]'); } catch(_) {}
+  const sources = collectSources();
+  const article = {
+    id:          id || String(Date.now()),
+    title_ar:    gv('f-art-title-ar'),
+    title_en:    gv('f-art-title-en'),
+    excerpt_ar:  gv('f-art-exc-ar'),
+    excerpt_en:  gv('f-art-exc-en'),
+    content_ar:  ge('rte-ar').innerHTML,
+    content_en:  ge('rte-en').innerHTML,
+    program_id:  gv('f-art-program'),
+    date:        gv('f-art-date'),
+    is_published: ge('f-art-published').value === 'true',
+    featured:    gv('f-art-featured') === 'true',
+    read_time:   ge('f-art-readtime').value ? parseInt(ge('f-art-readtime').value) : null,
+    image:       gv('f-art-image'),
+    youtube_url: gv('f-art-youtube'),
+    video_url:   gv('f-art-videourl'),
+    tags,
+    sources,
+    slug:        slugify(gv('f-art-title-en') || gv('f-art-title-ar'))
+  };
+  if (!DB.articles) DB.articles = [];
+  if (id) {
+    const idx = DB.articles.findIndex(a => a.id === id);
+    if (idx > -1) DB.articles[idx] = article; else DB.articles.unshift(article);
+  } else {
+    DB.articles.unshift(article);
+  }
+
+  // Check approximate size before saving
+  const dbSize = JSON.stringify(DB).length;
+  if (dbSize > 4.5 * 1024 * 1024) {
+    showAdminToast('⚠️ تحذير: البيانات كبيرة جداً (' + (dbSize / 1024 / 1024).toFixed(1) + 'MB). جرّب حذف صور قديمة.', true);
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = origLabel; }
+    return;
+  }
+
+  dbSave();
+  if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = origLabel; }
+  modalClose('article');
+  if (currentSection === 'articles') renderArticles();
+  else if (currentSection === 'overview') renderOverview();
+}
+
+// ── Programs Admin ────────────────────────────
+function renderAdminPrograms() {
+  const progs = DB.programs || [];
+  ge('main-content').innerHTML = `
+    <div class="a-card">
+      <div class="a-card-title">البرامج (${progs.length})</div>
+      <table class="a-table">
+        <thead><tr><th>البرنامج</th><th>Slug</th><th>المواضيع</th><th>الترتيب</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+        <tbody>
+          ${progs.sort((a,b)=>(a.sort_order||99)-(b.sort_order||99)).map(p => {
+            const count = (DB.articles||[]).filter(a=>a.program_id===p.id).length;
+            return `<tr>
+              <td>
+                ${p.logo_url ? `<img src="${p.logo_url.startsWith('data:') ? p.logo_url : '../' + p.logo_url}" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;margin-inline-end:8px;border-radius:3px;" onerror="this.style.display='none'">` : ''}
+                <strong>${esc(p.name_ar||'—')}</strong>
+                <br><small style="color:var(--warm-dark);">${esc(p.name_en||'')}</small>
+              </td>
+              <td style="font-family:var(--ff-mono);font-size:.75rem;">${esc(p.slug||'')}</td>
+              <td style="font-family:var(--ff-mono);">${count}</td>
+              <td style="font-family:var(--ff-mono);">${p.sort_order||'—'}</td>
+              <td><span class="badge ${p.is_active!==false?'g':'d'}">${p.is_active!==false?'ظاهر':'مخفي'}</span></td>
+              <td>
+                <div class="actions">
+                  <button class="ibtn" data-edit-prog="${p.id}">✏ تعديل</button>
+                  <button class="ibtn red" data-del-prog="${p.id}">🗑</button>
+                </div>
+              </td>
+            </tr>`;
+          }).join('')||`<tr><td colspan="6" style="text-align:center;color:var(--warm-dark);padding:32px;">لا توجد برامج — اضغط "+ إضافة"</td></tr>`}
+        </tbody>
+      </table>
+    </div>`;
+  bindEditBtns();
+}
+
+function openProgramModal(prog) {
+  const isNew = !prog;
+  ge('modal-program-title').textContent = isNew ? 'إضافة برنامج جديد' : 'تعديل برنامج';
+  ge('f-prog-id').value    = prog?.id || '';
+  ge('f-prog-na').value    = prog?.name_ar || '';
+  ge('f-prog-ne').value    = prog?.name_en || '';
+  ge('f-prog-sda').value   = prog?.short_description_ar || '';
+  ge('f-prog-sde').value   = prog?.short_description_en || '';
+  ge('f-prog-da').value    = prog?.description_ar || '';
+  ge('f-prog-de').value    = prog?.description_en || '';
+  ge('f-prog-slug').value  = prog?.slug || '';
+  ge('f-prog-color').value = prog?.accent_color || '#c8a86e';
+  ge('f-prog-order').value = prog?.sort_order || '';
+  ge('f-prog-active').value = String(prog?.is_active !== false);
+  ge('f-prog-logo').value       = prog?.logo_url || '';
+  ge('f-prog-cover').value      = prog?.cover_image || '';
+  ge('f-prog-featured').checked = !!prog?.is_featured;
+  const prev = ge('prog-logo-prev');
+  if (prog?.logo_url) { prev.src = prog.logo_url.startsWith('data:') ? prog.logo_url : '../' + prog.logo_url; prev.style.display = 'block'; }
+  else prev.style.display = 'none';
+  const cprev = ge('prog-cover-prev');
+  if (prog?.cover_image) { cprev.src = prog.cover_image.startsWith('data:') ? prog.cover_image : '../' + prog.cover_image; cprev.style.display = 'block'; }
+  else cprev.style.display = 'none';
+  switchTab('prog-tabs', 'prog-ar');
+  modalOpen('program');
+}
+
+function saveProgramAdmin() {
+  const id = ge('f-prog-id').value;
+  const prog = {
+    id:                    id || String(Date.now()),
+    name_ar:               gv('f-prog-na'),
+    name_en:               gv('f-prog-ne'),
+    short_description_ar:  ge('f-prog-sda').value.trim(),
+    short_description_en:  ge('f-prog-sde').value.trim(),
+    description_ar:        ge('f-prog-da').value.trim(),
+    description_en:        ge('f-prog-de').value.trim(),
+    slug:                  gv('f-prog-slug') || slugify(gv('f-prog-ne') || gv('f-prog-na')),
+    accent_color:          ge('f-prog-color').value || '#c8a86e',
+    sort_order:            parseInt(gv('f-prog-order')) || 99,
+    is_active:             ge('f-prog-active').value === 'true',
+    is_featured:           ge('f-prog-featured').checked,
+    logo_url:              gv('f-prog-logo'),
+    cover_image:           gv('f-prog-cover')
+  };
+  if (!DB.programs) DB.programs = [];
+  if (id) {
+    const idx = DB.programs.findIndex(p => p.id === id);
+    if (idx > -1) DB.programs[idx] = prog; else DB.programs.push(prog);
+  } else {
+    DB.programs.push(prog);
+  }
+  dbSave(); modalClose('program');
+  if (currentSection === 'programs') renderAdminPrograms();
+}
+
+// ── Tags Admin ────────────────────────────────
+function renderAdminTags() {
+  const tags = DB.tags || [];
+  ge('main-content').innerHTML = `
+    <div class="a-card">
+      <div class="a-card-title">التاقات (${tags.length})</div>
+      <table class="a-table">
+        <thead><tr><th>اسم التاق</th><th>Slug</th><th>عدد المواضيع</th><th>إجراءات</th></tr></thead>
+        <tbody>
+          ${tags.map(t => {
+            const count = (DB.articles||[]).filter(a=>Array.isArray(a.tags)&&a.tags.includes(t.id)).length;
+            return `<tr>
+              <td><strong>${esc(t.name||'—')}</strong></td>
+              <td style="font-family:var(--ff-mono);font-size:.75rem;">${esc(t.slug||'')}</td>
+              <td style="font-family:var(--ff-mono);">${count}</td>
+              <td>
+                <div class="actions">
+                  <button class="ibtn" data-edit-tag="${t.id}">✏</button>
+                  <button class="ibtn red" data-del-tag="${t.id}">🗑</button>
+                </div>
+              </td>
+            </tr>`;
+          }).join('')||`<tr><td colspan="4" style="text-align:center;color:var(--warm-dark);padding:28px;">لا توجد تاقات — اضغط "+ إضافة"</td></tr>`}
+        </tbody>
+      </table>
+    </div>`;
+  bindEditBtns();
+}
+
+function openTagModal(tag) {
+  ge('f-tag-id').value   = tag?.id || '';
+  ge('f-tag-name').value = tag?.name || '';
+  ge('f-tag-slug').value = tag?.slug || '';
+  modalOpen('tag');
+}
+
+function saveTagAdmin() {
+  const id = ge('f-tag-id').value;
+  const tag = {
+    id:   id || String(Date.now()),
+    name: ge('f-tag-name').value.trim(),
+    slug: ge('f-tag-slug').value.trim() || slugify(ge('f-tag-name').value.trim())
+  };
+  if (!DB.tags) DB.tags = [];
+  if (id) {
+    const idx = DB.tags.findIndex(t => t.id === id);
+    if (idx > -1) DB.tags[idx] = tag; else DB.tags.push(tag);
+  } else {
+    DB.tags.push(tag);
+  }
+  dbSave(); modalClose('tag');
+  if (currentSection === 'tags') renderAdminTags();
+}
+
+// ── Tag display helpers (article modal) ──────
+function refreshTagChips() {
+  let tags = [];
+  try { tags = JSON.parse(ge('f-art-tags-val')?.value || '[]'); } catch(_) {}
+  const el = ge('f-art-tags-display');
+  if (!el) return;
+  el.innerHTML = tags.map(tid => {
+    const tag = (DB.tags||[]).find(t => t.id === tid);
+    const name = tag ? esc(tag.name) : esc(tid);
+    return `<span class="tag-chip-admin">${name}<button type="button" onclick="tagRemoveAdmin('${tid}')">×</button></span>`;
+  }).join('');
+}
+
+window.tagRemoveAdmin = function(tid) {
+  let tags = [];
+  try { tags = JSON.parse(ge('f-art-tags-val').value || '[]'); } catch(_) {}
+  ge('f-art-tags-val').value = JSON.stringify(tags.filter(t => t !== tid));
+  refreshTagChips();
+};
+
+function initTagInput() {
+  const input = ge('tag-input');
+  const dropdown = ge('tag-suggestions');
+  if (!input || !dropdown) return;
+  input.replaceWith(input.cloneNode(true)); // remove old listeners
+  const inp = ge('tag-input');
+  let activeIdx = -1;
+
+  function getTags() {
+    try { return JSON.parse(ge('f-art-tags-val').value || '[]'); } catch(_) { return []; }
+  }
+
+  function showSuggestions(q) {
+    const current = getTags();
+    const all = (DB.tags||[]).filter(t => !current.includes(t.id));
+    const matches = q
+      ? all.filter(t => t.name.toLowerCase().includes(q.toLowerCase()))
+      : all;
+    const exactMatch = (DB.tags||[]).find(t => t.name.toLowerCase() === q.toLowerCase());
+    let html = matches.slice(0, 8).map((t, i) =>
+      `<li data-id="${t.id}" class="${i === activeIdx ? 'active' : ''}">${esc(t.name)}</li>`
+    ).join('');
+    if (q && !exactMatch) {
+      html += `<li data-new="${esc(q)}" class="new-tag">+ إضافة "<strong>${esc(q)}</strong>"</li>`;
+    }
+    if (html) {
+      dropdown.innerHTML = html;
+      dropdown.style.display = 'block';
+      dropdown.querySelectorAll('li').forEach(li => {
+        li.addEventListener('mousedown', e => {
+          e.preventDefault();
+          li.dataset.id ? addTagById(li.dataset.id) : createAndAddTag(li.dataset.new);
+        });
+      });
+    } else {
+      dropdown.style.display = 'none';
+    }
+  }
+
+  function addTagById(id) {
+    const tags = getTags();
+    if (!tags.includes(id)) {
+      tags.push(id);
+      ge('f-art-tags-val').value = JSON.stringify(tags);
+      refreshTagChips();
+    }
+    inp.value = '';
+    dropdown.style.display = 'none';
+    activeIdx = -1;
+  }
+
+  function createAndAddTag(name) {
+    name = (name||'').trim();
+    if (!name) return;
+    const existing = (DB.tags||[]).find(t => t.name.toLowerCase() === name.toLowerCase());
+    if (existing) { addTagById(existing.id); return; }
+    const newTag = { id: 'tag_' + Date.now(), name, slug: slugify(name) };
+    if (!DB.tags) DB.tags = [];
+    DB.tags.push(newTag);
+    addTagById(newTag.id);
+  }
+
+  inp.addEventListener('input', () => { activeIdx = -1; showSuggestions(inp.value.trim()); });
+  inp.addEventListener('focus', () => { showSuggestions(inp.value.trim()); });
+  inp.addEventListener('blur', () => { setTimeout(() => { dropdown.style.display = 'none'; }, 160); });
+  inp.addEventListener('keydown', e => {
+    const items = [...dropdown.querySelectorAll('li')];
+    if (e.key === 'ArrowDown') { e.preventDefault(); activeIdx = Math.min(activeIdx + 1, items.length - 1); items.forEach((li, i) => li.classList.toggle('active', i === activeIdx)); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); activeIdx = Math.max(activeIdx - 1, -1); items.forEach((li, i) => li.classList.toggle('active', i === activeIdx)); }
+    else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (activeIdx >= 0 && items[activeIdx]) {
+        const li = items[activeIdx];
+        li.dataset.id ? addTagById(li.dataset.id) : createAndAddTag(li.dataset.new);
+      } else { createAndAddTag(inp.value.trim()); }
+    } else if (e.key === 'Escape') { dropdown.style.display = 'none'; }
+  });
+}
+
+// ── Source rows (article modal) ───────────────
+function appendSourceRow(s = {}) {
+  const div = document.createElement('div');
+  div.className = 'source-admin-row';
+  div.style.cssText = 'background:rgba(255,255,255,.03);border:1px solid var(--line);padding:10px 12px;display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;';
+  div.innerHTML = `
+    <div class="fg" style="margin:0;"><label class="fl" style="font-size:.7rem;">عنوان المصدر</label>
+      <input class="fi src-title" dir="rtl" value="${esc(s.title||'')}" placeholder="اسم المصدر أو الكتاب..."></div>
+    <div class="fg" style="margin:0;"><label class="fl" style="font-size:.7rem;">الرابط (URL)</label>
+      <input class="fi src-url" dir="ltr" value="${esc(s.url||'')}" placeholder="https://..."></div>
+    <div style="display:flex;flex-direction:column;gap:4px;">
+      <select class="fi src-type" style="padding:5px 8px;height:auto;font-size:.75rem;">
+        <option value="" ${!s.type?'selected':''}>النوع</option>
+        <option value="study" ${s.type==='study'?'selected':''}>دراسة</option>
+        <option value="official" ${s.type==='official'?'selected':''}>موقع رسمي</option>
+        <option value="report" ${s.type==='report'?'selected':''}>تقرير</option>
+        <option value="book" ${s.type==='book'?'selected':''}>كتاب</option>
+        <option value="video" ${s.type==='video'?'selected':''}>فيديو</option>
+        <option value="article" ${s.type==='article'?'selected':''}>مقال</option>
+      </select>
+      <button type="button" class="ibtn red" onclick="this.closest('.source-admin-row').remove()" style="font-size:.8rem;">حذف</button>
+    </div>`;
+  ge('f-art-sources-list').appendChild(div);
+}
+
+window.adminAddSource = function() { appendSourceRow(); };
+
+function collectSources() {
+  return Array.from(ge('f-art-sources-list').querySelectorAll('.source-admin-row')).map(row => ({
+    title: row.querySelector('.src-title')?.value.trim() || '',
+    url:   row.querySelector('.src-url')?.value.trim() || '',
+    type:  row.querySelector('.src-type')?.value || ''
+  })).filter(s => s.title || s.url);
+}
+
+// ── Delete ────────────────────────────────────
+function confirmDelete(type, id) {
+  pendingDeleteFn = () => {
+    if (type === 'article')  DB.articles   = (DB.articles||[]).filter(a => a.id !== id);
+    else if (type === 'book') DB.books     = (DB.books||[]).filter(b => b.id !== id);
+    else if (type === 'program') DB.programs = (DB.programs||[]).filter(p => p.id !== id);
+    else if (type === 'tag')      DB.tags      = (DB.tags||[]).filter(t => t.id !== id);
+    else if (type === 'resource') DB.resources = (DB.resources||[]).filter(r => r.id !== id);
+    dbSave();
+    modalClose('del');
+    if (type === 'article') renderArticles();
+    else if (type === 'book') renderBooks();
+    else if (type === 'program') renderAdminPrograms();
+    else if (type === 'tag') renderAdminTags();
+    else if (type === 'resource') renderAdminResources();
+    else renderOverview();
+  };
+  modalOpen('del');
+}
+
+// ── Event delegation for dynamic content ──────
+function bindEditBtns() {
+  const mc = ge('main-content');
+  mc.querySelectorAll('[data-edit-art]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const art = DB.articles?.find(a => a.id === btn.dataset.editArt);
+      if (art) openArticleModal(art);
+    });
+  });
+  mc.querySelectorAll('[data-del-art]').forEach(btn => {
+    btn.addEventListener('click', () => confirmDelete('article', btn.dataset.delArt));
+  });
+  mc.querySelectorAll('[data-edit-prog]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const prog = DB.programs?.find(p => p.id === btn.dataset.editProg);
+      if (prog) openProgramModal(prog);
+    });
+  });
+  mc.querySelectorAll('[data-del-prog]').forEach(btn => {
+    btn.addEventListener('click', () => confirmDelete('program', btn.dataset.delProg));
+  });
+  mc.querySelectorAll('[data-edit-tag]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = DB.tags?.find(t => t.id === btn.dataset.editTag);
+      if (tag) openTagModal(tag);
+    });
+  });
+  mc.querySelectorAll('[data-del-tag]').forEach(btn => {
+    btn.addEventListener('click', () => confirmDelete('tag', btn.dataset.delTag));
+  });
+  mc.querySelectorAll('[data-edit-res]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const res = DB.resources?.find(r => r.id === btn.dataset.editRes);
+      if (res) openResourceModal(res);
+    });
+  });
+  mc.querySelectorAll('[data-del-res]').forEach(btn => {
+    btn.addEventListener('click', () => confirmDelete('resource', btn.dataset.delRes));
+  });
+}
+
+// ── Utilities ─────────────────────────────────
+function ge(id) { return document.getElementById(id); }
+function gv(id) { const el = ge(id); return el ? (el.value || '').trim() : ''; }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function slugify(s) { return (s||'').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9\u0600-\u06FF-]/g,'').substring(0,60); }
+
+function showToast(msg, type='ok') {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('up')));
+  setTimeout(() => { el.classList.remove('up'); setTimeout(() => el.remove(), 350); }, 2800);
+}
+
+
+// ── About Rich Editor ─────────────────────────
+function galleryItemHtml(item = {}, idx = 0) {
+  return `<div class="gallery-admin-item" data-gallery-item>
+    <div class="gallery-admin-media">
+      ${item.image ? `<img src="../${item.image}" alt="">` : `<div class="gallery-admin-ph">صورة</div>`}
+      <input type="hidden" data-g-image value="${esc(item.image || '')}">
+      <input type="file" accept="image/*" data-g-file>
+    </div>
+    <div class="gallery-admin-fields">
+      <div class="fr">
+        <div class="fg"><label class="fl">عنوان التجربة (عربي)</label><input class="fi" data-g-title-ar dir="rtl" value="${esc(item.title_ar || '')}"></div>
+        <div class="fg"><label class="fl">Experience title (English)</label><input class="fi" data-g-title-en dir="ltr" value="${esc(item.title_en || '')}"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label class="fl">القصة / النبذة (عربي)</label><textarea class="fi" data-g-story-ar rows="4" dir="rtl">${esc(item.story_ar || '')}</textarea></div>
+        <div class="fg"><label class="fl">Story / note (English)</label><textarea class="fi" data-g-story-en rows="4" dir="ltr">${esc(item.story_en || '')}</textarea></div>
+      </div>
+      <button class="ibtn red" type="button" data-g-remove>حذف هذه الصورة</button>
+    </div>
+  </div>`;
+}
+function bindGalleryEditor() {
+  ge('btn-add-gallery')?.addEventListener('click', () => {
+    ge('about-gallery-editor').querySelector('.dash-empty')?.remove();
+    ge('about-gallery-editor').insertAdjacentHTML('beforeend', galleryItemHtml({}, Date.now()));
+    bindGalleryEditor();
+  }, { once: true });
+  document.querySelectorAll('[data-g-remove]').forEach(btn => {
+    if (btn.dataset.bound) return;
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', () => btn.closest('[data-gallery-item]')?.remove());
+  });
+  document.querySelectorAll('[data-g-file]').forEach(input => {
+    if (input.dataset.bound) return;
+    input.dataset.bound = '1';
+    input.addEventListener('change', function() {
+      const file = this.files[0];
+      if (!file) return;
+      const item = this.closest('[data-gallery-item]');
+      const hidden = item.querySelector('[data-g-image]');
+      const reader = new FileReader();
+      reader.onload = e => {
+        const dataUrl = e.target.result;
+        hidden.value = dataUrl;
+        item.querySelector('.gallery-admin-media img')?.remove();
+        item.querySelector('.gallery-admin-media').insertAdjacentHTML('afterbegin', `<img src="${dataUrl}" alt="">`);
+        item.querySelector('.gallery-admin-ph')?.remove();
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+}
+function collectGallery() {
+  return Array.from(document.querySelectorAll('[data-gallery-item]')).map(item => ({
+    image: item.querySelector('[data-g-image]')?.value.trim() || '',
+    title_ar: item.querySelector('[data-g-title-ar]')?.value.trim() || '',
+    title_en: item.querySelector('[data-g-title-en]')?.value.trim() || '',
+    story_ar: item.querySelector('[data-g-story-ar]')?.value.trim() || '',
+    story_en: item.querySelector('[data-g-story-en]')?.value.trim() || ''
+  })).filter(item => item.image || item.title_ar || item.title_en || item.story_ar || item.story_en);
+}
+function renderSAbout() {
+  const s = DB.settings || {};
+  ge('main-content').innerHTML = `
+    <div class="a-card">
+      <div class="a-card-title">محتوى صفحة "إعرف عني"</div>
+      <p style="color:var(--warm-mid);font-size:.83rem;margin-bottom:20px;">
+        الصفحة الجديدة مبنية كتجربة تفاعلية لعبدالعزيز. استخدم هذا المحرر للنصوص الإضافية عند الحاجة، واستخدم المعرض أدناه لإضافة الصور وقصصها.
+      </p>
+      <div class="tabs" id="abt-pg-tabs">
+        <button class="tab-btn on" data-tab="abt-pg-ar">عربي 🇸🇦</button>
+        <button class="tab-btn" data-tab="abt-pg-en">English 🇬🇧</button>
+      </div>
+      <div class="tc on" id="abt-pg-ar">
+        <div class="fg"><label class="fl">المحتوى (عربي)</label>
+          <div class="rte-bar" id="abt-rte-ar-bar">
+            <button class="rte-btn" data-cmd="bold" data-ed="abt-rte-ar"><b>B</b></button>
+            <button class="rte-btn" data-cmd="italic" data-ed="abt-rte-ar"><i>I</i></button>
+            <button class="rte-btn" data-cmd="underline" data-ed="abt-rte-ar"><u>U</u></button>
+            <span class="rte-sep"></span>
+            <button class="rte-btn" data-cmd="formatBlock" data-val="h2" data-ed="abt-rte-ar">H2</button>
+            <button class="rte-btn" data-cmd="formatBlock" data-val="h3" data-ed="abt-rte-ar">H3</button>
+            <button class="rte-btn" data-cmd="formatBlock" data-val="p" data-ed="abt-rte-ar">¶</button>
+            <span class="rte-sep"></span>
+            <button class="rte-btn" data-cmd="justifyRight" data-ed="abt-rte-ar">⇒</button>
+            <button class="rte-btn" data-cmd="justifyCenter" data-ed="abt-rte-ar">≡</button>
+            <button class="rte-btn" data-cmd="justifyLeft" data-ed="abt-rte-ar">⇐</button>
+            <span class="rte-sep"></span>
+            <button class="rte-btn" data-cmd="insertUnorderedList" data-ed="abt-rte-ar">• قائمة</button>
+            <button class="rte-btn" data-cmd="insertOrderedList" data-ed="abt-rte-ar">1. مرقم</button>
+            <span class="rte-sep"></span>
+            <button class="rte-btn" data-action="link" data-ed="abt-rte-ar">🔗 رابط</button>
+            <button class="rte-btn" data-action="image" data-ed="abt-rte-ar">🖼 صورة</button>
+            <button class="rte-btn" data-action="video" data-ed="abt-rte-ar">▶ فيديو</button>
+          </div>
+          <div class="rte-body" id="abt-rte-ar" contenteditable="true" dir="rtl" spellcheck="false" style="min-height:380px;"></div>
+        </div>
+      </div>
+      <div class="tc" id="abt-pg-en">
+        <div class="fg"><label class="fl">Content (English)</label>
+          <div class="rte-bar" id="abt-rte-en-bar">
+            <button class="rte-btn" data-cmd="bold" data-ed="abt-rte-en"><b>B</b></button>
+            <button class="rte-btn" data-cmd="italic" data-ed="abt-rte-en"><i>I</i></button>
+            <button class="rte-btn" data-cmd="underline" data-ed="abt-rte-en"><u>U</u></button>
+            <span class="rte-sep"></span>
+            <button class="rte-btn" data-cmd="formatBlock" data-val="h2" data-ed="abt-rte-en">H2</button>
+            <button class="rte-btn" data-cmd="formatBlock" data-val="h3" data-ed="abt-rte-en">H3</button>
+            <button class="rte-btn" data-cmd="formatBlock" data-val="p" data-ed="abt-rte-en">¶</button>
+            <span class="rte-sep"></span>
+            <button class="rte-btn" data-cmd="justifyLeft" data-ed="abt-rte-en">⇐</button>
+            <button class="rte-btn" data-cmd="justifyCenter" data-ed="abt-rte-en">≡</button>
+            <button class="rte-btn" data-cmd="justifyRight" data-ed="abt-rte-en">⇒</button>
+            <span class="rte-sep"></span>
+            <button class="rte-btn" data-cmd="insertUnorderedList" data-ed="abt-rte-en">• List</button>
+            <button class="rte-btn" data-cmd="insertOrderedList" data-ed="abt-rte-en">1. List</button>
+            <span class="rte-sep"></span>
+            <button class="rte-btn" data-action="link" data-ed="abt-rte-en">🔗 Link</button>
+            <button class="rte-btn" data-action="image" data-ed="abt-rte-en">🖼 Image</button>
+            <button class="rte-btn" data-action="video" data-ed="abt-rte-en">▶ Video</button>
+          </div>
+          <div class="rte-body" id="abt-rte-en" contenteditable="true" dir="ltr" spellcheck="false" style="min-height:380px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="a-card">
+      <div class="a-card-title">معرض التجارب والصور</div>
+      <p style="color:var(--warm-mid);font-size:.83rem;margin-bottom:18px;">
+        أضف صور زياراتك ومعايشاتك ودوراتك ومحاضراتك، واكتب تحت كل صورة نبذة أو قصة قصيرة.
+      </p>
+      <div id="about-gallery-editor" class="gallery-admin-list">
+        ${(s.about_gallery || []).map((item, idx) => galleryItemHtml(item, idx)).join('') || `<div class="dash-empty">لا توجد صور بعد. اضغط إضافة صورة.</div>`}
+      </div>
+      <button class="ibtn" type="button" id="btn-add-gallery" style="margin-top:12px;">+ إضافة صورة تجربة</button>
+    </div>
+    <button class="btn btn-fill" id="btn-save-sabout" style="padding:11px 36px;">حفظ المحتوى ✓</button>`;
+
+  // Load existing content
+  ge('abt-rte-ar').innerHTML = s.about_content_ar || `<p>${esc(s.about_ar||'')}</p>`;
+  ge('abt-rte-en').innerHTML = s.about_content_en || `<p>${esc(s.about_en||'')}</p>`;
+
+  initTabs('abt-pg-tabs');
+  initRTE('abt-rte-ar-bar', 'abt-rte-ar');
+  initRTE('abt-rte-en-bar', 'abt-rte-en');
+  bindGalleryEditor();
+
+  ge('btn-save-sabout').addEventListener('click', () => {
+    if (!DB.settings) DB.settings = {};
+    DB.settings.about_content_ar = ge('abt-rte-ar').innerHTML;
+    DB.settings.about_content_en = ge('abt-rte-en').innerHTML;
+    DB.settings.about_gallery = collectGallery();
+    dbSave();
+  });
+}
+
+// ── Ticker Editor ─────────────────────────────
+function renderSTicker() {
+  const s = DB.settings || {};
+  ge('main-content').innerHTML = `
+    <div class="a-card">
+      <div class="a-card-title">الشريط المتحرك</div>
+      <p style="color:var(--warm-mid);font-size:.83rem;margin-bottom:20px;">
+        نص الشريط المتحرك الذي يظهر في الصفحة الرئيسية. اتركه فارغاً للنص الافتراضي.
+      </p>
+      <div class="fg">
+        <label class="fl">نص الشريط (عربي)</label>
+        <input id="tk-ar" class="fi" dir="rtl" value="${esc(s.ticker_ar||'')}" placeholder="اكتشاف المواهب ✦ تطوير اللاعبين ✦ ...">
+        <small style="color:var(--warm-dark);font-size:.75rem;margin-top:6px;display:block;">استخدم ✦ أو | للفصل بين العبارات</small>
+      </div>
+      <div class="fg">
+        <label class="fl">Ticker Text (English)</label>
+        <input id="tk-en" class="fi" dir="ltr" value="${esc(s.ticker_en||'')}" placeholder="Talent Identification ✦ Player Development ✦ ...">
+      </div>
+      <button class="btn btn-fill" id="btn-save-sticker" style="padding:11px 36px;margin-top:8px;">حفظ ✓</button>
+    </div>`;
+
+  ge('btn-save-sticker').addEventListener('click', () => {
+    if (!DB.settings) DB.settings = {};
+    DB.settings.ticker_ar = gv('tk-ar');
+    DB.settings.ticker_en = gv('tk-en');
+    dbSave();
+  });
+}
+
+// ── Popup Editor ──────────────────────────────
+function renderSPopup() {
+  const s = DB.settings || {};
+  const popup = s.popup || {};
+  const notif = s.new_article_bar || {};
+  ge('main-content').innerHTML = `
+    <div class="a-card">
+      <div class="a-card-title">شريط إشعار المقال الجديد</div>
+      <p style="color:var(--warm-mid);font-size:.83rem;margin-bottom:20px;">
+        يظهر أعلى الموقع إذا كان هناك مقال عليه علامة is_new: true. يمكن للزائر إغلاقه خلال الجلسة.
+      </p>
+      <div class="fg">
+        <label class="fl">الحالة</label>
+        <div class="tog-wrap">
+          <label class="tog"><input type="checkbox" id="nb-enabled" ${notif.enabled !== false ? 'checked' : ''}><span class="tog-sl"></span></label>
+          <span id="nb-enabled-lbl" style="font-size:.84rem;color:var(--warm-mid);">${notif.enabled !== false ? 'مفعّل' : 'معطّل'}</span>
+        </div>
+      </div>
+    </div>
+    <div class="a-card">
+      <div class="a-card-title">إعدادات البوب أب</div>
+      <p style="color:var(--warm-mid);font-size:.83rem;margin-bottom:20px;">
+        رسالة منبثقة تظهر للزوار مرة واحدة في كل جلسة. يمكن تفعيلها أو إيقافها.
+      </p>
+      <div class="fg">
+        <label class="fl">الحالة</label>
+        <div class="tog-wrap">
+          <label class="tog"><input type="checkbox" id="pp-enabled" ${popup.enabled?'checked':''}><span class="tog-sl"></span></label>
+          <span id="pp-enabled-lbl" style="font-size:.84rem;color:var(--warm-mid);">${popup.enabled?'مفعّل':'معطّل'}</span>
+        </div>
+      </div>
+      <div class="fr">
+        <div class="fg">
+          <label class="fl">تأخير الظهور (ثوانٍ)</label>
+          <input type="number" id="pp-delay" class="fi" value="${popup.delay||2}" min="0" max="30">
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">نص الرسالة (عربي)</label>
+        <textarea id="pp-msg-ar" class="fi" rows="4" dir="rtl" placeholder="اكتب رسالتك أو إعلانك هنا...">${esc(popup.message_ar||'')}</textarea>
+      </div>
+      <div class="fg">
+        <label class="fl">Message (English)</label>
+        <textarea id="pp-msg-en" class="fi" rows="4" dir="ltr" placeholder="Write your announcement here...">${esc(popup.message_en||'')}</textarea>
+      </div>
+      <div class="fg">
+        <label class="fl">صورة البوب أب (اختياري)</label>
+        <div class="upzone"><input type="file" id="pp-img-file" accept="image/*"><div class="upzone-txt">📁 انقر لرفع صورة (تظهر في أعلى الرسالة)</div></div>
+        <input type="hidden" id="pp-img-val" value="${esc(popup.image||'')}">
+        <img id="pp-img-prev" class="up-prev" ${popup.image?`src="../${popup.image}" style="display:block;"`:''}>
+      </div>
+      <button class="btn btn-fill" id="btn-save-spopup" style="padding:11px 36px;margin-top:8px;">حفظ ✓</button>
+    </div>`;
+
+  ge('pp-enabled').addEventListener('change', e => {
+    ge('pp-enabled-lbl').textContent = e.target.checked ? 'مفعّل' : 'معطّل';
+  });
+  ge('nb-enabled').addEventListener('change', e => {
+    ge('nb-enabled-lbl').textContent = e.target.checked ? 'مفعّل' : 'معطّل';
+  });
+  initUpload('pp-img-file', 'pp-img-prev', 'pp-img-val');
+
+  ge('btn-save-spopup').addEventListener('click', () => {
+    if (!DB.settings) DB.settings = {};
+    DB.settings.popup = {
+      enabled:    ge('pp-enabled').checked,
+      delay:      parseInt(ge('pp-delay').value||'2', 10),
+      message_ar: ge('pp-msg-ar').value,
+      message_en: ge('pp-msg-en').value,
+      image:      gv('pp-img-val')
+    };
+    DB.settings.new_article_bar = {
+      enabled: ge('nb-enabled').checked
+    };
+    dbSave();
+  });
+}
+
+// ── Wire up all static buttons ─────────────────
+function wireButtons() {
+  // Login
+  ge('li-btn').addEventListener('click', doLogin);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && ge('login-screen').style.display !== 'none') doLogin();
+  });
+
+  // Logout & site link
+  ge('nav-logout').addEventListener('click', () => {
+    sessionStorage.removeItem('bzt'); location.reload();
+  });
+  ge('nav-site').addEventListener('click', () => window.open('../index.html','_blank'));
+  ge('btn-site').addEventListener('click', () => window.open('../index.html','_blank'));
+
+  // Nav buttons
+  ['overview','programs','articles','tags','resources','sabout','sgeneral','sticker','spopup','ssocial','ssec'].forEach(name => {
+    ge('nav-' + name)?.addEventListener('click', () => goSection(name));
+  });
+
+  // Add button
+  ge('btn-add').addEventListener('click', () => {
+    if (currentSection === 'articles')  openArticleModal(null);
+    else if (currentSection === 'programs') openProgramModal(null);
+    else if (currentSection === 'tags') openTagModal(null);
+    else if (currentSection === 'resources') openResourceModal(null);
+  });
+
+  // Article modal
+  ge('modal-article-close').addEventListener('click', () => modalClose('article'));
+  ge('modal-article-cancel').addEventListener('click', () => modalClose('article'));
+  ge('modal-article-save').addEventListener('click', saveArticle);
+
+  // Program modal
+  ge('modal-program-close').addEventListener('click', () => modalClose('program'));
+  ge('modal-program-cancel').addEventListener('click', () => modalClose('program'));
+  ge('modal-program-save').addEventListener('click', saveProgramAdmin);
+  initTabs('prog-tabs');
+  initUpload('prog-logo-file', 'prog-logo-prev', 'f-prog-logo');
+  initUpload('prog-cover-file', 'prog-cover-prev', 'f-prog-cover');
+
+  // Tag modal
+  ge('modal-tag-close').addEventListener('click', () => modalClose('tag'));
+  ge('modal-tag-cancel').addEventListener('click', () => modalClose('tag'));
+  ge('modal-tag-save').addEventListener('click', saveTagAdmin);
+
+  // Resource modal
+  ge('modal-resource-close').addEventListener('click', () => modalClose('resource'));
+  ge('modal-resource-cancel').addEventListener('click', () => modalClose('resource'));
+  ge('modal-resource-save').addEventListener('click', saveResourceAdmin);
+  initTabs('res-tabs');
+  initUpload('res-cover-file', 'res-cover-prev', 'f-res-cover');
+
+  // Delete modal
+  ge('modal-del-close').addEventListener('click', () => modalClose('del'));
+  ge('modal-del-cancel').addEventListener('click', () => modalClose('del'));
+  ge('modal-del-confirm').addEventListener('click', () => {
+    if (pendingDeleteFn) { pendingDeleteFn(); pendingDeleteFn = null; }
+  });
+
+  // Tabs
+  initTabs('art-tabs');
+
+  // RTEs
+  initRTE('rte-ar-bar', 'rte-ar');
+  initRTE('rte-en-bar', 'rte-en');
+
+  // File uploads
+  initUpload('art-file', 'art-img-prev', 'f-art-image');
+}
+
+// ── Bootstrap ─────────────────────────────────
+(async function init() {
+  await dbLoad();
+  wireButtons();
+  if (sessionStorage.getItem('bzt')) {
+    ge('login-screen').style.display = 'none';
+    ge('dashboard').style.display = 'block';
+    goSection('overview');
+  }
+})();
+</script>
+</body>
+</html>

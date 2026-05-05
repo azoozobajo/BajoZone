@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.vercel/
+.claude/
+.vscode/
+
+*.log
+*.out.log
+*.err.log
+
+.DS_Store
+Thumbs.db
