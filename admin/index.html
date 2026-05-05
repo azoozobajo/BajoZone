@@ -105,6 +105,7 @@
         <h1 class="a-page-title" id="pg-title">نظرة عامة</h1>
         <div class="a-actions">
           <button class="btn btn-ghost" id="btn-site" style="padding:8px 18px;font-size:.8rem;">🌐 الموقع</button>
+          <button class="btn btn-ghost" id="btn-export-db" style="padding:8px 18px;font-size:.8rem;">⬇ تصدير للنشر</button>
           <button class="btn btn-fill" id="btn-add" style="display:none;padding:9px 22px;font-size:.84rem;">+ إضافة</button>
         </div>
       </div>
@@ -568,6 +569,24 @@ function dbSave() {
     body: JSON.stringify(DB)
   }).catch(() => {});
   showToast('تم الحفظ بنجاح ✓', 'ok');
+}
+
+function exportDbForPublish() {
+  if (!DB) {
+    showToast('لا توجد بيانات للتصدير', 'err');
+    return;
+  }
+  const json = JSON.stringify(DB, null, 2);
+  const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'db.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showToast('تم تنزيل db.json — استبدله داخل مجلد data ثم ارفع الموقع', 'ok');
 }
 
 // ── Auth ──────────────────────────────────────
@@ -2138,6 +2157,7 @@ function wireButtons() {
   });
   ge('nav-site').addEventListener('click', () => window.open('../index.html','_blank'));
   ge('btn-site').addEventListener('click', () => window.open('../index.html','_blank'));
+  ge('btn-export-db')?.addEventListener('click', exportDbForPublish);
 
   // Nav buttons
   ['overview','programs','articles','tags','resources','sabout','sgeneral','sticker','spopup','ssocial','ssec'].forEach(name => {
