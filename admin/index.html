@@ -8,6 +8,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Tajawal:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/main.css">
   <link rel="icon" type="image/png" href="../assets/images/logo-bajo.png">
+  <script defer src="../js/supabase-config.js"></script>
+  <script defer src="../js/supabase-adapter.js"></script>
   <style>
     body { background:#0e0e0e; }
     .upzone { border:2px dashed rgba(255,255,255,.13);padding:24px;text-align:center;cursor:pointer;position:relative;transition:border-color .3s; }
@@ -527,8 +529,23 @@ let DB = null;
 const LS_KEY = 'bz_db_v8';
 let currentSection = 'overview';
 let pendingDeleteFn = null;
+let supabaseSaveTimer = null;
 
 async function dbLoad() {
+  if (window.BajoSupabase?.ready?.()) {
+    try {
+      const remoteDb = await window.BajoSupabase.loadDb();
+      const hasRemoteContent = ['articles', 'programs', 'books', 'resources'].some(k => (remoteDb[k] || []).length);
+      if (hasRemoteContent) {
+        DB = remoteDb;
+        localStorage.setItem(LS_KEY, JSON.stringify(DB));
+        return;
+      }
+    } catch (err) {
+      console.warn('Supabase load failed, falling back to local data', err);
+    }
+  }
+
   const saved = localStorage.getItem(LS_KEY);
   if (saved) {
     try { DB = JSON.parse(saved); } catch(e) { DB = null; }
@@ -567,23 +584,60 @@ function dbSave() {
     headers: { 'Content-Type':'application/json', 'X-Admin-Token': sessionStorage.getItem('bzt')||'' },
     body: JSON.stringify(DB)
   }).catch(() => {});
+  scheduleSupabaseSave();
   showToast('تم الحفظ بنجاح ✓', 'ok');
+}
+
+function scheduleSupabaseSave() {
+  if (!window.BajoSupabase?.ready?.() || !window.BajoSupabase.getAccessToken?.()) return;
+  clearTimeout(supabaseSaveTimer);
+  supabaseSaveTimer = setTimeout(async () => {
+    try {
+      await window.BajoSupabase.saveDb(DB);
+      showToast('تم تحديث Supabase ✓', 'ok');
+    } catch (err) {
+      console.error(err);
+      showToast('تم الحفظ محلياً، لكن فشل تحديث Supabase', 'err');
+    }
+  }, 250);
 }
 
 // ── Auth ──────────────────────────────────────
 function doLogin() {
   const u = gv('li-u');
   const p = gv('li-p');
+  if (u.includes('@') && window.BajoSupabase?.ready?.()) {
+    window.BajoSupabase.authSignIn(u, p)
+      .then(async () => {
+        try {
+          DB = await window.BajoSupabase.loadDb();
+          localStorage.setItem(LS_KEY, JSON.stringify(DB));
+        } catch (err) {
+          console.warn('Supabase reload after login failed', err);
+        }
+        sessionStorage.setItem('bzt', btoa(u + ':' + Date.now()));
+        ge('login-screen').style.display = 'none';
+        ge('dashboard').style.display = 'block';
+        goSection('overview');
+        showToast('تم تسجيل الدخول عبر Supabase ✓', 'ok');
+      })
+      .catch(() => showLoginError());
+    return;
+  }
   if (u === DB?.admin?.username && p === DB?.admin?.password) {
     sessionStorage.setItem('bzt', btoa(u + ':' + Date.now()));
     ge('login-screen').style.display = 'none';
     ge('dashboard').style.display = 'block';
     goSection('overview');
   } else {
-    const err = ge('li-err');
-    err.style.display = 'block';
-    setTimeout(() => err.style.display = 'none', 3000);
+    showLoginError();
   }
+}
+
+function showLoginError() {
+  const err = ge('li-err');
+  err.style.display = 'block';
+  setTimeout(() => err.style.display = 'none', 3000);
 }
 
 // ── Section Navigation ────────────────────────
@@ -742,6 +796,24 @@ function compressImage(file, maxW, maxH, quality, cb) {
   reader.readAsDataURL(file);
 }
 
+function dataUrlToBlob(dataUrl) {
+  const parts = dataUrl.split(',');
+  const mime = (parts[0].match(/:(.*?);/) || [])[1] || 'image/jpeg';
+  const binary = atob(parts[1] || '');
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new Blob([bytes], { type: mime });
+}
+
+function uploadPathFor(inputId, file) {
+  const base = (file?.name || 'image.jpg')
+    .toLowerCase()
+    .replace(/\.[^.]+$/, '')
+    .replace(/[^a-z0-9-]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'image';
+  return `uploads/${inputId}/${Date.now()}-${base}.jpg`;
+}
+
 function initUpload(inputId, prevId, hiddenId) {
   const input = ge(inputId);
   if (!input) return;
@@ -756,24 +828,41 @@ function initUpload(inputId, prevId, hiddenId) {
     if (txt) txt.innerHTML = '<span style="color:#c8a86e;">⏳ جاري معالجة الصورة...</span>';
     input.disabled = true;
 
-    compressImage(file, 1400, 1400, 0.82, (err, dataUrl) => {
+    compressImage(file, 1400, 1400, 0.82, async (err, dataUrl) => {
       input.disabled = false;
-      if (txt) txt.textContent = origTxt;
 
       if (err) {
+        if (txt) txt.textContent = origTxt;
         showAdminToast('خطأ في الصورة: ' + err, true);
         return;
       }
 
       // Check size after compression (~4MB safe limit)
       if (dataUrl.length > 4 * 1024 * 1024) {
+        if (txt) txt.textContent = origTxt;
         showAdminToast('الصورة كبيرة جداً حتى بعد الضغط. جرّب صورة أصغر.', true);
         return;
       }
 
+      let finalUrl = dataUrl;
+      if (window.BajoSupabase?.getAccessToken?.()) {
+        try {
+          if (txt) txt.innerHTML = '<span style="color:#c8a86e;">⏳ جاري رفع الصورة إلى Supabase...</span>';
+          finalUrl = await window.BajoSupabase.uploadMedia(
+            dataUrlToBlob(dataUrl),
+            uploadPathFor(inputId, file),
+            'image/jpeg'
+          );
+        } catch (uploadErr) {
+          console.error(uploadErr);
+          showAdminToast('تعذر رفع الصورة إلى Supabase، تم حفظها محلياً مؤقتاً.', true);
+          finalUrl = dataUrl;
+        }
+      }
+
       const prev = ge(prevId);
-      if (prev) { prev.src = dataUrl; prev.style.display = 'block'; }
-      ge(hiddenId).value = dataUrl;
+      if (prev) { prev.src = finalUrl; prev.style.display = 'block'; }
+      ge(hiddenId).value = finalUrl;
       if (txt) txt.innerHTML = '<span style="color:#4caf50;">✓ تم تحميل الصورة</span>';
       setTimeout(() => { if (txt) txt.textContent = origTxt; }, 2500);
     });
@@ -2134,6 +2223,7 @@ function wireButtons() {
 
   // Logout & site link
   ge('nav-logout').addEventListener('click', () => {
+    window.BajoSupabase?.authSignOut?.();
     sessionStorage.removeItem('bzt'); location.reload();
   });
   ge('nav-site').addEventListener('click', () => window.open('../index.html','_blank'));

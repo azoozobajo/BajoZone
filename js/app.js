@@ -9,19 +9,31 @@
 const CMS = {
   db: null, LS_KEY: 'bz_db_v8',
   async init() {
+    if (window.BajoSupabase?.ready?.()) {
+      try {
+        const remoteDb = await window.BajoSupabase.loadDb();
+        const hasRemoteContent = ['articles', 'programs', 'books', 'resources'].some(k => (remoteDb[k] || []).length);
+        if (hasRemoteContent) {
+          this.db = remoteDb;
+          localStorage.setItem(this.LS_KEY, JSON.stringify(this.db));
+          return true;
+        }
+      } catch (err) {
+        console.warn('Supabase load failed, falling back to local db.json', err);
+      }
+    }
+
     const s = localStorage.getItem(this.LS_KEY);
     if (s) {
       try { this.db = JSON.parse(s); } catch(e) { this.db = null; }
     }
-    if (!this.db) {
-      try {
-        const r = await fetch('data/db.json?t=' + Date.now());
-        if (!r.ok) throw 0;
-        this.db = await r.json();
-        localStorage.setItem(this.LS_KEY, JSON.stringify(this.db));
-      } catch(_) {
-        // fallback to previously loaded data if parse succeeded
-      }
+    try {
+      const r = await fetch('data/db.json?t=' + Date.now());
+      if (!r.ok) throw 0;
+      this.db = await r.json();
+      localStorage.setItem(this.LS_KEY, JSON.stringify(this.db));
+    } catch(_) {
+      // fallback to previously loaded data if parse succeeded
     }
     return !!this.db;
   },
@@ -2320,7 +2332,6 @@ function renderAbout() {
   maybeShowNewArticleBar();
   setTimeout(hideBootLoader, 180);
 })();
-
 
 
 
