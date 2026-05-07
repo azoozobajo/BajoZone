@@ -529,7 +529,6 @@ let DB = null;
 const LS_KEY = 'bz_db_v8';
 let currentSection = 'overview';
 let pendingDeleteFn = null;
-let supabaseSaveTimer = null;
 
 async function dbLoad() {
   if (window.BajoSupabase?.ready?.()) {
@@ -584,22 +583,22 @@ function dbSave() {
     headers: { 'Content-Type':'application/json', 'X-Admin-Token': sessionStorage.getItem('bzt')||'' },
     body: JSON.stringify(DB)
   }).catch(() => {});
-  scheduleSupabaseSave();
+  saveSupabaseNow();
   showToast('تم الحفظ بنجاح ✓', 'ok');
 }
 
-function scheduleSupabaseSave() {
-  if (!window.BajoSupabase?.ready?.() || !window.BajoSupabase.getAccessToken?.()) return;
-  clearTimeout(supabaseSaveTimer);
-  supabaseSaveTimer = setTimeout(async () => {
-    try {
-      await window.BajoSupabase.saveDb(DB);
-      showToast('تم تحديث Supabase ✓', 'ok');
-    } catch (err) {
-      console.error(err);
-      showToast('تم الحفظ محلياً، لكن فشل تحديث Supabase', 'err');
-    }
-  }, 250);
+async function saveSupabaseNow() {
+  if (!window.BajoSupabase?.ready?.() || !window.BajoSupabase.getAccessToken?.()) return false;
+  try {
+    await window.BajoSupabase.saveDb(DB);
+    showToast('تم تحديث Supabase ✓', 'ok');
+    return true;
+  } catch (err) {
+    console.error(err);
+    const reason = err?.message ? `: ${err.message}` : '';
+    showToast(`تم الحفظ محلياً، لكن فشل تحديث Supabase${reason}`, 'err');
+    return false;
+  }
 }
 
 // ── Auth ──────────────────────────────────────
@@ -803,6 +802,12 @@ function dataUrlToBlob(dataUrl) {
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
   return new Blob([bytes], { type: mime });
+}
+
+function mediaSrc(url) {
+  if (!url) return '';
+  if (/^(data:|blob:|https?:\/\/|\/)/i.test(url)) return url;
+  return '../' + url;
 }
 
 function uploadPathFor(inputId, file) {
@@ -1309,14 +1314,14 @@ function openResourceModal(res) {
   _setCheckboxGroup('.res-audience', res?.target_audience || []);
   _setCheckboxGroup('.res-field',    res?.field || []);
   const prev = ge('res-cover-prev');
-  if (res?.cover_image) { prev.src = res.cover_image.startsWith('data:') ? res.cover_image : '../' + res.cover_image; prev.style.display = 'block'; }
+  if (res?.cover_image) { prev.src = mediaSrc(res.cover_image); prev.style.display = 'block'; }
   else prev.style.display = 'none';
   toggleResDocSubtype();
   switchTab('res-tabs', 'res-ar');
   modalOpen('resource');
 }
 
-function saveResourceAdmin() {
+async function saveResourceAdmin() {
   const id   = ge('f-res-id').value;
   const today = new Date().toISOString().split('T')[0];
   const splitLines = v => v.trim().split('\n').map(s=>s.trim()).filter(Boolean);
@@ -1360,6 +1365,10 @@ function saveResourceAdmin() {
     DB.resources.unshift(res);
   }
   dbSave();
+  if (window.BajoSupabase?.getAccessToken?.()) {
+    const ok = await saveSupabaseNow();
+    if (!ok) return;
+  }
   modalClose('resource');
   if (currentSection === 'resources') renderAdminResources();
 }
@@ -1538,14 +1547,14 @@ function openArticleModal(article) {
 
   // Image preview
   const prev = ge('art-img-prev');
-  if (article?.image) { prev.src = article.image.startsWith('data:') ? article.image : '../' + article.image; prev.style.display = 'block'; }
+  if (article?.image) { prev.src = mediaSrc(article.image); prev.style.display = 'block'; }
   else prev.style.display = 'none';
 
   switchTab('art-tabs', 'art-ar');
   modalOpen('article');
 }
 
-function saveArticle() {
+async function saveArticle() {
   const saveBtn = ge('modal-article-save');
   const origLabel = saveBtn?.textContent || 'حفظ الموضوع ✓';
   if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '⏳ جاري الحفظ...'; }
@@ -1591,6 +1600,13 @@ function saveArticle() {
   }
 
   dbSave();
+  if (window.BajoSupabase?.getAccessToken?.()) {
+    const ok = await saveSupabaseNow();
+    if (!ok) {
+      if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = origLabel; }
+      return;
+    }
+  }
   if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = origLabel; }
   modalClose('article');
   if (currentSection === 'articles') renderArticles();
@@ -1610,7 +1626,7 @@ function renderAdminPrograms() {
             const count = (DB.articles||[]).filter(a=>a.program_id===p.id).length;
             return `<tr>
               <td>
-                ${p.logo_url ? `<img src="${p.logo_url.startsWith('data:') ? p.logo_url : '../' + p.logo_url}" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;margin-inline-end:8px;border-radius:3px;" onerror="this.style.display='none'">` : ''}
+                ${p.logo_url ? `<img src="${mediaSrc(p.logo_url)}" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;margin-inline-end:8px;border-radius:3px;" onerror="this.style.display='none'">` : ''}
                 <strong>${esc(p.name_ar||'—')}</strong>
                 <br><small style="color:var(--warm-dark);">${esc(p.name_en||'')}</small>
               </td>
@@ -1650,16 +1666,16 @@ function openProgramModal(prog) {
   ge('f-prog-cover').value      = prog?.cover_image || '';
   ge('f-prog-featured').checked = !!prog?.is_featured;
   const prev = ge('prog-logo-prev');
-  if (prog?.logo_url) { prev.src = prog.logo_url.startsWith('data:') ? prog.logo_url : '../' + prog.logo_url; prev.style.display = 'block'; }
+  if (prog?.logo_url) { prev.src = mediaSrc(prog.logo_url); prev.style.display = 'block'; }
   else prev.style.display = 'none';
   const cprev = ge('prog-cover-prev');
-  if (prog?.cover_image) { cprev.src = prog.cover_image.startsWith('data:') ? prog.cover_image : '../' + prog.cover_image; cprev.style.display = 'block'; }
+  if (prog?.cover_image) { cprev.src = mediaSrc(prog.cover_image); cprev.style.display = 'block'; }
   else cprev.style.display = 'none';
   switchTab('prog-tabs', 'prog-ar');
   modalOpen('program');
 }
 
-function saveProgramAdmin() {
+async function saveProgramAdmin() {
   const id = ge('f-prog-id').value;
   const prog = {
     id:                    id || String(Date.now()),
@@ -1684,7 +1700,12 @@ function saveProgramAdmin() {
   } else {
     DB.programs.push(prog);
   }
-  dbSave(); modalClose('program');
+  dbSave();
+  if (window.BajoSupabase?.getAccessToken?.()) {
+    const ok = await saveSupabaseNow();
+    if (!ok) return;
+  }
+  modalClose('program');
   if (currentSection === 'programs') renderAdminPrograms();
 }
 

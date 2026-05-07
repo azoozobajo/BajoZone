@@ -63,23 +63,65 @@
   function rowArticle(row) {
     return Object.assign({}, row, {
       tags: row.tag_ids || [],
+      read_time: row.reading_time || null,
       tag_ids: undefined
     });
+  }
+
+  function pick(row, keys) {
+    return keys.reduce((acc, key) => {
+      if (row[key] !== undefined) acc[key] = row[key];
+      return acc;
+    }, {});
   }
 
   function payloadArticle(item) {
     const row = Object.assign({}, item);
     row.tag_ids = Array.isArray(item.tags) ? item.tags : (item.tag_ids || []);
+    row.reading_time = item.read_time || item.reading_time || null;
     delete row.tags;
+    delete row.read_time;
     delete row.created_at;
     delete row.updated_at;
-    return row;
+    return pick(row, [
+      'id', 'slug', 'title_ar', 'title_en', 'excerpt_ar', 'excerpt_en',
+      'content_ar', 'content_en', 'image', 'date', 'category_id',
+      'category_ar', 'category_en', 'program_id', 'tag_ids', 'featured',
+      'is_new', 'is_published', 'reading_time', 'level', 'sources',
+      'youtube_url', 'video_url', 'view_count', 'share_count'
+    ]);
   }
 
-  function payloadClean(item) {
+  function payloadClean(item, keys) {
     const row = Object.assign({}, item);
     delete row.created_at;
     delete row.updated_at;
+    return keys ? pick(row, keys) : row;
+  }
+
+  function payloadSettings(item) {
+    return pick(item || {}, [
+      'id', 'site_name_ar', 'site_name_en', 'tagline_ar', 'tagline_en',
+      'about_ar', 'about_en', 'about_image', 'logo', 'favicon',
+      'ticker_ar', 'ticker_en', 'about_content_ar', 'about_content_en',
+      'social', 'about_gallery', 'popup', 'new_article_bar'
+    ]);
+  }
+
+  function payloadResource(item) {
+    const row = payloadClean(item, [
+      'id', 'slug', 'type', 'document_subtype', 'title_ar', 'title_en',
+      'short_description_ar', 'short_description_en', 'full_description_ar',
+      'full_description_en', 'bajo_summary_ar', 'why_it_matters_ar',
+      'target_audience', 'field', 'language', 'author_or_org', 'publisher',
+      'publication_year', 'pages', 'file_size', 'cover_image', 'source_url',
+      'download_url', 'access_type', 'rights', 'tags', 'is_featured',
+      'is_published', 'download_count'
+    ]);
+    ['bajo_summary_ar', 'why_it_matters_ar', 'target_audience', 'field'].forEach(key => {
+      if (Array.isArray(row[key])) row[key] = row[key].join(',');
+    });
+    row.tags = Array.isArray(row.tags) ? row.tags : String(row.tags || '').split(',').map(x => x.trim()).filter(Boolean);
     return row;
   }
 
@@ -131,17 +173,27 @@
 
   async function saveDb(db) {
     if (!getAccessToken()) throw new Error('Supabase Auth session is required for saving');
-    const settings = Object.assign({}, db.settings || {}, { id: 'main' });
-    delete settings.created_at;
-    delete settings.updated_at;
+    const settings = payloadSettings(Object.assign({}, db.settings || {}, { id: 'main' }));
 
     await upsertTable('site_settings', [settings]);
-    await upsertTable('programs', (db.programs || []).map(payloadClean));
-    await upsertTable('categories', (db.categories || []).map(payloadClean));
-    await upsertTable('tags', (db.tags || []).map(payloadClean));
+    await upsertTable('programs', (db.programs || []).map(item => payloadClean(item, [
+      'id', 'slug', 'name_ar', 'name_en', 'short_description_ar',
+      'short_description_en', 'description_ar', 'description_en',
+      'logo_url', 'accent_color', 'sort_order', 'is_active'
+    ])));
+    await upsertTable('categories', (db.categories || []).map(item => payloadClean(item, [
+      'id', 'name_ar', 'name_en', 'sort_order'
+    ])));
+    await upsertTable('tags', (db.tags || []).map(item => payloadClean(item, [
+      'id', 'name', 'slug'
+    ])));
     await upsertTable('articles', (db.articles || []).map(payloadArticle));
-    await upsertTable('books', (db.books || []).map(payloadClean));
-    await upsertTable('resources', (db.resources || []).map(payloadClean));
+    await upsertTable('books', (db.books || []).map(item => payloadClean(item, [
+      'id', 'title_ar', 'title_en', 'subtitle_ar', 'subtitle_en',
+      'description_ar', 'description_en', 'cover', 'amazon_url',
+      'price', 'available', 'download_count'
+    ])));
+    await upsertTable('resources', (db.resources || []).map(payloadResource));
 
     await deleteMissing('programs', (db.programs || []).map(x => x.id));
     await deleteMissing('categories', (db.categories || []).map(x => x.id));
