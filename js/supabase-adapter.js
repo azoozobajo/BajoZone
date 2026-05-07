@@ -155,19 +155,36 @@
     if (!getAccessToken()) throw new Error('Supabase Auth session is required for upload');
     if (!ready()) throw new Error('Supabase config is missing');
     const safePath = String(path || `${Date.now()}.bin`).replace(/^\/+/, '');
-    const res = await fetch(`${baseUrl}/storage/v1/object/bajozone-media/${encodeURI(safePath)}`, {
+    const objectUrl = `${baseUrl}/storage/v1/object/bajozone-media/${safePath.split('/').map(encodeURIComponent).join('/')}`;
+    const uploadHeaders = {
+      apikey: anonKey,
+      Authorization: `Bearer ${getAccessToken()}`,
+      'Content-Type': contentType || blob.type || 'application/octet-stream',
+      'x-upsert': 'true'
+    };
+
+    let res = await fetch(objectUrl, {
       method: 'POST',
-      headers: {
-        apikey: anonKey,
-        Authorization: `Bearer ${getAccessToken()}`,
-        'Content-Type': contentType || blob.type || 'application/octet-stream',
-        'x-upsert': 'true'
-      },
+      headers: uploadHeaders,
       body: blob
     });
+
+    if (!res.ok && [400, 409].includes(res.status)) {
+      res = await fetch(objectUrl, {
+        method: 'PUT',
+        headers: uploadHeaders,
+        body: blob
+      });
+    }
+
     if (!res.ok) {
       const text = await res.text().catch(() => '');
-      throw new Error(text || `Supabase upload HTTP ${res.status}`);
+      let message = text || `Supabase upload HTTP ${res.status}`;
+      try {
+        const parsed = JSON.parse(text);
+        message = parsed.message || parsed.error || message;
+      } catch (_) {}
+      throw new Error(message);
     }
     const publicUrl = `${baseUrl}/storage/v1/object/public/bajozone-media/${safePath.split('/').map(encodeURIComponent).join('/')}`;
     return publicUrl;

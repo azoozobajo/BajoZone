@@ -855,7 +855,8 @@ function initUpload(inputId, prevId, hiddenId) {
           );
         } catch (uploadErr) {
           console.error(uploadErr);
-          showAdminToast('تعذر رفع الصورة إلى Supabase، تم حفظها محلياً مؤقتاً.', true);
+          const reason = uploadErr?.message ? `: ${uploadErr.message}` : '';
+          showAdminToast(`تعذر رفع الصورة إلى Supabase${reason} — تم حفظها محلياً مؤقتاً.`, true);
           finalUrl = dataUrl;
         }
       }
