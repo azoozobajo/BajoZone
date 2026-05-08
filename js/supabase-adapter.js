@@ -68,9 +68,23 @@
     });
   }
 
+  function defaultValueFor(key) {
+    if (['social', 'popup', 'new_article_bar'].includes(key)) return {};
+    if (['about_gallery', 'sources'].includes(key)) return [];
+    if (['tag_ids', 'tags'].includes(key)) return [];
+    if (['featured', 'is_new', 'is_featured'].includes(key)) return false;
+    if (['is_published', 'is_active', 'available'].includes(key)) return true;
+    if (['sort_order'].includes(key)) return 100;
+    if (['view_count', 'share_count', 'download_count'].includes(key)) return 0;
+    if (['reading_time', 'publication_year', 'pages'].includes(key)) return null;
+    if (['category_id', 'program_id', 'document_subtype'].includes(key)) return null;
+    if (key === 'date') return new Date().toISOString().slice(0, 10);
+    return '';
+  }
+
   function pick(row, keys) {
     return keys.reduce((acc, key) => {
-      if (row[key] !== undefined) acc[key] = row[key];
+      acc[key] = row[key] !== undefined ? row[key] : defaultValueFor(key);
       return acc;
     }, {});
   }
