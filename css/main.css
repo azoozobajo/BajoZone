@@ -2947,14 +2947,22 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   display: flex;
   align-items: stretch;
   height: 100%;
-  gap: 8px;
-  animation: photoAlbumSlide 42s linear infinite;
   width: max-content;
+  animation: photoAlbumSlide 52s linear infinite;
+  will-change: transform;
+}
+.about-photo-album-group {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  height: 100%;
+  padding-inline-end: 8px;
+  flex-shrink: 0;
 }
 .about-photo-album-track:hover { animation-play-state: paused; }
 @keyframes photoAlbumSlide {
-  from { transform: translateX(-12.5%); }
-  to   { transform: translateX(-25%); }
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
 [dir="rtl"] .about-photo-album-track { animation-direction: reverse; }
 .about-photo-album-item {
@@ -2963,6 +2971,7 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   aspect-ratio: 4/3;
   border-radius: 8px;
   overflow: hidden;
+  background: rgba(255,255,255,.04);
 }
 .about-photo-album-item img {
   width: 100%;
@@ -2972,6 +2981,7 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   filter: brightness(.82) saturate(.88);
   transition: filter 0.35s ease;
 }
+.about-photo-album-item.is-missing { display: none; }
 .about-photo-album-item:hover img { filter: brightness(1) saturate(1); }
 .about-moments-text-col {
   width: 220px;

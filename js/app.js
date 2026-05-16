@@ -2779,10 +2779,19 @@ function renderAboutPremium() {
   const galleryWithImages = Array.isArray(gallery) ? gallery.filter(item => item && item.image) : [];
   const galleryPhotos = galleryWithImages.length > 0 ? galleryWithImages :
     ['01','02','03','04','05','06'].map(n => ({ image: `/images/about/gallery/journey-${n}.jpg`, title_ar: '', title_en: '' }));
+  const albumRepeat = Math.max(1, Math.ceil(8 / Math.max(galleryPhotos.length, 1)));
   const albumItems = galleryPhotos.map(item =>
-    `<div class="about-photo-album-item"><img src="${mediaSrc(item.image || '')}" alt="${isAr ? (item.title_ar || '') : (item.title_en || '')}" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`
+    `<div class="about-photo-album-item"><img src="${mediaSrc(item.image || '')}" alt="${isAr ? (item.title_ar || '') : (item.title_en || '')}" loading="eager" decoding="async" onerror="this.closest('.about-photo-album-item').classList.add('is-missing')"></div>`
   ).join('');
-  const albumTrack = albumItems.repeat(8);
+  const albumGroup = albumItems.repeat(albumRepeat);
+  const albumTrack = `<div class="about-photo-album-group">${albumGroup}</div><div class="about-photo-album-group" aria-hidden="true">${albumGroup}</div>`;
+  galleryPhotos.forEach(item => {
+    const src = mediaSrc(item.image || '');
+    if (!src) return;
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = src;
+  });
 
   const savedLogos = CMS.s('about_journey_logos', null);
   const logos = (Array.isArray(savedLogos) && savedLogos.length ? savedLogos : AboutPremium.logos)
