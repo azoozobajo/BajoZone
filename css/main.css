@@ -2928,7 +2928,7 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   align-items: stretch;
   height: 100%;
   gap: 8px;
-  animation: photoAlbumSlide 26s linear infinite;
+  animation: photoAlbumSlide 42s linear infinite;
   width: max-content;
 }
 .about-photo-album-track:hover { animation-play-state: paused; }
@@ -2982,11 +2982,11 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   position: relative;
   width: 100%;
   overflow: hidden;
-  border-radius: 6px;
+  border-radius: 0;
 }
 .about-logo-strip-wrap::before,
 .about-logo-strip-wrap::after {
-  content: '';
+  content: none;
   position: absolute;
   top: 0;
   bottom: 0;
@@ -3005,9 +3005,9 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
 .about-logo-track {
   display: flex;
   align-items: center;
-  gap: 36px;
-  padding: 12px 0;
-  animation: aboutLogoScroll 20s linear infinite;
+  gap: 54px;
+  padding: 18px 0;
+  animation: aboutLogoScroll 34s linear infinite;
   width: max-content;
 }
 .about-logo-strip-wrap:hover .about-logo-track { animation-play-state: paused; }
@@ -3018,15 +3018,18 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
 [dir="rtl"] .about-logo-track { animation-direction: reverse; }
 .about-logo-item { flex-shrink: 0; }
 .about-logo-item img {
-  height: 28px;
+  height: clamp(48px, 6vw, 78px);
   width: auto;
+  max-width: 190px;
   object-fit: contain;
-  filter: grayscale(1) brightness(.6);
-  opacity: .65;
-  transition: filter 0.35s ease, opacity 0.35s ease;
+  filter: none;
+  opacity: 1;
+  transition: transform 0.35s ease, opacity 0.35s ease;
   display: block;
+  mix-blend-mode: normal;
+  background: transparent;
 }
-.about-logo-item:hover img { filter: grayscale(0) brightness(1.05); opacity: 1; }
+.about-logo-item:hover img { transform: scale(1.06); opacity: 1; }
 
 /* ══ SCENE 6 — CLOSING ══ */
 .about-closing-statement {
