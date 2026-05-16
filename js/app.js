@@ -1790,7 +1790,7 @@ function renderArticleSingle(id) {
           <button type="button" class="share-btn pdf" title="PDF" aria-label="PDF" onclick="downloadArticlePDF('${a.id}')">PDF</button>
         </div>
       </div>
-      ${a.image ? `<img class="art-hero" src="${imgSrc(a.image)}" alt="${t}">` : ''}
+      ${a.image ? `<figure class="art-hero-frame"><img class="art-hero" src="${imgSrc(a.image)}" alt="${t}"></figure>` : ''}
       ${youtubeEmbedHtml(a.youtube_url)}
       <div class="art-body">${con}</div>
       ${sourcesAccordionHtml(a)}

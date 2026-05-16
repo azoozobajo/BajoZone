@@ -876,7 +876,27 @@ section { padding: 96px 0; }
 .article-detail-grid { display: flex; flex-wrap: wrap; gap: 10px 18px; color: var(--warm-dark); font-size: .78rem; margin-bottom: 12px; }
 .art-meta { display: flex; align-items: center; justify-content: space-between; gap: 18px; font-family: var(--ff-mono); font-size: .72rem; color: var(--warm-dark); padding-bottom: 24px; border-bottom: 1px solid var(--line); margin-bottom: 44px; }
 .art-meta-info { display: flex; align-items: center; gap: 18px; min-width: 0; }
-.art-hero { width: 100%; height: 380px; object-fit: cover; display: block; filter: grayscale(.5); margin-bottom: 44px; }
+.art-hero-frame {
+  width: 100%;
+  min-height: 220px;
+  max-height: min(68vh, 540px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.018);
+  margin: 0 0 44px;
+}
+.art-hero {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: min(68vh, 540px);
+  object-fit: contain;
+  filter: grayscale(.35);
+}
 .art-body { color: var(--off-white); font-size: 1.04rem; line-height: 1.95; }
 .art-body h2 { font-family: var(--ff-display); font-size: 1.75rem; color: var(--paper); margin: 44px 0 18px; }
 .art-body h3 { font-family: var(--ff-display); font-size: 1.3rem; color: var(--paper); margin: 32px 0 14px; }
@@ -934,7 +954,7 @@ body.focus-reading #site-footer,
 body.focus-reading .art-back,
 body.focus-reading .art-eyebrow,
 body.focus-reading .art-meta,
-body.focus-reading .art-hero,
+body.focus-reading .art-hero-frame,
 body.focus-reading .focus-toggle,
 body.focus-reading .article-detail-panel,
 body.focus-reading .related-articles {
