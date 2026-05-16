@@ -3010,69 +3010,84 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   position: relative;
   border-radius: 10px;
 }
-.about-moments-photos-col::before,
-.about-moments-photos-col::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 32px;
-  z-index: 2;
-  pointer-events: none;
-}
-.about-moments-photos-col::before {
-  inset-inline-start: 0;
-  background: linear-gradient(to right, rgba(10,10,10,.85) 0%, transparent 100%);
-}
-.about-moments-photos-col::after {
-  inset-inline-end: 0;
-  background: linear-gradient(to left, rgba(10,10,10,.85) 0%, transparent 100%);
-}
-.about-photo-album-track {
+.about-film-reel {
+  height: 100%;
   display: flex;
-  align-items: stretch;
-  height: 100%;
-  width: max-content;
-  animation: photoAlbumSlide 52s linear infinite;
-  will-change: transform;
+  flex-direction: column;
+  gap: 10px;
 }
-.about-photo-album-group {
-  display: flex;
-  align-items: stretch;
-  gap: 8px;
-  height: 100%;
-  padding-inline-end: 8px;
-  flex-shrink: 0;
+.about-film-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
 }
-.about-photo-album-track:hover { animation-play-state: paused; }
-@keyframes photoAlbumSlide {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-[dir="rtl"] .about-photo-album-track { animation-direction: reverse; }
-.about-photo-album-item {
-  flex-shrink: 0;
+.about-film-slot {
+  position: relative;
+  min-width: 0;
   height: 100%;
-  aspect-ratio: 4/3;
-  border-radius: 8px;
   overflow: hidden;
-  background: rgba(255,255,255,.04);
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.025);
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity .36s ease, transform .42s cubic-bezier(.2,.8,.2,1), border-color .3s ease;
 }
-.about-photo-album-item img {
+.about-film-slot:nth-child(2) { transition-delay: 45ms; }
+.about-film-slot:nth-child(3) { transition-delay: 90ms; }
+.about-film-slot:nth-child(4) { transition-delay: 135ms; }
+.about-film-reel.is-switching .about-film-slot {
+  opacity: 0;
+  transform: translateY(12px) scale(.985);
+}
+.about-film-slot img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  filter: brightness(.82) saturate(.88);
-  transition: filter 0.35s ease;
+  filter: brightness(.84) saturate(.9);
+  transition: filter .35s ease, transform .5s ease;
 }
-.about-photo-album-item.is-missing img { display: none; }
-.about-photo-album-item.is-missing,
-.about-photo-album-item--ph {
-  background: linear-gradient(135deg, rgba(200,168,110,.07) 0%, rgba(200,168,110,.02) 100%);
-  border: 1px solid rgba(200,168,110,.12);
+.about-film-slot:hover {
+  border-color: rgba(200,168,110,.32);
 }
-.about-photo-album-item:hover img { filter: brightness(1) saturate(1); }
+.about-film-slot:hover img {
+  filter: brightness(1) saturate(1);
+  transform: scale(1.025);
+}
+.about-film-slot figcaption {
+  position: absolute;
+  inset-inline: 8px;
+  bottom: 8px;
+  font-size: .62rem;
+  line-height: 1.35;
+  color: rgba(255,255,255,.78);
+  background: linear-gradient(90deg, rgba(0,0,0,.72), rgba(0,0,0,.18));
+  padding: 6px 7px;
+  border-inline-start: 1px solid rgba(200,168,110,.5);
+}
+.about-film-slot.is-empty {
+  display: grid;
+  place-items: end start;
+  background: linear-gradient(135deg, rgba(200,168,110,.07), rgba(255,255,255,.018));
+}
+.about-film-meta {
+  height: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--ff-mono);
+  font-size: .58rem;
+  color: rgba(200,168,110,.72);
+  letter-spacing: .12em;
+}
+.about-film-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(200,168,110,.5), transparent);
+}
 .about-moments-text-col {
   width: 220px;
   flex-shrink: 0;
@@ -3360,6 +3375,8 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   .about-var-btn { padding: 14px 32px; font-size: 1.1rem; }
   .about-moments-main { height: 180px; gap: 16px; }
   .about-moments-text-col { width: 150px; }
+  .about-film-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .about-film-slot figcaption { font-size: .56rem; padding: 5px 6px; }
 }
 
 @media (max-width: 400px) {
@@ -3375,6 +3392,6 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   .about-scene { transition: none !important; }
   .about-scene.is-leaving { transition: none !important; }
   .about-btn-fill, .about-btn-ghost, .about-dot, .about-scene-next,
-  .about-focus-card, .about-photo-album-item img, .about-logo-item img { transition: none !important; }
-  .about-photo-album-track, .about-logo-track { animation: none !important; }
+  .about-focus-card, .about-film-slot, .about-film-slot img, .about-logo-item img { transition: none !important; }
+  .about-logo-track { animation: none !important; }
 }

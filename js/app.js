@@ -2782,17 +2782,14 @@ function renderAboutPremium() {
     : ['Talent Discovery','Sport Science','Talent Development','Player Care','Football Academies','Youth Categories','Team Building','Player Scouting'];
   const keywords = CMS.s('about_keywords', null) || defaultKeywords;
   const kwItems = keywords.map(kw => `<span class="about-hero-kw">${kw}</span>`).join('');
+  const aboutEsc = value => String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 
   const gallery = CMS.s('about_gallery', []);
   const galleryWithImages = Array.isArray(gallery) ? gallery.filter(item => item && item.image) : [];
-  const albumRepeat = Math.max(1, Math.ceil(8 / Math.max(galleryWithImages.length || 6, 1)));
-  const albumItems = galleryWithImages.length > 0
-    ? galleryWithImages.map(item =>
-        `<div class="about-photo-album-item"><img src="${mediaSrc(item.image || '')}" alt="${isAr ? (item.title_ar || '') : (item.title_en || '')}" loading="eager" decoding="async" onerror="this.closest('.about-photo-album-item').classList.add('is-missing')"></div>`
-      ).join('')
-    : Array.from({length: 6}, () => `<div class="about-photo-album-item about-photo-album-item--ph"></div>`).join('');
-  const albumGroup = albumItems.repeat(albumRepeat);
-  const albumTrack = `<div class="about-photo-album-group">${albumGroup}</div><div class="about-photo-album-group" aria-hidden="true">${albumGroup}</div>`;
   galleryWithImages.forEach(item => {
     const src = mediaSrc(item.image || '');
     if (!src) return;
@@ -2800,6 +2797,17 @@ function renderAboutPremium() {
     img.decoding = 'async';
     img.src = src;
   });
+  const filmItems = galleryWithImages.map((item, idx) => ({
+    src: mediaSrc(item.image || ''),
+    title: isAr ? (item.title_ar || item.title_en || '') : (item.title_en || item.title_ar || ''),
+    idx
+  }));
+  const filmSlotsHtml = Array.from({ length: 4 }, (_, idx) => `
+    <figure class="about-film-slot${filmItems.length ? '' : ' is-empty'}" data-film-slot="${idx}">
+      ${filmItems.length ? `<img src="${aboutEsc(filmItems[idx % filmItems.length].src)}" alt="${aboutEsc(filmItems[idx % filmItems.length].title)}" loading="eager" decoding="async">` : ''}
+      <figcaption>${aboutEsc(filmItems.length ? (filmItems[idx % filmItems.length].title || (isAr ? 'محطة من الرحلة' : 'Journey moment')) : (isAr ? 'أضف صورة من لوحة التحكم' : 'Add an image from admin'))}</figcaption>
+    </figure>
+  `).join('');
 
   const savedLogos = CMS.s('about_journey_logos', null);
   const logos = (Array.isArray(savedLogos) && savedLogos.length ? savedLogos : AboutPremium.logos)
@@ -2908,7 +2916,13 @@ function renderAboutPremium() {
               <p class="about-moments-text-body">${c.experience.text}</p>
             </div>
             <div class="about-moments-photos-col">
-              <div class="about-photo-album-track">${albumTrack}</div>
+              <div class="about-film-reel" id="about-film-reel" data-count="${filmItems.length}">
+                <div class="about-film-grid">${filmSlotsHtml}</div>
+                <div class="about-film-meta">
+                  <span class="about-film-count" id="about-film-count">${filmItems.length ? `01 / ${String(Math.max(1, Math.ceil(filmItems.length / 4))).padStart(2, '0')}` : '00 / 00'}</span>
+                  <span class="about-film-line" aria-hidden="true"></span>
+                </div>
+              </div>
             </div>
           </div>
           <div class="about-logo-strip-wrap">
@@ -2964,8 +2978,68 @@ function renderAboutPremium() {
 
   requestAnimationFrame(() => {
     initAboutScenes();
+    initAboutFilmReel(filmItems);
     if (varEnabled !== false) initVarCheck(varData);
   });
+}
+
+function initAboutFilmReel(items) {
+  const reel = document.getElementById('about-film-reel');
+  if (!reel) return;
+  const slots = [...reel.querySelectorAll('[data-film-slot]')];
+  const count = document.getElementById('about-film-count');
+  const photos = Array.isArray(items) ? items.filter(item => item && item.src) : [];
+  if (!slots.length || !photos.length) return;
+
+  const size = 4;
+  const totalBatches = Math.max(1, Math.ceil(photos.length / size));
+  let batch = 0;
+  let timer = null;
+  const esc = value => String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+
+  const batchItems = (batchIndex) => {
+    const start = (batchIndex * size) % photos.length;
+    return Array.from({ length: size }, (_, i) => photos[(start + i) % photos.length]);
+  };
+
+  const renderBatch = (batchIndex) => {
+    reel.classList.add('is-switching');
+    const nextItems = batchItems(batchIndex);
+    window.setTimeout(() => {
+      slots.forEach((slot, idx) => {
+        const item = nextItems[idx];
+        const label = item.title || (Lang.cur === 'ar' ? 'محطة من الرحلة' : 'Journey moment');
+        slot.innerHTML = `<img src="${esc(item.src)}" alt="${esc(label)}" loading="eager" decoding="async"><figcaption>${esc(label)}</figcaption>`;
+      });
+      if (count) count.textContent = `${String((batchIndex % totalBatches) + 1).padStart(2, '0')} / ${String(totalBatches).padStart(2, '0')}`;
+      reel.classList.remove('is-switching');
+    }, 230);
+  };
+
+  const next = () => {
+    if (!document.getElementById('about-film-reel')) { stop(); return; }
+    batch = (batch + 1) % totalBatches;
+    renderBatch(batch);
+  };
+
+  const start = () => {
+    if (timer || photos.length <= size) return;
+    timer = window.setInterval(next, 4200);
+  };
+  const stop = () => {
+    if (!timer) return;
+    window.clearInterval(timer);
+    timer = null;
+  };
+
+  reel.addEventListener('mouseenter', stop);
+  reel.addEventListener('mouseleave', start);
+  renderBatch(0);
+  start();
 }
 
 function initAboutScenes() {
