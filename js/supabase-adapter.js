@@ -204,7 +204,8 @@
     await upsertTable('programs', (db.programs || []).map(item => payloadClean(item, [
       'id', 'slug', 'name_ar', 'name_en', 'short_description_ar',
       'short_description_en', 'description_ar', 'description_en',
-      'logo_url', 'accent_color', 'sort_order', 'is_active'
+      'logo_url', 'cover_image', 'accent_color', 'sort_order', 'is_active',
+      'is_featured'
     ])));
     await upsertTable('categories', (db.categories || []).map(item => payloadClean(item, [
       'id', 'name_ar', 'name_en', 'sort_order'

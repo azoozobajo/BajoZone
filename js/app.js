@@ -27,6 +27,7 @@ const CMS = {
     if (s) {
       try { this.db = JSON.parse(s); } catch(e) { this.db = null; }
     }
+    if (this.db) return true;
     try {
       const r = await fetch('data/db.json?t=' + Date.now());
       if (!r.ok) throw 0;
@@ -290,12 +291,22 @@ function updatePageMeta(title, description, image, url) {
   setMetaTag('description', description);
   setMetaTag('og:title', title, true);
   setMetaTag('og:description', description, true);
-  setMetaTag('og:image', image || CMS.s('logo', 'assets/images/logo-bajo.png'), true);
+  setMetaTag('og:image', imgSrc(image || CMS.s('logo', 'assets/images/logo-bajo.png')), true);
   setMetaTag('og:url', url || location.href, true);
   setMetaTag('twitter:card', 'summary_large_image');
   setMetaTag('twitter:title', title);
   setMetaTag('twitter:description', description);
-  setMetaTag('twitter:image', image || CMS.s('logo', 'assets/images/logo-bajo.png'));
+  setMetaTag('twitter:image', imgSrc(image || CMS.s('logo', 'assets/images/logo-bajo.png')));
+}
+function mediaSrc(url) {
+  if (!url) return '';
+  const value = String(url).trim();
+  if (/^(data:|blob:|https?:\/\/|\/)/i.test(value)) return value;
+  if (value.startsWith('public/')) return '/' + value.replace(/^public\//, '');
+  return value;
+}
+function imgSrc(url) {
+  return mediaSrc(url);
 }
 function copyTextToClipboard(text) {
   if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -381,8 +392,8 @@ function downloadArticlePDF(id) {
   const dateLabel = isAr ? 'التاريخ' : 'Date';
   const sourceLabel = isAr ? 'المصدر' : 'Source';
   const siteUrl = 'www.bajozone.com';
-  const logo = CMS.s('logo', 'assets/images/logo-bajo.png');
-  const image = a.image ? `<img class="hero-img" src="${a.image}" alt="${t}">` : '';
+  const logo = imgSrc(CMS.s('logo', 'assets/images/logo-bajo.png'));
+  const image = a.image ? `<img class="hero-img" src="${imgSrc(a.image)}" alt="${t}">` : '';
   const html = `<!doctype html>
 <html lang="${Lang.cur}" dir="${dir}">
 <head>
@@ -518,7 +529,7 @@ function renderNav() {
   const ne = document.getElementById('nav-brand-name');
   if (ne) ne.textContent = CMS.s('site_name_en', 'BajoZone');
   const li = document.getElementById('nav-logo');
-  if (li) li.src = CMS.s('logo', 'assets/images/logo-bajo.png');
+  if (li) li.src = imgSrc(CMS.s('logo', 'assets/images/logo-bajo.png'));
   const ul = document.getElementById('nav-links');
   if (ul) ul.innerHTML = `
     <li><a href="#/" onclick="Router.go('/')">${Lang.t('home')}</a></li>
@@ -558,7 +569,7 @@ function renderFooter() {
       <div class="container">
         <div class="footer-grid">
           <div>
-            <img class="footer-brand-logo" src="${CMS.s('logo','assets/images/logo-bajo.png')}" alt="${nameEn}" onerror="this.style.display='none'">
+            <img class="footer-brand-logo" src="${imgSrc(CMS.s('logo','assets/images/logo-bajo.png'))}" alt="${nameEn}" onerror="this.style.display='none'">
             <div class="footer-brand-name">${nameEn}</div>
             <p class="footer-brand-desc">${footerDesc}</p>
           </div>
@@ -596,7 +607,7 @@ function maybeShowPopup() {
   const delay = (popup.delay || 2) * 1000;
   setTimeout(() => {
     const msg = Lang.cur === 'ar' ? (popup.message_ar || '') : (popup.message_en || '');
-    const img = popup.image || '';
+    const img = imgSrc(popup.image || '');
     const el = document.createElement('div');
     el.id = 'bz-popup';
     el.style.cssText = 'position:fixed;inset:0;z-index:8000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.82);backdrop-filter:blur(10px);animation:fadein .4s ease;';
@@ -708,7 +719,7 @@ function bkCard(b) {
     <div class="book-card reveal" onclick="Router.go('/book/${b.id}')" style="cursor:pointer;" role="button" tabindex="0" onkeydown="if(event.key==='Enter')Router.go('/book/${b.id}')">
       <div class="book-cover-wrap">
         ${b.cover
-          ? `<img class="book-cover" src="${b.cover}" alt="${t}" loading="lazy" onerror="this.style.display='none'">`
+          ? `<img class="book-cover" src="${imgSrc(b.cover)}" alt="${t}" loading="lazy" onerror="this.style.display='none'">`
           : `<div class="book-cover-ph"><span class="icon">📚</span><span class="name">${t}</span></div>`}
         ${badge}
       </div>
@@ -748,7 +759,7 @@ function renderBookSingle(id) {
       <div style="display:grid;grid-template-columns:280px 1fr;gap:56px;align-items:start;">
         <div style="position:sticky;top:100px;">
           ${b.cover
-            ? `<img src="${b.cover}" alt="${t}" style="width:100%;display:block;filter:grayscale(.3);border:1px solid var(--line);">`
+            ? `<img src="${imgSrc(b.cover)}" alt="${t}" style="width:100%;display:block;filter:grayscale(.3);border:1px solid var(--line);">`
             : `<div style="width:100%;aspect-ratio:2/3;background:linear-gradient(160deg,var(--gold-dim),rgba(255,255,255,.02));display:flex;align-items:center;justify-content:center;font-size:4rem;opacity:.3;border:1px solid var(--line);">📚</div>`}
         </div>
         <div>
@@ -835,14 +846,14 @@ function artCard(a) {
   const prog = getProgramForArticle(a);
   const isAr = Lang.cur === 'ar';
   const progBadge = prog ? `<div class="prog-badge">
-      ${prog.logo_url ? `<img src="${prog.logo_url}" alt="" class="prog-badge-logo" loading="lazy">` : `<span class="prog-badge-initial">${(isAr ? prog.name_ar : (prog.name_en || prog.name_ar)).slice(0,1)}</span>`}
+      ${prog.logo_url ? `<img src="${imgSrc(prog.logo_url)}" alt="" class="prog-badge-logo" loading="lazy">` : `<span class="prog-badge-initial">${(isAr ? prog.name_ar : (prog.name_en || prog.name_ar)).slice(0,1)}</span>`}
       <span>${isAr ? prog.name_ar : (prog.name_en || prog.name_ar)}</span>
     </div>` : '';
   const tags = tagChipsHtml(a);
   return `
     <article class="card reveal" onclick="Router.go('/article/${a.id}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')Router.go('/article/${a.id}')">
       ${a.image
-        ? `<img class="card-thumb" src="${a.image}" alt="${t}" loading="lazy" onerror="this.style.display='none'">`
+        ? `<img class="card-thumb" src="${imgSrc(a.image)}" alt="${t}" loading="lazy" onerror="this.style.display='none'">`
         : `<div class="card-thumb-ph">✍</div>`}
       <div class="card-body">
         ${progBadge}
@@ -1410,12 +1421,12 @@ function renderHomeStory() {
                 const progName = prog ? (isAr ? prog.name_ar : (prog.name_en || prog.name_ar)) : '';
                 const progIdHtml = prog ? `<div class="fci-prog-id">
                   ${prog.logo_url
-                    ? `<img src="${prog.logo_url}" alt="${progName}" class="fci-prog-logo">`
+                    ? `<img src="${imgSrc(prog.logo_url)}" alt="${progName}" class="fci-prog-logo">`
                     : `<div class="fci-prog-initial">${progName.slice(0,1)}</div>`}
                   <span class="fci-prog-name">${progName}</span>
                 </div>` : '';
                 return `<div class="featured-cycle-item${i===0?' fci-active':''}" data-fci="${i}" onclick="Router.go('/article/${a.id}')">
-                  ${a.image ? `<img class="fci-img" src="${a.image}" alt="${t}" loading="lazy">` : '<div class="fci-img-ph"></div>'}
+                  ${a.image ? `<img class="fci-img" src="${imgSrc(a.image)}" alt="${t}" loading="lazy">` : '<div class="fci-img-ph"></div>'}
                   <div class="fci-body">
                     ${progIdHtml}
                     <h3 class="fci-title">${t}</h3>
@@ -1450,7 +1461,7 @@ function renderHomeStory() {
                 const t = Lang.str({ ar: a.title_ar, en: a.title_en });
                 const initial = prog ? (isAr ? prog.name_ar : (prog.name_en || prog.name_ar)).slice(0, 1) : '؟';
                 const logoHtml = prog?.logo_url
-                  ? `<img src="${prog.logo_url}" alt="">`
+                  ? `<img src="${imgSrc(prog.logo_url)}" alt="">`
                   : `<div class="li-prog-initial">${initial}</div>`;
                 return `<div class="latest-item${i===0?' li-active':''}" data-li="${i}" onclick="Router.go('/article/${a.id}')">
                   <div class="li-prog-logo">${logoHtml}</div>
@@ -1588,7 +1599,7 @@ function buildTickerHtml(arts, programs, isAr) {
     const title = (isAr ? a.title_ar : a.title_en) || a.title_ar || '';
     const initial = prog ? (isAr ? prog.name_ar : (prog.name_en || prog.name_ar)).slice(0, 1) : '؟';
     const logoHtml = prog?.logo_url
-      ? `<img class="ticker-prog-logo" src="${prog.logo_url}" alt="">`
+      ? `<img class="ticker-prog-logo" src="${imgSrc(prog.logo_url)}" alt="">`
       : `<span class="ticker-prog-initial">${initial}</span>`;
     return `<span class="ticker-item" onclick="Router.go('/article/${a.id}')" role="link" tabindex="0" onkeydown="if(event.key==='Enter')Router.go('/article/${a.id}')">${logoHtml}<span class="ticker-title">${title}</span></span><span class="ticker-dot" aria-hidden="true"></span>`;
   }
@@ -1614,7 +1625,7 @@ function programCardHtml(p, isAr, arts) {
       <div class="prog-card-base">
         <div class="prog-card-logo">
           ${p.logo_url
-            ? `<img src="${p.logo_url}" alt="${name}" loading="lazy">`
+            ? `<img src="${imgSrc(p.logo_url)}" alt="${name}" loading="lazy">`
             : `<div class="prog-card-initial">${initial}</div>`}
         </div>
         <div class="prog-card-name">${name}</div>
@@ -1646,7 +1657,7 @@ function updateProgramTopics(programId, isAr) {
       <div class="program-selected-info reveal">
         <div class="program-selected-logo">
           ${program.logo_url
-            ? `<img src="${program.logo_url}" alt="${name}" loading="lazy">`
+            ? `<img src="${imgSrc(program.logo_url)}" alt="${name}" loading="lazy">`
             : `<div class="program-logo-ph lg"><span>${initial}</span></div>`}
         </div>
         <div class="program-selected-text">
@@ -1739,7 +1750,7 @@ function renderArticleSingle(id) {
   const progBanner = prog ? `
     <div class="art-program-banner" onclick="Router.go('/programs')" style="cursor:pointer;" title="${isAr ? 'فتح البرنامج' : 'Open program'}">
       ${prog.logo_url
-        ? `<img src="${prog.logo_url}" alt="" class="art-prog-logo" loading="lazy">`
+        ? `<img src="${imgSrc(prog.logo_url)}" alt="" class="art-prog-logo" loading="lazy">`
         : `<div class="art-prog-logo-ph">${(isAr ? prog.name_ar : (prog.name_en || prog.name_ar)).slice(0,1)}</div>`}
       <div class="art-prog-info">
         <span class="art-prog-label">${isAr ? 'برنامج' : 'Program'}</span>
@@ -1779,7 +1790,7 @@ function renderArticleSingle(id) {
           <button type="button" class="share-btn pdf" title="PDF" aria-label="PDF" onclick="downloadArticlePDF('${a.id}')">PDF</button>
         </div>
       </div>
-      ${a.image ? `<img class="art-hero" src="${a.image}" alt="${t}">` : ''}
+      ${a.image ? `<img class="art-hero" src="${imgSrc(a.image)}" alt="${t}">` : ''}
       ${youtubeEmbedHtml(a.youtube_url)}
       <div class="art-body">${con}</div>
       ${sourcesAccordionHtml(a)}
@@ -1796,7 +1807,7 @@ function renderArticleSingle(id) {
   updatePageMeta(
     `${t} — ${CMS.s('site_name_en', 'BajoZone')}`,
     con.replace(/<[^>]+>/g, '').slice(0, 140),
-    a.image || CMS.s('logo', 'assets/images/logo-bajo.png'),
+    imgSrc(a.image || CMS.s('logo', 'assets/images/logo-bajo.png')),
     getShareUrl(a.id)
   );
 }
@@ -1865,7 +1876,7 @@ function resourceCard(r, isAr, isFeatured) {
       <div class="rc-type-badge" style="background:${typeColor}20;color:${typeColor};border-color:${typeColor}40">
         ${typeIcon}<span>${typeLabel}</span>
       </div>
-      ${r.cover_image ? `<img class="rc-cover" src="${r.cover_image}" alt="${t}" loading="lazy">` : ''}
+      ${r.cover_image ? `<img class="rc-cover" src="${imgSrc(r.cover_image)}" alt="${t}" loading="lazy">` : ''}
       <div class="rc-body">
         <h3 class="rc-title">${t}</h3>
         <p class="rc-desc">${desc}</p>
@@ -1920,7 +1931,7 @@ function openResourceDetail(id) {
           ${r.file_size?`<span>${r.file_size}</span>`:''}
         </div>
       </div>
-      ${r.cover_image?`<img class="lib-modal-cover" src="${r.cover_image}" alt="${t}">`:''}
+      ${r.cover_image?`<img class="lib-modal-cover" src="${imgSrc(r.cover_image)}" alt="${t}">`:''}
       ${fullDesc?`<div class="lib-modal-section"><p class="lib-modal-full-desc">${fullDesc}</p></div>`:''}
       ${bajo.length?`<div class="lib-modal-section"><div class="lib-modal-section-title">${isAr?'ملخص باجو زون':'BajoZone Summary'}</div><ul class="lib-modal-list">${bajo.map(b=>`<li>${b}</li>`).join('')}</ul></div>`:''}
       ${why.length?`<div class="lib-modal-section"><div class="lib-modal-section-title">${isAr?'لماذا يهمك هذا المورد؟':'Why Does This Matter?'}</div><ul class="lib-modal-list">${why.map(w=>`<li>${w}</li>`).join('')}</ul></div>`:''}
@@ -2090,7 +2101,7 @@ function renderBooks() {
 /* ── ABOUT BAJO ─────────────────────────────── */
 function renderAbout() {
   const isAr = Lang.cur === 'ar';
-  const abtImg = CMS.s('about_image', '');
+  const abtImg = imgSrc(CMS.s('about_image', ''));
   const gallery = CMS.s('about_gallery', []);
   const articlesCount = CMS.list('articles').length;
   const booksCount = CMS.list('books').length;
@@ -2211,7 +2222,7 @@ function renderAbout() {
   const contactHref = /^(https?:|mailto:|tel:|https:\/\/wa\.me)/i.test(profile.email || '') ? profile.email : `mailto:${profile.email}`;
 
   const albumItems = Array.isArray(gallery) && gallery.length ? gallery.map(item => ({
-    image: item.image || '',
+    image: imgSrc(item.image || ''),
     title: Lang.str({ ar: item.title_ar, en: item.title_en }, profile.albumTitle),
     story: Lang.str({ ar: item.story_ar, en: item.story_en }, '')
   })) : profile.emptyAlbum.map(item => ({ image: '', title: item[0], story: item[1] }));
@@ -2236,7 +2247,7 @@ function renderAbout() {
           <div class="bajo-portrait reveal">
             <div class="portrait-card">
               ${abtImg
-                ? `<img src="${abtImg}" alt="${profile.name}" loading="eager">`
+                ? `<img src="${imgSrc(abtImg)}" alt="${profile.name}" loading="eager">`
                 : `<div class="portrait-placeholder"><span>BAJO</span><strong>${profile.name}</strong><small>${isAr ? 'أضف صورتك من لوحة التحكم' : 'Add your photo from admin'}</small></div>`}
               <div class="portrait-strip">
                 <span>Sports Science</span><span>Talent ID</span><span>Youth Football</span>
@@ -2329,7 +2340,7 @@ function renderAbout() {
         <div class="about-stations-slider reveal" style="--station-count:${movingAlbum.length || 1};">
           <div class="about-stations-track">
           ${movingAlbum.map((item, idx) => `<article class="about-memory">
-            ${item.image ? `<img src="${item.image}" alt="${item.title}" loading="lazy">` : `<div class="about-memory-ph"><span>${String(idx + 1).padStart(2, '0')}</span></div>`}
+            ${item.image ? `<img src="${imgSrc(item.image)}" alt="${item.title}" loading="lazy">` : `<div class="about-memory-ph"><span>${String(idx + 1).padStart(2, '0')}</span></div>`}
             <div class="about-memory-body">
               <span>${String((idx % albumItems.length) + 1).padStart(2, '0')}</span>
               <h3>${item.title}</h3>
@@ -2370,7 +2381,7 @@ function renderAbout() {
   updatePageMeta(
     `${profile.name} — ${CMS.s('site_name_en', 'BajoZone')}`,
     profile.lead,
-    CMS.s('about_image', CMS.s('logo', 'assets/images/logo-bajo.png')),
+    imgSrc(CMS.s('about_image', CMS.s('logo', 'assets/images/logo-bajo.png'))),
     location.origin + location.pathname + '#/about'
   );
 }
@@ -2433,7 +2444,7 @@ function renderAboutPortfolio() {
     } else if (langEditable[key]) profile[key] = langEditable[key];
   });
 
-  const abtImg = CMS.s('about_image', '');
+  const abtImg = imgSrc(CMS.s('about_image', ''));
   const gallery = CMS.s('about_gallery', []);
   const books = CMS.list('books');
   const book = books[0] || null;
@@ -2446,7 +2457,7 @@ function renderAboutPortfolio() {
     [isAr ? 'مشروع أو كتاب' : 'Project or Book', isAr ? 'اعرض العمل كقصة لا كصورة فقط.' : 'Present the work as a story, not only an image.']
   ];
   const stations = (Array.isArray(gallery) && gallery.length ? gallery.map(item => ({
-    image: item.image || '',
+    image: imgSrc(item.image || ''),
     title: Lang.str({ ar: item.title_ar, en: item.title_en }, profile.albumTitle),
     story: Lang.str({ ar: item.story_ar, en: item.story_en }, '')
   })) : albumFallback.map(item => ({ image: '', title: item[0], story: item[1] })));
@@ -2478,7 +2489,7 @@ function renderAboutPortfolio() {
             </div>
             <div class="portfolio-visual reveal">
               <div class="portfolio-portrait-panel">
-                ${abtImg ? `<img src="${abtImg}" alt="${profile.name}" loading="eager">` : `<div class="portfolio-portrait-empty"><b>BAJO</b><span>${profile.name}</span></div>`}
+                ${abtImg ? `<img src="${imgSrc(abtImg)}" alt="${profile.name}" loading="eager">` : `<div class="portfolio-portrait-empty"><b>BAJO</b><span>${profile.name}</span></div>`}
                 <div class="portfolio-orbit p1"><span>01</span>${isAr ? 'موهبة' : 'Talent'}</div>
                 <div class="portfolio-orbit p2"><span>02</span>${isAr ? 'ميدان' : 'Field'}</div>
                 <div class="portfolio-orbit p3"><span>03</span>${isAr ? 'معرفة' : 'Knowledge'}</div>
@@ -2544,7 +2555,7 @@ function renderAboutPortfolio() {
         <div class="portfolio-stations-slider reveal" style="--station-count:${stationLoop.length || 1};">
           <div class="portfolio-stations-track">
             ${stationLoop.map((item, idx) => `<article class="portfolio-station-card">
-              ${item.image ? `<img src="${item.image}" alt="${item.title}" loading="lazy">` : `<div class="portfolio-station-empty">${String((idx % stations.length) + 1).padStart(2, '0')}</div>`}
+              ${item.image ? `<img src="${imgSrc(item.image)}" alt="${item.title}" loading="lazy">` : `<div class="portfolio-station-empty">${String((idx % stations.length) + 1).padStart(2, '0')}</div>`}
               <div class="portfolio-station-caption">
                 <span>${String((idx % stations.length) + 1).padStart(2, '0')}</span>
                 <h3>${item.title}</h3>
@@ -2589,7 +2600,7 @@ function renderAboutPortfolio() {
           <div class="portfolio-work-grid">
             <article class="portfolio-book-feature reveal" ${book ? `onclick="Router.go('/book/${book.id}')"` : ''}>
               <div class="portfolio-book-cover">
-                ${book?.cover ? `<img src="${book.cover}" alt="${Lang.str({ ar: book.title_ar, en: book.title_en })}" loading="lazy">` : `<span>${isAr ? 'كتاب' : 'Book'}</span>`}
+                ${book?.cover ? `<img src="${imgSrc(book.cover)}" alt="${Lang.str({ ar: book.title_ar, en: book.title_en })}" loading="lazy">` : `<span>${isAr ? 'كتاب' : 'Book'}</span>`}
               </div>
               <div>
                 <span class="portfolio-card-kicker">${isAr ? 'كتاب / مرجع' : 'Book / Reference'}</span>
@@ -2622,7 +2633,7 @@ function renderAboutPortfolio() {
   updatePageMeta(
     `${profile.name} — ${CMS.s('site_name_en', 'BajoZone')}`,
     profile.lead,
-    CMS.s('about_image', CMS.s('logo', 'assets/images/logo-bajo.png')),
+    imgSrc(CMS.s('about_image', CMS.s('logo', 'assets/images/logo-bajo.png'))),
     location.origin + location.pathname + '#/about'
   );
 }
@@ -2757,7 +2768,7 @@ function renderAboutPremium() {
   const emailRaw = social?.email?.value || (typeof social?.email === 'string' ? social.email : '') || '';
   const contactHref = emailRaw.includes('@') ? `mailto:${emailRaw}` : '#';
 
-  const heroPhoto = CMS.s('about_image', '');
+  const heroPhoto = mediaSrc(CMS.s('about_image', ''));
   const defaultKeywords = isAr
     ? ['اكتشاف المواهب','علوم الرياضة','تطوير المواهب','رعاية المواهب','أكاديميات كرة القدم','الفئات السنية','بناء الفريق','استقطاب اللاعبين']
     : ['Talent Discovery','Sport Science','Talent Development','Player Care','Football Academies','Youth Categories','Team Building','Player Scouting'];
@@ -2768,13 +2779,13 @@ function renderAboutPremium() {
   const galleryPhotos = gallery.length > 0 ? gallery :
     ['01','02','03','04','05','06'].map(n => ({ image: `/images/about/gallery/journey-${n}.jpg`, title_ar: '', title_en: '' }));
   const albumItems = galleryPhotos.map(item =>
-    `<div class="about-photo-album-item"><img src="${item.image || ''}" alt="${isAr ? (item.title_ar || '') : (item.title_en || '')}" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`
+    `<div class="about-photo-album-item"><img src="${mediaSrc(item.image || '')}" alt="${isAr ? (item.title_ar || '') : (item.title_en || '')}" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`
   ).join('');
   const albumTrack = albumItems + albumItems;
 
   const logos = CMS.s('about_journey_logos', null) || AboutPremium.logos;
   const logoItems = logos.map(logo =>
-    `<div class="about-logo-item"><img src="${logo.src.startsWith('http') ? logo.src : '/' + logo.src}" alt="${isAr ? logo.alt_ar : logo.alt_en}" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`
+    `<div class="about-logo-item"><img src="${mediaSrc(logo.src || '')}" alt="${isAr ? logo.alt_ar : logo.alt_en}" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`
   ).join('');
   const logoTrack = logoItems + logoItems;
 

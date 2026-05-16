@@ -56,9 +56,11 @@ create table if not exists public.programs (
   description_ar text default '',
   description_en text default '',
   logo_url text default '',
+  cover_image text not null default '',
   accent_color text default '#c8a86e',
   sort_order integer not null default 100,
   is_active boolean not null default true,
+  is_featured boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -403,4 +405,3 @@ using (bucket_id = 'bajozone-media');
 insert into public.site_settings (id, site_name_ar, site_name_en)
 values ('main', 'باجو زون', 'BajoZone')
 on conflict (id) do nothing;
-

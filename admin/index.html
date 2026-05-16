@@ -584,11 +584,15 @@ function dbSave() {
     body: JSON.stringify(DB)
   }).catch(() => {});
   saveSupabaseNow();
+  return;
   showToast('تم الحفظ بنجاح ✓', 'ok');
 }
 
 async function saveSupabaseNow() {
-  if (!window.BajoSupabase?.ready?.() || !window.BajoSupabase.getAccessToken?.()) return false;
+  if (!window.BajoSupabase?.ready?.() || !window.BajoSupabase.getAccessToken?.()) {
+    showToast('Not synced to Supabase: sign in with your Supabase email.', 'err');
+    return false;
+  }
   try {
     await window.BajoSupabase.saveDb(DB);
     showToast('تم تحديث Supabase ✓', 'ok');
@@ -807,8 +811,20 @@ function dataUrlToBlob(dataUrl) {
 
 function mediaSrc(url) {
   if (!url) return '';
-  if (/^(data:|blob:|https?:\/\/|\/)/i.test(url)) return url;
-  return '../' + url;
+  const value = String(url).trim();
+  if (/^(data:|blob:|https?:\/\/|\/)/i.test(value)) return value;
+  if (value.startsWith('public/')) return '../' + value.replace(/^public\//, '');
+  return '../' + value;
+}
+
+function hasSupabaseSession() {
+  return !!(window.BajoSupabase?.ready?.() && window.BajoSupabase?.getAccessToken?.());
+}
+
+function requireSupabaseSessionForMedia() {
+  if (hasSupabaseSession()) return true;
+  showAdminToast('Upload requires Supabase login. Sign in with your Supabase email, not the local admin user.', true);
+  return false;
 }
 
 function uploadPathFor(inputId, file) {
@@ -863,7 +879,8 @@ function initUpload(inputId, prevId, hiddenId) {
           console.error(uploadErr);
           const reason = uploadErr?.message ? `: ${uploadErr.message}` : '';
           showAdminToast(`تعذر رفع الصورة إلى Supabase${reason} — تم حفظها محلياً مؤقتاً.`, true);
-          finalUrl = dataUrl;
+          if (ph) ph.textContent = oldPh;
+          return;
         }
       }
 
@@ -871,6 +888,64 @@ function initUpload(inputId, prevId, hiddenId) {
       if (prev) { prev.src = finalUrl; prev.style.display = 'block'; }
       ge(hiddenId).value = finalUrl;
       if (txt) txt.innerHTML = '<span style="color:#4caf50;">✓ تم تحميل الصورة</span>';
+      setTimeout(() => { if (txt) txt.textContent = origTxt; }, 2500);
+    });
+  });
+}
+
+function initUpload(inputId, prevId, hiddenId) {
+  const input = ge(inputId);
+  if (!input) return;
+  input.addEventListener('change', function() {
+    const file = this.files[0];
+    if (!file) return;
+
+    const upzone = input.closest('.upzone');
+    const txt = upzone?.querySelector('.upzone-txt');
+    const origTxt = txt?.textContent || '';
+    if (txt) txt.innerHTML = '<span style="color:#c8a86e;">Processing image...</span>';
+    input.disabled = true;
+
+    compressImage(file, 1400, 1400, 0.82, async (err, dataUrl) => {
+      input.disabled = false;
+
+      if (err) {
+        if (txt) txt.textContent = origTxt;
+        showAdminToast('Image processing failed: ' + err, true);
+        return;
+      }
+
+      if (dataUrl.length > 4 * 1024 * 1024) {
+        if (txt) txt.textContent = origTxt;
+        showAdminToast('Image is still too large after compression. Try a smaller image.', true);
+        return;
+      }
+
+      if (!requireSupabaseSessionForMedia()) {
+        if (txt) txt.textContent = origTxt;
+        return;
+      }
+
+      let finalUrl = '';
+      try {
+        if (txt) txt.innerHTML = '<span style="color:#c8a86e;">Uploading to Supabase...</span>';
+        finalUrl = await window.BajoSupabase.uploadMedia(
+          dataUrlToBlob(dataUrl),
+          uploadPathFor(inputId, file),
+          'image/jpeg'
+        );
+      } catch (uploadErr) {
+        console.error(uploadErr);
+        const reason = uploadErr?.message ? `: ${uploadErr.message}` : '';
+        if (txt) txt.textContent = origTxt;
+        showAdminToast(`Supabase upload failed${reason}`, true);
+        return;
+      }
+
+      const prev = ge(prevId);
+      if (prev) { prev.src = mediaSrc(finalUrl); prev.style.display = 'block'; }
+      ge(hiddenId).value = finalUrl;
+      if (txt) txt.innerHTML = '<span style="color:#4caf50;">Uploaded to Supabase</span>';
       setTimeout(() => { if (txt) txt.textContent = origTxt; }, 2500);
     });
   });
@@ -2208,6 +2283,14 @@ function bindGalleryEditorFixed() {
           showAdminToast('خطأ في الصورة: ' + err, true);
           return;
         }
+        if (!requireSupabaseSessionForMedia()) {
+          if (ph) ph.textContent = oldPh;
+          return;
+        }
+        if (!requireSupabaseSessionForMedia()) {
+          if (ph) ph.textContent = oldPh;
+          return;
+        }
         let finalUrl = '';
         if (window.BajoSupabase?.getAccessToken?.()) {
           try {
@@ -2222,6 +2305,10 @@ function bindGalleryEditorFixed() {
             const reason = uploadErr?.message ? `: ${uploadErr.message}` : '';
             showAdminToast(`تعذر رفع صورة المحطة إلى Supabase${reason}`, true);
           }
+        }
+        if (!finalUrl) {
+          if (ph) ph.textContent = oldPh;
+          return;
         }
         if (!finalUrl) {
           if (dataUrl.length > 900 * 1024) {
@@ -2389,6 +2476,10 @@ function bindLogoEditor() {
       const ph = item.querySelector('.gallery-admin-ph');
       const oldPh = ph?.textContent || 'لوقو';
       if (ph) ph.textContent = 'جاري المعالجة...';
+      if (!requireSupabaseSessionForMedia()) {
+        if (ph) ph.textContent = oldPh;
+        return;
+      }
       this.disabled = true;
       compressImage(file, 400, 400, 0.85, async (err, dataUrl) => {
         this.disabled = false;
@@ -2411,7 +2502,10 @@ function bindLogoEditor() {
             showAdminToast(`تعذر رفع الشعار${reason}`, true);
           }
         }
-        if (!finalUrl) finalUrl = dataUrl;
+        if (!finalUrl) {
+          if (ph) ph.textContent = oldPh;
+          return;
+        }
         hidden.value = finalUrl;
         media.querySelector('img')?.remove();
         media.insertAdjacentHTML('afterbegin', `<img src="${mediaSrc(finalUrl)}" alt="">`);

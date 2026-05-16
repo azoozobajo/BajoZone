@@ -15,6 +15,11 @@ ALTER TABLE public.site_settings
   ADD COLUMN IF NOT EXISTS about_contact_invite_ar TEXT     NOT NULL DEFAULT '',
   ADD COLUMN IF NOT EXISTS about_contact_invite_en TEXT     NOT NULL DEFAULT '';
 
+-- Extra program fields used by the admin dashboard
+ALTER TABLE public.programs
+  ADD COLUMN IF NOT EXISTS cover_image TEXT NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS is_featured BOOLEAN NOT NULL DEFAULT false;
+
 -- ─── 2. Storage bucket — تحديث إذا كانت موجودة ──────────────────
 --  يضمن أن الـ bucket عام وبالإعدادات الصحيحة
 
@@ -73,4 +78,11 @@ WHERE table_schema = 'public'
     'about_var_enabled', 'about_var_data',
     'about_contact_invite_ar', 'about_contact_invite_en'
   )
+ORDER BY column_name;
+
+SELECT column_name, data_type, column_default
+FROM information_schema.columns
+WHERE table_schema = 'public'
+  AND table_name   = 'programs'
+  AND column_name IN ('logo_url', 'cover_image', 'is_featured')
 ORDER BY column_name;
