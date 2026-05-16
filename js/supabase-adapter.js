@@ -32,6 +32,10 @@
     return sessionStorage.getItem('bz_supabase_refresh_token') || '';
   }
 
+  function hasAuthSession() {
+    return !!(getStoredAccessToken() || getRefreshToken());
+  }
+
   function decodeJwtPayload(token) {
     try {
       const payload = String(token || '').split('.')[1];
@@ -158,10 +162,26 @@
     }, {});
   }
 
-  function payloadArticle(item) {
+  function nullIfBlank(value) {
+    if (value === null || value === undefined) return null;
+    const text = String(value).trim();
+    if (!text || ['null', 'undefined', 'none', '__none__', '-'].includes(text.toLowerCase())) return null;
+    return text;
+  }
+
+  function validRef(value, allowedIds) {
+    const id = nullIfBlank(value);
+    if (!id) return null;
+    if (allowedIds && !allowedIds.has(id)) return null;
+    return id;
+  }
+
+  function payloadArticle(item, refs) {
     const row = Object.assign({}, item);
     row.tag_ids = Array.isArray(item.tags) ? item.tags : (item.tag_ids || []);
     row.reading_time = item.read_time || item.reading_time || null;
+    row.category_id = validRef(row.category_id, refs?.categoryIds);
+    row.program_id = validRef(row.program_id, refs?.programIds);
     delete row.tags;
     delete row.read_time;
     delete row.created_at;
@@ -268,6 +288,9 @@
   async function saveDb(db) {
     await ensureAuthSession();
     const settings = payloadSettings(Object.assign({}, db.settings || {}, { id: 'main' }));
+    const programIds = new Set((db.programs || []).map(item => nullIfBlank(item.id)).filter(Boolean));
+    const categoryIds = new Set((db.categories || []).map(item => nullIfBlank(item.id)).filter(Boolean));
+    const articleRefs = { programIds, categoryIds };
 
     await upsertTable('site_settings', [settings]);
     await upsertTable('programs', (db.programs || []).map(item => payloadClean(item, [
@@ -282,7 +305,7 @@
     await upsertTable('tags', (db.tags || []).map(item => payloadClean(item, [
       'id', 'name', 'slug'
     ])));
-    await upsertTable('articles', (db.articles || []).map(payloadArticle));
+    await upsertTable('articles', (db.articles || []).map(item => payloadArticle(item, articleRefs)));
     await upsertTable('books', (db.books || []).map(item => payloadClean(item, [
       'id', 'title_ar', 'title_en', 'subtitle_ar', 'subtitle_en',
       'description_ar', 'description_en', 'cover', 'amazon_url',
@@ -344,6 +367,7 @@
     uploadMedia,
     authSignIn,
     authSignOut,
+    hasAuthSession,
     getAccessToken
   };
 })();

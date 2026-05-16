@@ -2782,7 +2782,7 @@ function renderAboutPremium() {
   const albumItems = galleryPhotos.map(item =>
     `<div class="about-photo-album-item"><img src="${mediaSrc(item.image || '')}" alt="${isAr ? (item.title_ar || '') : (item.title_en || '')}" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`
   ).join('');
-  const albumTrack = albumItems.repeat(4);
+  const albumTrack = albumItems.repeat(8);
 
   const savedLogos = CMS.s('about_journey_logos', null);
   const logos = (Array.isArray(savedLogos) && savedLogos.length ? savedLogos : AboutPremium.logos)

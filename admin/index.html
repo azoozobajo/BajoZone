@@ -589,7 +589,7 @@ function dbSave() {
 }
 
 async function saveSupabaseNow() {
-  if (!window.BajoSupabase?.ready?.() || !window.BajoSupabase.getAccessToken?.()) {
+  if (!window.BajoSupabase?.ready?.() || !window.BajoSupabase.hasAuthSession?.()) {
     showToast('Not synced to Supabase: sign in with your Supabase email.', 'err');
     return false;
   }
@@ -819,7 +819,7 @@ function mediaSrc(url) {
 }
 
 function hasSupabaseSession() {
-  return !!(window.BajoSupabase?.ready?.() && window.BajoSupabase?.getAccessToken?.());
+  return !!(window.BajoSupabase?.ready?.() && window.BajoSupabase?.hasAuthSession?.());
 }
 
 function requireSupabaseSessionForMedia() {
@@ -868,7 +868,7 @@ function initUpload(inputId, prevId, hiddenId) {
       }
 
       let finalUrl = dataUrl;
-      if (window.BajoSupabase?.getAccessToken?.()) {
+      if (window.BajoSupabase?.hasAuthSession?.()) {
         try {
           if (txt) txt.innerHTML = '<span style="color:#c8a86e;">⏳ جاري رفع الصورة إلى Supabase...</span>';
           finalUrl = await window.BajoSupabase.uploadMedia(
@@ -1442,7 +1442,7 @@ async function saveResourceAdmin() {
     DB.resources.unshift(res);
   }
   dbSave();
-  if (window.BajoSupabase?.getAccessToken?.()) {
+  if (window.BajoSupabase?.hasAuthSession?.()) {
     const ok = await saveSupabaseNow();
     if (!ok) return;
   }
@@ -1648,7 +1648,7 @@ async function saveArticle() {
     excerpt_en:  gv('f-art-exc-en'),
     content_ar:  ge('rte-ar').innerHTML,
     content_en:  ge('rte-en').innerHTML,
-    program_id:  gv('f-art-program'),
+    program_id:  gv('f-art-program') || null,
     date:        gv('f-art-date'),
     is_published: ge('f-art-published').value === 'true',
     featured:    gv('f-art-featured') === 'true',
@@ -1677,7 +1677,7 @@ async function saveArticle() {
   }
 
   dbSave();
-  if (window.BajoSupabase?.getAccessToken?.()) {
+  if (window.BajoSupabase?.hasAuthSession?.()) {
     const ok = await saveSupabaseNow();
     if (!ok) {
       if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = origLabel; }
@@ -1778,7 +1778,7 @@ async function saveProgramAdmin() {
     DB.programs.push(prog);
   }
   dbSave();
-  if (window.BajoSupabase?.getAccessToken?.()) {
+  if (window.BajoSupabase?.hasAuthSession?.()) {
     const ok = await saveSupabaseNow();
     if (!ok) return;
   }
@@ -2293,7 +2293,7 @@ function bindGalleryEditorFixed() {
           return;
         }
         let finalUrl = '';
-        if (window.BajoSupabase?.getAccessToken?.()) {
+        if (window.BajoSupabase?.hasAuthSession?.()) {
           try {
             if (ph) ph.textContent = 'جاري رفع الصورة...';
             finalUrl = await window.BajoSupabase.uploadMedia(
@@ -2490,7 +2490,7 @@ function bindLogoEditor() {
           return;
         }
         let finalUrl = '';
-        if (window.BajoSupabase?.getAccessToken?.()) {
+        if (window.BajoSupabase?.hasAuthSession?.()) {
           try {
             if (ph) ph.textContent = 'جاري الرفع...';
             finalUrl = await window.BajoSupabase.uploadMedia(

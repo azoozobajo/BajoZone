@@ -2933,8 +2933,8 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
 }
 .about-photo-album-track:hover { animation-play-state: paused; }
 @keyframes photoAlbumSlide {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  from { transform: translateX(-12.5%); }
+  to   { transform: translateX(-25%); }
 }
 [dir="rtl"] .about-photo-album-track { animation-direction: reverse; }
 .about-photo-album-item {
