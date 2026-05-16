@@ -70,7 +70,7 @@
 
   function defaultValueFor(key) {
     if (['social', 'popup', 'new_article_bar'].includes(key)) return {};
-    if (['about_gallery', 'sources'].includes(key)) return [];
+    if (['about_gallery', 'sources', 'about_keywords'].includes(key)) return [];
     if (['tag_ids', 'tags'].includes(key)) return [];
     if (['featured', 'is_new', 'is_featured'].includes(key)) return false;
     if (['is_published', 'is_active', 'available'].includes(key)) return true;
@@ -114,12 +114,20 @@
   }
 
   function payloadSettings(item) {
-    return pick(item || {}, [
+    const source = item || {};
+    const row = pick(source, [
       'id', 'site_name_ar', 'site_name_en', 'tagline_ar', 'tagline_en',
       'about_ar', 'about_en', 'about_image', 'logo', 'favicon',
       'ticker_ar', 'ticker_en', 'about_content_ar', 'about_content_en',
-      'social', 'about_gallery', 'popup', 'new_article_bar'
+      'social', 'about_gallery', 'popup', 'new_article_bar',
+      'about_journey_logos', 'about_var_enabled', 'about_var_data',
+      'about_contact_invite_ar', 'about_contact_invite_en',
+      'about_keywords'
     ]);
+    if (source.about_profile && typeof row.social === 'object' && !Array.isArray(row.social)) {
+      row.social = Object.assign({}, row.social, { __about_profile: source.about_profile });
+    }
+    return row;
   }
 
   function payloadResource(item) {
@@ -141,6 +149,9 @@
 
   function buildDb(rows) {
     const settings = rows.settings?.[0] || {};
+    if (!settings.about_profile && settings.social?.__about_profile) {
+      settings.about_profile = settings.social.__about_profile;
+    }
     const db = {
       settings,
       programs: rows.programs || [],

@@ -217,6 +217,7 @@ const Router = {
   go(path, push = true) {
     if (push) history.pushState({}, '', '#' + path);
     if (!path.startsWith('/article/')) document.body.classList.remove('focus-reading');
+    document.body.classList.remove('is-about-page');
     this.cur = path;
     const parts = path.replace(/^\//, '').split('/');
     const base = '/' + (parts[0] || '');
@@ -2177,11 +2178,44 @@ function renderAbout() {
     ctaText: 'I am open to conversations around talent, youth football, player development, lectures, and Arabic football knowledge.'
   };
 
+  const editable = CMS.s('about_profile', {});
+  const langEditable = editable && typeof editable === 'object' ? (editable[Lang.cur] || {}) : {};
+  Object.keys(langEditable).forEach(key => {
+    if (Array.isArray(langEditable[key])) {
+      if (langEditable[key].length) profile[key] = langEditable[key];
+    } else if (langEditable[key]) {
+      profile[key] = langEditable[key];
+    }
+  });
+  const customContent = isAr ? CMS.s('about_content_ar', '') : CMS.s('about_content_en', '');
+  const quotes = Array.isArray(profile.quotes) && profile.quotes.length ? profile.quotes : (isAr ? [
+    'أحيانا لا تضيع الموهبة لأنها ضعيفة، بل لأنها قُرئت بطريقة خاطئة.',
+    'الكشاف لا يرى ما حدث فقط، بل يسأل: ماذا يمكن أن يحدث بعد عامين؟',
+    'في كرة القدم، السياق نصف الحقيقة.'
+  ] : [
+    'Sometimes talent is not lost because it is weak, but because it was read incorrectly.',
+    'A scout does not only see what happened. A scout asks what could happen in two years.',
+    'In football, context is half the truth.'
+  ]);
+  const services = Array.isArray(profile.services) && profile.services.length ? profile.services : (isAr ? [
+    ['محتوى معرفي رياضي', 'كتابة وتطوير مقالات وأدلة تربط العلم بالميدان بلغة واضحة.'],
+    ['نماذج تقييم وكشف', 'بناء قوالب عملية تساعد الكشاف والمدرب على قراءة اللاعب بعمق.'],
+    ['ورش ومحاضرات', 'جلسات معرفية حول اكتشاف المواهب، الفئات السنية، وبيئات التطوير.'],
+    ['تعاون بحثي أو إعلامي', 'تحويل الأفكار الرياضية إلى محتوى أو مشاريع قابلة للنشر والتطبيق.']
+  ] : [
+    ['Sports knowledge content', 'Writing and developing articles and guides that connect science with the field.'],
+    ['Scouting frameworks', 'Building practical templates that help scouts and coaches read players deeply.'],
+    ['Workshops and lectures', 'Knowledge sessions on talent identification, youth football, and development environments.'],
+    ['Research or media collaboration', 'Turning sport ideas into publishable and practical projects.']
+  ]);
+  const contactHref = /^(https?:|mailto:|tel:|https:\/\/wa\.me)/i.test(profile.email || '') ? profile.email : `mailto:${profile.email}`;
+
   const albumItems = Array.isArray(gallery) && gallery.length ? gallery.map(item => ({
     image: item.image || '',
     title: Lang.str({ ar: item.title_ar, en: item.title_en }, profile.albumTitle),
     story: Lang.str({ ar: item.story_ar, en: item.story_en }, '')
   })) : profile.emptyAlbum.map(item => ({ image: '', title: item[0], story: item[1] }));
+  const movingAlbum = albumItems.length > 1 ? albumItems.concat(albumItems) : albumItems;
 
   document.getElementById('app').innerHTML = `
     <section class="bajo-about-hero">
@@ -2195,7 +2229,7 @@ function renderAbout() {
             <p class="about-lead">${profile.lead}</p>
             <blockquote>${profile.quote}</blockquote>
             <div class="about-hero-actions">
-              <a class="btn btn-fill" href="mailto:${profile.email}">${profile.emailLabel}</a>
+              <a class="btn btn-fill" href="${contactHref}">${profile.emailLabel}</a>
               <a class="btn btn-ghost" href="#about-album">${isAr ? 'شاهد التجارب' : 'View Album'}</a>
             </div>
           </div>
@@ -2222,6 +2256,12 @@ function renderAbout() {
         </div>
       </div>
     </section>
+
+    ${customContent ? `<section class="about-custom-section">
+      <div class="container">
+        <div class="about-custom-copy reveal">${customContent}</div>
+      </div>
+    </section>` : ''}
 
     <section class="about-lenses-section">
       <div class="container">
@@ -2263,6 +2303,20 @@ function renderAbout() {
       </div>
     </section>
 
+    <section class="about-quotes-section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <div class="section-label">${isAr ? 'اقتباسات' : 'Quotes'}</div>
+            <h2 class="section-title" style="margin-bottom:0;">${isAr ? 'من الأفكار التي أؤمن بها' : 'Ideas I Keep Returning To'}</h2>
+          </div>
+        </div>
+        <div class="about-quotes-grid">
+          ${quotes.map((quote, idx) => `<blockquote class="about-quote-card reveal"><span>${String(idx + 1).padStart(2, '0')}</span><p>${quote}</p></blockquote>`).join('')}
+        </div>
+      </div>
+    </section>
+
     <section class="about-gallery-section" id="about-album">
       <div class="container">
         <div class="section-header">
@@ -2272,14 +2326,31 @@ function renderAbout() {
             <p class="section-sub" style="margin-top:16px;">${profile.albumSub}</p>
           </div>
         </div>
-        <div class="about-gallery-grid">
-          ${albumItems.map((item, idx) => `<article class="about-memory reveal">
+        <div class="about-stations-slider reveal" style="--station-count:${movingAlbum.length || 1};">
+          <div class="about-stations-track">
+          ${movingAlbum.map((item, idx) => `<article class="about-memory">
             ${item.image ? `<img src="${item.image}" alt="${item.title}" loading="lazy">` : `<div class="about-memory-ph"><span>${String(idx + 1).padStart(2, '0')}</span></div>`}
             <div class="about-memory-body">
+              <span>${String((idx % albumItems.length) + 1).padStart(2, '0')}</span>
               <h3>${item.title}</h3>
               <p>${item.story}</p>
             </div>
           </article>`).join('')}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-services-section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <div class="section-label">${isAr ? 'كيف أستطيع أن أخدمك؟' : 'How I Can Help'}</div>
+            <h2 class="section-title" style="margin-bottom:0;">${isAr ? 'مساحات التعاون والعمل' : 'Collaboration Areas'}</h2>
+          </div>
+        </div>
+        <div class="about-services-grid">
+          ${services.map(([title, text], idx) => `<article class="about-service-card reveal"><span>0${idx + 1}</span><h3>${title}</h3><p>${text}</p></article>`).join('')}
         </div>
       </div>
     </section>
@@ -2291,7 +2362,7 @@ function renderAbout() {
             <h2>${profile.ctaTitle}</h2>
             <p>${profile.ctaText}</p>
           </div>
-          <a class="btn btn-fill" href="mailto:${profile.email}">${profile.email}</a>
+          <a class="btn btn-fill" href="${contactHref}">${profile.email}</a>
         </div>
       </div>
     </section>`;
@@ -2302,6 +2373,744 @@ function renderAbout() {
     CMS.s('about_image', CMS.s('logo', 'assets/images/logo-bajo.png')),
     location.origin + location.pathname + '#/about'
   );
+}
+
+/* ── ABOUT PORTFOLIO REDESIGN ───────────────── */
+function aboutBaseProfile(isAr) {
+  return isAr ? {
+    eyebrow: 'Personal Portfolio',
+    name: 'عبدالعزيز باجخيف',
+    title: 'باحث وممارس في كرة القدم وعلوم الرياضة',
+    lead: 'أقرأ كرة القدم من نقطة التقاء العلم بالميدان: الموهبة، اللاعب، البيئة، القرار، والحكاية التي تصنع المسار.',
+    quote: 'الموهبة لا تكفي أن ترى. يجب أن تفهم، تقاس، ترعى، ثم تمنح البيئة التي تجعلها تكبر.',
+    emailLabel: 'لنتواصل',
+    email: 'Abdulaziz.bajkhaif@hotmail.com',
+    journeyTitle: 'من أين بدأت الحكاية؟',
+    journeySub: 'ليست سيرة خطية. هي محطات صغيرة صنعت طريقة نظر مختلفة للعبة واللاعب.',
+    albumTitle: 'محطات مصورة',
+    albumSub: 'صور تتحرك كدفتر ميدان: كل محطة تحمل قصة قصيرة أو فكرة أو أثر.',
+    whyTitle: 'فكرتي',
+    whyText: 'BajoZone مساحة شخصية ومهنية لتحويل المشاهدة والخبرة والقراءة إلى محتوى عملي يخدم كرة القدم العربية.',
+    ctaTitle: 'هل لديك مشروع أو تجربة تستحق أن نبني حولها معرفة؟',
+    ctaText: 'أهتم بالتعاون في المحتوى، المحاضرات، نماذج التقييم، المشاريع التعليمية، وتجارب تطوير المواهب.',
+    stats: [['علوم الرياضة','خلفية لفهم الحركة والأداء والنمو'],['الفئات السنية','تركيز على اللاعب في لحظات التكوين'],['التأليف','تحويل الأفكار إلى مراجع وأدلة'],['الميدان','الزيارات والتجارب كمصدر معرفة']],
+    lenses: [['اكتشاف المواهب','قراءة الإمكانية لا اللقطة فقط'],['تطوير اللاعب','مسار طويل لا قرار سريع'],['البيئة','ما حول اللاعب يصنع جزءا منه'],['المعرفة','تبسيط العلم دون تفريغه']],
+    journey: [['البداية','بدأت الحكاية من سؤال بسيط: لماذا يظهر لاعب ويختفي آخر؟'],['التعلم','الدراسة والقراءة أعطتني لغة لفهم الأداء والنمو.'],['الميدان','كل زيارة أو معايشة تكشف ما لا يظهر في الكتب.'],['التأليف','الكتابة صارت طريقة لترتيب الفكرة ومشاركتها.'],['BajoZone','مساحة تجمع الحكاية، البحث، والتطبيق.']],
+    quotes: ['أحيانا لا تضيع الموهبة لأنها ضعيفة، بل لأنها قرئت بطريقة خاطئة.','الكشاف الجيد لا يبحث عن اللاعب الجاهز فقط، بل عن القابل للنمو.','في كرة القدم، السياق نصف الحقيقة.'],
+    services: [['محتوى معرفي رياضي','مقالات وأدلة تربط العلم بالميدان.'],['نماذج تقييم وكشف','قوالب عملية لقراءة اللاعب بوضوح.'],['محاضرات وورش','جلسات حول الموهبة والفئات السنية والتطوير.'],['تعاون بحثي أو إعلامي','تحويل الأفكار إلى مشاريع قابلة للنشر.']]
+  } : {
+    eyebrow: 'Personal Portfolio',
+    name: 'Abdulaziz Bajkhaif',
+    title: 'Football and sports science practitioner',
+    lead: 'I read football where science meets the field: talent, players, environments, decisions, and the stories that shape pathways.',
+    quote: 'Talent should not only be seen. It should be understood, measured, supported, and placed in an environment where it can grow.',
+    emailLabel: 'Contact',
+    email: 'Abdulaziz.bajkhaif@hotmail.com',
+    journeyTitle: 'Where The Story Began',
+    journeySub: 'Not a linear CV. A set of stops that shaped how I read the game and the player.',
+    albumTitle: 'Visual Milestones',
+    albumSub: 'A moving field notebook: every image carries a note, story, or idea.',
+    whyTitle: 'The Idea',
+    whyText: 'BajoZone is a personal and professional space for turning watching, experience, and reading into useful football knowledge.',
+    ctaTitle: 'Have a project or experience worth turning into knowledge?',
+    ctaText: 'I am interested in content, lectures, evaluation models, learning projects, and talent development experiences.',
+    stats: [['Sports Science','A lens for movement, performance, and growth'],['Youth Football','A focus on players during formation years'],['Authoring','Turning ideas into references and guides'],['The Field','Visits and experiences as knowledge sources']],
+    lenses: [['Talent ID','Reading potential, not only moments'],['Player Development','A long pathway, not a quick verdict'],['Environment','What surrounds the player shapes part of him'],['Knowledge','Simplifying science without emptying it']],
+    journey: [['The Start','It began with a simple question: why does one player emerge and another disappear?'],['Learning','Study and reading gave me language for performance and growth.'],['The Field','Every visit reveals what books cannot show alone.'],['Authoring','Writing became a way to organize and share ideas.'],['BajoZone','A space where story, research, and application meet.']],
+    quotes: ['Sometimes talent is not lost because it is weak, but because it was read incorrectly.','A good scout does not only search for the ready player, but the player who can grow.','In football, context is half the truth.'],
+    services: [['Sports knowledge content','Articles and guides that connect science with the field.'],['Scouting frameworks','Practical templates for reading players clearly.'],['Lectures and workshops','Sessions around talent, youth football, and development.'],['Research or media collaboration','Turning ideas into publishable projects.']]
+  };
+}
+
+function renderAboutPortfolio() {
+  const isAr = Lang.cur === 'ar';
+  const profile = aboutBaseProfile(isAr);
+  const editable = CMS.s('about_profile', {});
+  const langEditable = editable && typeof editable === 'object' ? (editable[Lang.cur] || {}) : {};
+  Object.keys(langEditable).forEach(key => {
+    if (Array.isArray(langEditable[key])) {
+      if (langEditable[key].length) profile[key] = langEditable[key];
+    } else if (langEditable[key]) profile[key] = langEditable[key];
+  });
+
+  const abtImg = CMS.s('about_image', '');
+  const gallery = CMS.s('about_gallery', []);
+  const books = CMS.list('books');
+  const book = books[0] || null;
+  const articlesCount = pubArts().length;
+  const customContent = isAr ? CMS.s('about_content_ar', '') : CMS.s('about_content_en', '');
+  const contactHref = /^(https?:|mailto:|tel:|https:\/\/wa\.me)/i.test(profile.email || '') ? profile.email : `mailto:${profile.email}`;
+  const albumFallback = [
+    [isAr ? 'محطة ميدانية' : 'Field Stop', isAr ? 'أضف صورة من لوحة التحكم واكتب التعليق الذي يشرح أثرها.' : 'Add a photo from the admin panel and write the note behind it.'],
+    [isAr ? 'لحظة تعلم' : 'Learning Moment', isAr ? 'اربط الصورة بفكرة أو درس أو سؤال.' : 'Connect the image to an idea, lesson, or question.'],
+    [isAr ? 'مشروع أو كتاب' : 'Project or Book', isAr ? 'اعرض العمل كقصة لا كصورة فقط.' : 'Present the work as a story, not only an image.']
+  ];
+  const stations = (Array.isArray(gallery) && gallery.length ? gallery.map(item => ({
+    image: item.image || '',
+    title: Lang.str({ ar: item.title_ar, en: item.title_en }, profile.albumTitle),
+    story: Lang.str({ ar: item.story_ar, en: item.story_en }, '')
+  })) : albumFallback.map(item => ({ image: '', title: item[0], story: item[1] })));
+  const stationLoop = stations.length > 1 ? stations.concat(stations) : stations;
+  const quotes = Array.isArray(profile.quotes) ? profile.quotes : [];
+  const services = Array.isArray(profile.services) ? profile.services : [];
+  const lenses = Array.isArray(profile.lenses) ? profile.lenses : [];
+  const journey = Array.isArray(profile.journey) ? profile.journey : [];
+  const stats = Array.isArray(profile.stats) ? profile.stats : [];
+  const interests = (isAr ? ['اكتشاف المواهب', 'الفئات السنية', 'الكشافة', 'علوم الرياضة', 'تحليل القرار', 'بيئة اللاعب'] : ['Talent ID', 'Youth Football', 'Scouting', 'Sports Science', 'Decision Analysis', 'Player Environment']);
+  const heroChips = [isAr ? 'كاتب' : 'Author', isAr ? 'باحث' : 'Research-minded', isAr ? 'ممارس ميداني' : 'Field practitioner'];
+
+  document.getElementById('app').innerHTML = `
+    <div class="portfolio-about-page">
+      <section class="portfolio-hero-section">
+        <div class="portfolio-hero-grid-bg"></div>
+        <div class="container">
+          <div class="portfolio-hero-layout">
+            <div class="portfolio-hero-copy reveal">
+              <div class="portfolio-eyebrow">${profile.eyebrow}</div>
+              <h1>${profile.name}</h1>
+              <p class="portfolio-title-line">${profile.title}</p>
+              <p class="portfolio-lead">${profile.lead}</p>
+              <div class="portfolio-hero-actions">
+                <a class="btn btn-fill" href="${contactHref}">${profile.emailLabel}</a>
+                <a class="btn btn-ghost" href="#portfolio-stations">${isAr ? 'شاهد المحطات' : 'View Milestones'}</a>
+              </div>
+              <div class="portfolio-chip-row">${heroChips.map(x => `<span>${x}</span>`).join('')}</div>
+            </div>
+            <div class="portfolio-visual reveal">
+              <div class="portfolio-portrait-panel">
+                ${abtImg ? `<img src="${abtImg}" alt="${profile.name}" loading="eager">` : `<div class="portfolio-portrait-empty"><b>BAJO</b><span>${profile.name}</span></div>`}
+                <div class="portfolio-orbit p1"><span>01</span>${isAr ? 'موهبة' : 'Talent'}</div>
+                <div class="portfolio-orbit p2"><span>02</span>${isAr ? 'ميدان' : 'Field'}</div>
+                <div class="portfolio-orbit p3"><span>03</span>${isAr ? 'معرفة' : 'Knowledge'}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="portfolio-nav-band">
+        <div class="container">
+          <div class="portfolio-mini-nav">
+            <a href="#portfolio-story">${isAr ? 'الحكاية' : 'Story'}</a>
+            <a href="#portfolio-stations">${isAr ? 'المحطات' : 'Milestones'}</a>
+            <a href="#portfolio-thinking">${isAr ? 'الأفكار' : 'Thinking'}</a>
+            <a href="#portfolio-work">${isAr ? 'المشاريع' : 'Work'}</a>
+            <a href="#portfolio-services">${isAr ? 'الخدمات' : 'Services'}</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="portfolio-snapshot-section">
+        <div class="container">
+          <div class="portfolio-snapshot-grid">
+            ${stats.map(([title, text], idx) => `<article class="portfolio-snapshot-card reveal"><span>${String(idx + 1).padStart(2, '0')}</span><h3>${title}</h3><p>${text}</p></article>`).join('')}
+            <article class="portfolio-snapshot-card reveal"><span>${String(stats.length + 1).padStart(2, '0')}</span><h3>${articlesCount}+</h3><p>${isAr ? 'موضوع منشور داخل BajoZone' : 'Published BajoZone topics'}</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="portfolio-story-section" id="portfolio-story">
+        <div class="container">
+          <div class="portfolio-story-layout">
+            <div class="portfolio-section-head reveal">
+              <div class="section-label">${isAr ? 'من أنا؟' : 'Who I Am'}</div>
+              <h2>${profile.journeyTitle}</h2>
+              <p>${profile.journeySub}</p>
+            </div>
+            <div class="portfolio-story-map">
+              ${journey.map(([title, text], idx) => `<article class="portfolio-story-node reveal" style="--delay:${idx * 80}ms">
+                <button type="button">${String(idx + 1).padStart(2, '0')}</button>
+                <div><h3>${title}</h3><p>${text}</p></div>
+              </article>`).join('')}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      ${customContent ? `<section class="portfolio-note-section">
+        <div class="container">
+          <div class="portfolio-note-copy reveal">${customContent}</div>
+        </div>
+      </section>` : ''}
+
+      <section class="portfolio-stations-section" id="portfolio-stations">
+        <div class="container">
+          <div class="portfolio-section-head reveal">
+            <div class="section-label">${isAr ? 'محطات وصور' : 'Photos & Milestones'}</div>
+            <h2>${profile.albumTitle}</h2>
+            <p>${profile.albumSub}</p>
+          </div>
+        </div>
+        <div class="portfolio-stations-slider reveal" style="--station-count:${stationLoop.length || 1};">
+          <div class="portfolio-stations-track">
+            ${stationLoop.map((item, idx) => `<article class="portfolio-station-card">
+              ${item.image ? `<img src="${item.image}" alt="${item.title}" loading="lazy">` : `<div class="portfolio-station-empty">${String((idx % stations.length) + 1).padStart(2, '0')}</div>`}
+              <div class="portfolio-station-caption">
+                <span>${String((idx % stations.length) + 1).padStart(2, '0')}</span>
+                <h3>${item.title}</h3>
+                <p>${item.story}</p>
+              </div>
+            </article>`).join('')}
+          </div>
+        </div>
+      </section>
+
+      <section class="portfolio-thinking-section" id="portfolio-thinking">
+        <div class="container">
+          <div class="portfolio-thinking-grid">
+            <div class="portfolio-section-head reveal">
+              <div class="section-label">${isAr ? 'فكرتي واهتماماتي' : 'Thinking & Interests'}</div>
+              <h2>${profile.whyTitle}</h2>
+              <p>${profile.whyText}</p>
+              <div class="portfolio-interest-cloud">${interests.map(x => `<span>${x}</span>`).join('')}</div>
+            </div>
+            <div class="portfolio-lens-grid">
+              ${lenses.map(([title, text], idx) => `<article class="portfolio-lens-card reveal"><span>0${idx + 1}</span><h3>${title}</h3><p>${text}</p></article>`).join('')}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="portfolio-quotes-section">
+        <div class="container">
+          <div class="portfolio-quote-strip">
+            ${quotes.map((quote, idx) => `<blockquote class="reveal"><span>${String(idx + 1).padStart(2, '0')}</span><p>${quote}</p></blockquote>`).join('')}
+          </div>
+        </div>
+      </section>
+
+      <section class="portfolio-work-section" id="portfolio-work">
+        <div class="container">
+          <div class="portfolio-section-head reveal">
+            <div class="section-label">${isAr ? 'مشاريعي وكتابي' : 'Work & Book'}</div>
+            <h2>${isAr ? 'ما أحاول بناءه' : 'What I Am Building'}</h2>
+            <p>${isAr ? 'الكتابة، المشاريع، والأدوات ليست واجهة فقط؛ هي طريقة لتنظيم المعرفة وتحويلها إلى أثر.' : 'Writing, projects, and tools are not only a showcase; they organize knowledge into impact.'}</p>
+          </div>
+          <div class="portfolio-work-grid">
+            <article class="portfolio-book-feature reveal" ${book ? `onclick="Router.go('/book/${book.id}')"` : ''}>
+              <div class="portfolio-book-cover">
+                ${book?.cover ? `<img src="${book.cover}" alt="${Lang.str({ ar: book.title_ar, en: book.title_en })}" loading="lazy">` : `<span>${isAr ? 'كتاب' : 'Book'}</span>`}
+              </div>
+              <div>
+                <span class="portfolio-card-kicker">${isAr ? 'كتاب / مرجع' : 'Book / Reference'}</span>
+                <h3>${book ? Lang.str({ ar: book.title_ar, en: book.title_en }) : (isAr ? 'مساحة الكتاب القادم' : 'Book space')}</h3>
+                <p>${book ? Lang.str({ ar: book.description_ar, en: book.description_en }, Lang.str({ ar: book.subtitle_ar, en: book.subtitle_en })) : (isAr ? 'أضف كتابك من لوحة التحكم ليظهر هنا كجزء من البورتفوليو.' : 'Add your book in the admin panel to feature it here.')}</p>
+              </div>
+            </article>
+            <div class="portfolio-project-stack">
+              ${services.slice(0, 3).map(([title, text], idx) => `<article class="portfolio-project-card reveal"><span>${String(idx + 1).padStart(2, '0')}</span><h3>${title}</h3><p>${text}</p></article>`).join('')}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="portfolio-services-section" id="portfolio-services">
+        <div class="container">
+          <div class="portfolio-services-panel reveal">
+            <div>
+              <div class="section-label">${isAr ? 'كيف أقدر أخدمك؟' : 'How I Can Help'}</div>
+              <h2>${profile.ctaTitle}</h2>
+              <p>${profile.ctaText}</p>
+            </div>
+            <a class="btn btn-fill" href="${contactHref}">${profile.emailLabel}</a>
+          </div>
+        </div>
+      </section>
+    </div>`;
+
+  initReveal();
+  updatePageMeta(
+    `${profile.name} — ${CMS.s('site_name_en', 'BajoZone')}`,
+    profile.lead,
+    CMS.s('about_image', CMS.s('logo', 'assets/images/logo-bajo.png')),
+    location.origin + location.pathname + '#/about'
+  );
+}
+
+/* ── ABOUT PREMIUM CINEMATIC PAGE ───────────── */
+const AboutPremium = {
+  ar: {
+    dir: 'rtl',
+    hero: {
+      name: 'عبدالعزيز باجخيف',
+      tagline: 'باحث ومهتم باكتشاف وتطوير ورعاية المواهب الرياضية، أعمل عند تقاطع كرة القدم، علوم الرياضة، التحليل، والتقنية.',
+      bio: 'BajoZone هي مساحتي الشخصية لمشاركة الأفكار، المشاريع، والمحتوى المعرفي حول مستقبل كرة القدم، تطوير اللاعبين، واستخدام البحث والتقنية في فهم المواهب الرياضية بشكل أعمق.',
+      primary: 'استكشف BajoZone',
+      secondary: 'تواصل معي'
+    },
+    journey: {
+      title: 'رحلتي باختصار',
+      intro: 'لم تكن رحلتي مع كرة القدم مجرد متابعة للعبة، بل محاولة مستمرة لفهم اللاعب: كيف يُكتشف؟ كيف يتطور؟ وكيف يمكن رعايته بطريقة تساعده على الوصول إلى أفضل نسخة من نفسه؟',
+      items: [
+        ['البداية مع كرة القدم', ''],
+        ['العمل مع الفئات السنية', ''],
+        ['الدراسة والبحث', ''],
+        ['التحليل والتقنية', ''],
+        ['BajoZone', '']
+      ]
+    },
+    focus: {
+      title: 'ما الذي أركز عليه؟',
+      intro: 'أركز على فهم الموهبة الرياضية من زاوية أوسع: اكتشافها، تطويرها، رعايتها، وتحليل العوامل التي تساعدها على النمو داخل وخارج الملعب.',
+      cards: [
+        ['المواهب الرياضية', 'اكتشاف المواهب لا يعني البحث عن اللاعب الأفضل اليوم فقط، بل فهم الإمكانات التي قد تظهر غداً.'],
+        ['تطوير اللاعبين', 'الموهبة تحتاج بيئة، توجيه، متابعة، وصبر.'],
+        ['رعاية الموهوبين', 'رعاية اللاعب لا تتوقف عند التدريب، بل تشمل الإنسان خلف الأداء.'],
+        ['البحث والتحليل', 'أحاول أن أفهم كرة القدم بعين الباحث، لا بعين المشاهد فقط.']
+      ]
+    },
+    experience: {
+      title: 'محطات من الرحلة',
+      text: 'جهات وتجارب أكاديمية ومهنية ورياضية شكّلت جزءاً من رحلتي.'
+    },
+    fragments: {
+      title: 'لقطات من الرحلة',
+      text: 'صور ومحطات صغيرة من رحلة مستمرة بين الملاعب، الدراسة، البحث، السفر، والتجارب التي شكّلت طريقة تفكيري في كرة القدم وتطوير المواهب.'
+    },
+    varCheck: {
+      btn: 'VAR',
+      eyebrow: 'هل يستحق هذا القرار مراجعة ثانية؟',
+      reviewing: '... جارٍ مراجعة القرار',
+      result: 'القرار النهائي: الموهبة الحقيقية لا تُوقف.'
+    },
+    closing: {
+      title: 'لماذا BajoZone؟',
+      paragraphs: [
+        'BajoZone ليس مجرد موقع شخصي، بل مساحة أفكر من خلالها بصوت عالٍ في مستقبل كرة القدم، وفي كيفية اكتشاف وتطوير ورعاية المواهب الرياضية بطريقة أكثر وعياً واحترافية.',
+        'أؤمن أن الموهبة لا تُفهم من لقطة واحدة، ولا تُبنى من تدريب واحد، بل من رحلة طويلة تجمع بين البيئة، المعرفة، المتابعة، والفرصة المناسبة.'
+      ],
+      statement: 'هدفي أن يكون BajoZone مساحة تجمع بين الملعب، البحث، والتقنية لخدمة مستقبل المواهب الرياضية.',
+      invite: 'لديك سؤال أو تريد التواصل؟',
+      button: 'استكشف BajoZone'
+    }
+  },
+  en: {
+    dir: 'ltr',
+    hero: {
+      name: 'Abdulaziz Bajkhaif',
+      tagline: 'A researcher and sports talent development enthusiast working at the intersection of football, sport science, analysis, and technology.',
+      bio: 'BajoZone is my personal space for sharing ideas, projects, and knowledge around the future of football, player development, and the role of research and technology in understanding sports talent more deeply.',
+      primary: 'Explore BajoZone',
+      secondary: 'Contact Me'
+    },
+    journey: {
+      title: 'My Journey in Brief',
+      intro: 'My journey with football has never been only about watching the game. It has always been about understanding the player: how talent is identified, how it develops, and how it can be supported in the right environment.',
+      items: [
+        ['The Beginning with Football', ''],
+        ['Working with Youth Players', ''],
+        ['Study and Research', ''],
+        ['Analysis and Technology', ''],
+        ['BajoZone', '']
+      ]
+    },
+    focus: {
+      title: 'What I Focus On',
+      intro: 'I focus on understanding sports talent from a wider perspective: identifying it, developing it, supporting it, and analyzing the factors that help it grow inside and outside the game.',
+      cards: [
+        ['Sports Talent', 'Talent identification is not only about finding the best player today, but about understanding the potential that may appear tomorrow.'],
+        ['Player Development', 'Talent needs environment, guidance, monitoring, and patience.'],
+        ['Talent Care', 'Supporting a player does not stop at training; it includes the person behind the performance.'],
+        ['Research and Analysis', 'I try to understand football through the eyes of a researcher, not only as a spectator.']
+      ]
+    },
+    experience: {
+      title: 'Journey Highlights',
+      text: 'Academic, professional, and football-related experiences that shaped my path.'
+    },
+    fragments: {
+      title: 'Fragments of the Journey',
+      text: 'Small images and moments from an ongoing journey between football fields, study, research, travel, and experiences that shaped the way I think about football and talent development.'
+    },
+    varCheck: {
+      btn: 'VAR',
+      eyebrow: 'Should this decision go to review?',
+      reviewing: '... reviewing the decision',
+      result: 'Final decision: real talent cannot be stopped.'
+    },
+    closing: {
+      title: 'Why BajoZone?',
+      paragraphs: [
+        'BajoZone is not just a personal website. It is a space where I think out loud about the future of football and how sports talent can be identified, developed, and supported in a more conscious and professional way.',
+        'I believe talent cannot be understood from one moment, nor built through one training session. It is a long journey shaped by environment, knowledge, guidance, and the right opportunity.'
+      ],
+      statement: 'My goal is for BajoZone to become a space where the pitch, research, and technology meet to serve the future of sports talent.',
+      invite: 'Have a question or want to get in touch?',
+      button: 'Explore BajoZone'
+    }
+  },
+  logos: [
+    { src: 'images/about/logos/logo-marburg.png',             alt_ar: 'جامعة ماربورغ',               alt_en: 'University of Marburg' },
+    { src: 'images/about/logos/logo-ifi.png',                 alt_ar: 'المعهد الدولي لكرة القدم',    alt_en: 'International Football Institute' },
+    { src: 'images/about/logos/logo-barca-innovation-hub.png',alt_ar: 'برشلونة إنوفيشن هاب',        alt_en: 'Barça Innovation Hub' },
+    { src: 'images/about/logos/logo-oliver-kahn-academy.png', alt_ar: 'أكاديمية أوليفر كان',        alt_en: 'Oliver Kahn Academy' },
+    { src: 'images/about/logos/logo-vfb-marburg.png',         alt_ar: 'في إف بي ماربورغ',           alt_en: 'VfB Marburg' },
+    { src: 'images/about/logos/logo-saudi-fa.png',            alt_ar: 'الاتحاد السعودي لكرة القدم', alt_en: 'Saudi Arabian Football Federation' }
+  ]
+};
+
+function renderAboutPremium() {
+  const isAr = Lang.cur === 'ar';
+  const c = AboutPremium[isAr ? 'ar' : 'en'];
+
+  const social = CMS.s('social', {}) || {};
+  const emailRaw = social?.email?.value || (typeof social?.email === 'string' ? social.email : '') || '';
+  const contactHref = emailRaw.includes('@') ? `mailto:${emailRaw}` : '#';
+
+  const heroPhoto = CMS.s('about_image', '');
+  const defaultKeywords = isAr
+    ? ['اكتشاف المواهب','علوم الرياضة','تطوير المواهب','رعاية المواهب','أكاديميات كرة القدم','الفئات السنية','بناء الفريق','استقطاب اللاعبين']
+    : ['Talent Discovery','Sport Science','Talent Development','Player Care','Football Academies','Youth Categories','Team Building','Player Scouting'];
+  const keywords = CMS.s('about_keywords', null) || defaultKeywords;
+  const kwItems = keywords.map(kw => `<span class="about-hero-kw">${kw}</span>`).join('');
+
+  const gallery = CMS.s('about_gallery', []);
+  const galleryPhotos = gallery.length > 0 ? gallery :
+    ['01','02','03','04','05','06'].map(n => ({ image: `/images/about/gallery/journey-${n}.jpg`, title_ar: '', title_en: '' }));
+  const albumItems = galleryPhotos.map(item =>
+    `<div class="about-photo-album-item"><img src="${item.image || ''}" alt="${isAr ? (item.title_ar || '') : (item.title_en || '')}" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`
+  ).join('');
+  const albumTrack = albumItems + albumItems;
+
+  const logos = CMS.s('about_journey_logos', null) || AboutPremium.logos;
+  const logoItems = logos.map(logo =>
+    `<div class="about-logo-item"><img src="${logo.src.startsWith('http') ? logo.src : '/' + logo.src}" alt="${isAr ? logo.alt_ar : logo.alt_en}" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`
+  ).join('');
+  const logoTrack = logoItems + logoItems;
+
+  const SVG = {
+    whatsapp: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`,
+    instagram: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>`,
+    twitter:   `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.742l7.734-8.835L1.254 2.25H8.08l4.259 5.629 5.905-5.629zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>`,
+    snapchat:  `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.206.793c.99 0 4.347.276 5.93 3.821.529 1.193.403 3.219.299 4.847l-.003.06c-.012.18-.022.345-.03.51.1.043.249.093.445.093.272 0 .58-.096.88-.32a.78.78 0 01.446-.148c.171 0 .34.046.49.135.43.245.5.747.5 1.121 0 .33-.065.612-.195.775-.26.328-.61.51-.99.635-.164.05-.349.07-.533.07-.17 0-.332-.017-.49-.05-.1.248-.167.524-.117.792.065.338-.041.6-.317.761-.266.154-.606.228-.98.228-.17 0-.354-.017-.536-.05-.255-.046-.535-.148-.814-.233-.414.78-.898 1.555-1.48 2.228-.956 1.1-2.11 1.742-3.43 2.09-.188.05-.39.09-.6.133l-.166.034c-.195.04-.41.082-.648.134-.073.016-.146.032-.22.049.177.277.368.524.569.73a.73.73 0 01.152.26c.033.118.048.267.027.423-.054.41-.32.844-.682 1.074-.413.26-.887.387-1.344.387-.35 0-.698-.087-1.014-.258-.27-.146-.521-.304-.764-.456a22.59 22.59 0 00-.703-.421 4.56 4.56 0 00-1.56-.42 5.93 5.93 0 00-.726-.035 4.56 4.56 0 00-.726.035 4.56 4.56 0 00-1.56.42 22.59 22.59 0 00-.703.421c-.243.152-.494.31-.764.456a2.27 2.27 0 01-1.014.258c-.457 0-.93-.127-1.344-.387-.362-.23-.628-.664-.682-1.074-.021-.156-.006-.305.027-.423a.73.73 0 01.152-.26c.2-.206.392-.453.569-.73l-.22-.049c-.237-.052-.453-.094-.648-.134l-.166-.034a6.3 6.3 0 01-.6-.133c-1.32-.348-2.474-.99-3.43-2.09-.582-.673-1.066-1.448-1.48-2.228-.28.085-.559.187-.814.233-.182.033-.365.05-.536.05-.374 0-.714-.074-.98-.228-.276-.16-.382-.423-.317-.761.05-.268-.017-.544-.117-.792a3.33 3.33 0 01-.49.05c-.184 0-.37-.02-.533-.07-.38-.125-.73-.307-.99-.635-.13-.163-.195-.446-.195-.775 0-.374.07-.876.5-1.121.15-.089.319-.135.49-.135a.78.78 0 01.446.148c.3.224.608.32.88.32.196 0 .345-.05.445-.093-.008-.165-.018-.33-.03-.51l-.003-.06c-.104-1.628-.23-3.654.299-4.847C7.659 1.07 11.016.793 12.006.793z"/></svg>`,
+    email:     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>`,
+    linkedin:  `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>`
+  };
+
+  const socialPlatforms = [
+    { key: 'whatsapp',  label: 'WhatsApp', href: v => `https://wa.me/${v.replace(/\D/g,'')}` },
+    { key: 'instagram', label: 'Instagram', href: v => `https://instagram.com/${v}` },
+    { key: 'twitter',   label: 'X',         href: v => `https://x.com/${v}` },
+    { key: 'snapchat',  label: 'Snapchat',  href: v => `https://snapchat.com/add/${v}` },
+    { key: 'email',     label: 'Email',     href: v => v.includes('@') ? `mailto:${v}` : '#' },
+    { key: 'linkedin',  label: 'LinkedIn',  href: v => v.startsWith('http') ? v : `https://linkedin.com/in/${v}` }
+  ];
+  const socialLinksHtml = socialPlatforms.map(p => {
+    const raw = social[p.key];
+    const val = raw ? (typeof raw === 'string' ? raw : (raw.value || '')) : '';
+    if (!val) return '';
+    return `<a class="about-social-link" href="${p.href(val)}" target="_blank" rel="noopener noreferrer" aria-label="${p.label}" title="${p.label}">${SVG[p.key]}</a>`;
+  }).filter(Boolean).join('');
+
+  const contactInvite = CMS.s(isAr ? 'about_contact_invite_ar' : 'about_contact_invite_en', '') || c.closing.invite || '';
+  const varEnabled = CMS.s('about_var_enabled', true);
+  const varOverride = CMS.s('about_var_data', null);
+  const varData = {
+    btn: c.varCheck.btn,
+    eyebrow: c.varCheck.eyebrow,
+    reviewing: (varOverride && varOverride.reviewing) || c.varCheck.reviewing,
+    result:    (varOverride && varOverride.result)    || c.varCheck.result
+  };
+
+  document.body.classList.add('is-about-page');
+
+  document.getElementById('app').innerHTML = `
+    <div class="about-page" dir="${c.dir}">
+
+      <div class="about-scene-shell" id="about-shell">
+
+        <!-- Scene 0: Intro + Photo + Keywords -->
+        <div class="about-scene is-active" data-scene="0">
+          <div class="about-hero-row">
+            <div class="about-hero-text">
+              <p class="about-eyebrow">${isAr ? 'عن صاحب BAJOZONE' : 'ABOUT THE FOUNDER'}</p>
+              <p class="about-name">${c.hero.name}</p>
+              <h1 class="about-headline">${isAr ? 'بين كرة القدم، البحث، والتقنية' : 'Where football, research, and technology meet'}</h1>
+              <div class="about-divider" aria-hidden="true"></div>
+              <p class="about-lead">${c.hero.tagline}</p>
+              <p class="about-bio">${c.hero.bio}</p>
+            </div>
+            <div class="about-hero-side">
+              <div class="about-hero-card">
+                ${heroPhoto
+                  ? `<img class="about-hero-card-photo" src="${heroPhoto}" alt="${c.hero.name}" loading="eager" onerror="this.style.display='none'">`
+                  : `<div class="about-hero-card-placeholder">${isAr ? 'ع.ب' : 'A.B'}</div>`}
+                <div class="about-hero-card-overlay">
+                  <div class="about-hero-card-tags">${kwItems}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scene 1: Journey -->
+        <div class="about-scene" data-scene="1">
+          <p class="about-scene-label">${isAr ? '02 — رحلتي' : '02 — JOURNEY'}</p>
+          <h2 class="about-scene-title">${c.journey.title}</h2>
+          <div class="about-divider" aria-hidden="true"></div>
+          <p class="about-scene-intro">${c.journey.intro}</p>
+          <ol class="about-timeline" role="list">
+            ${c.journey.items.map(([label]) => `<li class="about-timeline-item"><span class="about-timeline-dot" aria-hidden="true"></span><span class="about-timeline-label">${label}</span></li>`).join('')}
+          </ol>
+        </div>
+
+        <!-- Scene 2: Focus -->
+        <div class="about-scene" data-scene="2">
+          <p class="about-scene-label">${isAr ? '03 — ما أركز عليه' : '03 — FOCUS'}</p>
+          <h2 class="about-scene-title">${c.focus.title}</h2>
+          <div class="about-divider" aria-hidden="true"></div>
+          <p class="about-scene-intro">${c.focus.intro}</p>
+          <div class="about-focus-grid">
+            ${c.focus.cards.map(([title, text]) => `<div class="about-focus-card"><p class="about-focus-card-title">${title}</p><p class="about-focus-card-text">${text}</p></div>`).join('')}
+          </div>
+        </div>
+
+        <!-- Scene 3: Moments & Milestones (album + text + logo strip) -->
+        <div class="about-scene" data-scene="3">
+          <p class="about-scene-label">${isAr ? '04 — لقطات ومحطات' : '04 — MOMENTS & MILESTONES'}</p>
+          <h2 class="about-scene-title">${isAr ? 'لقطات ومحطات من الرحلة' : 'Moments and Milestones'}</h2>
+          <div class="about-divider" aria-hidden="true"></div>
+          <div class="about-moments-main">
+            <div class="about-moments-text-col">
+              <p class="about-moments-text-eyebrow">${isAr ? 'جهات وتجارب' : 'Institutions'}</p>
+              <p class="about-moments-text-body">${c.experience.text}</p>
+            </div>
+            <div class="about-moments-photos-col">
+              <div class="about-photo-album-track">${albumTrack}</div>
+            </div>
+          </div>
+          <div class="about-logo-strip-wrap">
+            <div class="about-logo-track">${logoTrack}</div>
+          </div>
+        </div>
+
+        <!-- Scene 4: VAR Check Easter Egg -->
+        ${varEnabled !== false ? `
+        <div class="about-scene" data-scene="4">
+          <p class="about-scene-label">05 — VAR CHECK</p>
+          <h2 class="about-scene-title">${isAr ? 'لحظة VAR' : 'VAR Moment'}</h2>
+          <div class="about-divider" aria-hidden="true"></div>
+          <p class="about-scene-intro">${isAr ? 'توقف للحظة. كل قرار مهم يستحق نظرة ثانية.' : 'Pause for a moment. Every important decision deserves a second look.'}</p>
+          <div class="about-var-area">
+            <p class="about-var-eyebrow">${varData.eyebrow}</p>
+            <button class="about-var-btn" id="about-var-btn" aria-label="${isAr ? 'مراجعة VAR' : 'VAR Review'}">${varData.btn}</button>
+            <p class="about-var-status" id="about-var-status" aria-live="polite"></p>
+          </div>
+        </div>` : ''}
+
+        <!-- Scene 5: Closing + Social -->
+        <div class="about-scene" data-scene="${varEnabled !== false ? 5 : 4}">
+          <p class="about-scene-label">${isAr ? '06 — الخاتمة' : '06 — CLOSING'}</p>
+          <h2 class="about-scene-title">${c.closing.title}</h2>
+          <div class="about-divider" aria-hidden="true"></div>
+          ${c.closing.paragraphs.map(p => `<p class="about-scene-para">${p}</p>`).join('')}
+          <p class="about-closing-statement">${c.closing.statement}</p>
+          ${contactInvite ? `<p class="about-contact-invite">${contactInvite}</p>` : ''}
+          ${socialLinksHtml ? `<div class="about-social-row">${socialLinksHtml}</div>` : ''}
+          <a class="about-btn-fill" href="#/" onclick="Router.go('/')">${c.closing.button}</a>
+        </div>
+
+      </div>
+
+      <div class="about-scene-controls">
+        <div class="about-scene-dots" role="tablist" aria-label="${isAr ? 'المشاهد' : 'Scenes'}">
+          ${(varEnabled !== false ? [0,1,2,3,4,5] : [0,1,2,3,4]).map(i => `<button class="about-dot${i===0?' is-active':''}" role="tab" aria-selected="${i===0}" data-target="${i}" aria-label="${isAr?'المشهد '+(i+1):'Scene '+(i+1)}"></button>`).join('')}
+        </div>
+        <button class="about-scene-next" id="about-next-btn" aria-label="${isAr ? 'المشهد التالي' : 'Next scene'}">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4,7 9,12 14,7"/></svg>
+        </button>
+      </div>
+
+    </div>`;
+
+  updatePageMeta(
+    `${c.hero.name} — ${CMS.s('site_name_en', 'BajoZone')}`,
+    c.hero.tagline,
+    'images/about/about-bg.png',
+    location.origin + location.pathname + '#/about'
+  );
+
+  requestAnimationFrame(() => {
+    initAboutScenes();
+    if (varEnabled !== false) initVarCheck(varData);
+  });
+}
+
+function initAboutScenes() {
+  const scenes = [...document.querySelectorAll('.about-scene')];
+  const dots   = [...document.querySelectorAll('.about-dot')];
+  const nextBtn = document.getElementById('about-next-btn');
+  if (!scenes.length) return;
+
+  let cur = 0;
+  let locked = false;
+  const TOTAL = scenes.length;
+  const LOCK_MS = 680;
+
+  function goTo(idx) {
+    if (locked) return;
+    const next = Math.max(0, Math.min(TOTAL - 1, idx));
+    if (next === cur) return;
+    locked = true;
+    const prevEl = scenes[cur];
+    const nextEl = scenes[next];
+    prevEl.classList.add('is-leaving');
+    prevEl.classList.remove('is-active');
+    if (dots[cur]) { dots[cur].classList.remove('is-active'); dots[cur].setAttribute('aria-selected', 'false'); }
+    cur = next;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        nextEl.classList.add('is-active');
+        if (dots[cur]) { dots[cur].classList.add('is-active'); dots[cur].setAttribute('aria-selected', 'true'); }
+        if (nextBtn) nextBtn.classList.toggle('is-last', cur === TOTAL - 1);
+        setTimeout(() => { prevEl.classList.remove('is-leaving'); locked = false; }, LOCK_MS);
+      });
+    });
+  }
+
+  if (nextBtn) nextBtn.addEventListener('click', () => { if (cur < TOTAL - 1) goTo(cur + 1); });
+  dots.forEach((dot, i) => dot.addEventListener('click', () => goTo(i)));
+
+  const keyHandler = (e) => {
+    if (!document.getElementById('about-shell')) { document.removeEventListener('keydown', keyHandler); return; }
+    if (e.key === 'ArrowDown') { e.preventDefault(); goTo(cur + 1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); goTo(cur - 1); }
+  };
+  document.addEventListener('keydown', keyHandler);
+
+  let lastWheel = 0;
+  const wheelHandler = (e) => {
+    if (!document.getElementById('about-shell')) { window.removeEventListener('wheel', wheelHandler); return; }
+    const active = scenes[cur];
+    const isLast = cur === TOTAL - 1;
+    if (active) {
+      const { scrollTop, scrollHeight, clientHeight } = active;
+      const atBottom = scrollTop + clientHeight >= scrollHeight - 2;
+      const atTop = scrollTop <= 2;
+      if (e.deltaY > 0 && !atBottom) return;
+      if (e.deltaY < 0 && !atTop) return;
+      if (isLast && e.deltaY > 20) return; // release to footer
+    }
+    e.preventDefault();
+    const now = Date.now();
+    if (now - lastWheel < 900) return;
+    lastWheel = now;
+    if (e.deltaY > 20) goTo(cur + 1);
+    else if (e.deltaY < -20) goTo(cur - 1);
+  };
+  window.addEventListener('wheel', wheelHandler, { passive: false });
+
+  let touchY = 0;
+  window.addEventListener('touchstart', (e) => { touchY = e.touches[0].clientY; }, { passive: true });
+  window.addEventListener('touchend', (e) => {
+    if (!document.getElementById('about-shell')) return;
+    const diff = touchY - e.changedTouches[0].clientY;
+    if (Math.abs(diff) > 48) { if (diff > 0) goTo(cur + 1); else goTo(cur - 1); }
+  }, { passive: true });
+}
+
+function initVarCheck(varData) {
+  const btn = document.getElementById('about-var-btn');
+  const status = document.getElementById('about-var-status');
+  if (!btn || !status) return;
+
+  btn.addEventListener('click', () => {
+    if (btn.classList.contains('is-reviewing')) return;
+    btn.classList.add('is-reviewing');
+    status.textContent = varData.reviewing;
+    status.classList.remove('is-result');
+
+    setTimeout(() => {
+      status.textContent = varData.result;
+      status.classList.add('is-result');
+
+      setTimeout(() => {
+        status.classList.remove('is-result');
+        status.style.opacity = '0';
+        setTimeout(() => {
+          status.textContent = '';
+          status.style.opacity = '';
+          btn.classList.remove('is-reviewing');
+        }, 500);
+      }, 2400);
+    }, 1800);
+  });
+}
+
+function initAboutPinnedStory(scenes) {
+  const pin = document.querySelector('.about-story-pin');
+  const stage = document.querySelector('.about-story-stage');
+  if (!pin || !stage || !Array.isArray(scenes) || !scenes.length) return;
+  const sceneEls = [...pin.querySelectorAll('.about-story-scene')];
+  const dots = [...pin.querySelectorAll('[data-scene-target]')];
+  const count = pin.querySelector('.about-story-count');
+  const current = pin.querySelector('.about-story-current');
+  const progress = pin.querySelector('.about-story-progressbar span');
+  const nextBtn = pin.querySelector('.about-story-next');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const canUseGsap = !reduceMotion && window.gsap && window.ScrollTrigger;
+  let active = 0;
+  if (window.__aboutStoryTrigger?.kill) window.__aboutStoryTrigger.kill();
+
+  const setScene = (idx) => {
+    const next = Math.max(0, Math.min(scenes.length - 1, idx));
+    if (next === active && stage.dataset.ready) return;
+    active = next;
+    stage.dataset.ready = '1';
+    stage.dataset.scene = scenes[active].key;
+    sceneEls.forEach((el, i) => el.classList.toggle('is-active', i === active));
+    dots.forEach((el, i) => el.classList.toggle('is-active', i === active));
+    if (count) count.textContent = `${String(active + 1).padStart(2, '0')} / ${String(scenes.length).padStart(2, '0')}`;
+    if (current) current.textContent = scenes[active].label;
+    if (progress) progress.style.width = `${((active + 1) / scenes.length) * 100}%`;
+    if (nextBtn) {
+      nextBtn.classList.toggle('is-last', active === scenes.length - 1);
+      nextBtn.querySelector('span').textContent = active === scenes.length - 1
+        ? (Lang.cur === 'ar' ? 'استكشف' : 'Explore')
+        : (Lang.cur === 'ar' ? 'التالي' : 'Next');
+    }
+  };
+
+  const scrollToScene = (idx) => {
+    if (reduceMotion) { sceneEls[idx]?.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+    const max = pin.offsetHeight - window.innerHeight;
+    const top = window.scrollY + pin.getBoundingClientRect().top + (max * (idx / Math.max(1, scenes.length - 1)));
+    window.scrollTo({ top, behavior: 'smooth' });
+  };
+
+  if (reduceMotion) {
+    pin.classList.add('is-reduced-motion');
+    setScene(0);
+  } else if (canUseGsap) {
+    window.gsap.registerPlugin(window.ScrollTrigger);
+    pin.style.setProperty('--about-story-scenes', scenes.length);
+    window.__aboutStoryTrigger = window.ScrollTrigger.create({
+      trigger: pin,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: true,
+      snap: 1 / Math.max(1, scenes.length - 1),
+      onUpdate: self => setScene(Math.round(self.progress * (scenes.length - 1)))
+    });
+    requestAnimationFrame(() => window.ScrollTrigger.refresh());
+  } else {
+    pin.style.setProperty('--about-story-scenes', scenes.length);
+    const onScroll = () => {
+      const max = Math.max(1, pin.offsetHeight - window.innerHeight);
+      const raw = Math.max(0, Math.min(1, -pin.getBoundingClientRect().top / max));
+      setScene(Math.round(raw * (scenes.length - 1)));
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    requestAnimationFrame(onScroll);
+  }
+
+  dots.forEach(btn => btn.addEventListener('click', () => scrollToScene(Number(btn.dataset.sceneTarget || 0))));
+  nextBtn?.addEventListener('click', () => {
+    if (active >= scenes.length - 1) { Router.go('/'); return; }
+    scrollToScene(active + 1);
+  });
+  setScene(0);
 }
 
 /* ── Boot ────────────────────────────────────── */
@@ -2327,11 +3136,8 @@ function renderAbout() {
   Router.reg('/article', id  => renderArticleSingle(id));
   Router.reg('/books',   ()  => renderBooks());
   Router.reg('/book',    id  => renderBookSingle(id));
-  Router.reg('/about',   ()  => renderAbout());
+  Router.reg('/about',   ()  => renderAboutPremium());
   renderNav(); renderFooter(); Router.init();
   maybeShowNewArticleBar();
   setTimeout(hideBootLoader, 180);
 })();
-
-
-

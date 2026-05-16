@@ -698,7 +698,8 @@ function initTabs(containerId) {
       container.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('on'));
       // Find and deactivate all tc siblings (go up to modal-bd)
       const modalBd = this.closest('.modal-bd');
-      if (modalBd) modalBd.querySelectorAll('.tc').forEach(t => t.classList.remove('on'));
+      const scope = container.closest('[data-tab-scope]') || modalBd || container.parentElement;
+      if (scope) scope.querySelectorAll('.tc').forEach(t => t.classList.remove('on'));
       // Activate clicked
       this.classList.add('on');
       const pane = ge(tabId);
@@ -1975,6 +1976,125 @@ function showToast(msg, type='ok') {
 
 
 // ── About Rich Editor ─────────────────────────
+function aboutProfileDefaults(lang = 'ar') {
+  if (lang === 'en') return {
+    name: 'Abdulaziz Bajkhaif',
+    title: 'Reading football through science and the field',
+    lead: 'A sports science and football practitioner focused on talent identification, youth player development, recruitment analysis, academy environments, and player care.',
+    quote: 'Talent should not only be seen. It should be understood, measured, supported, and placed in an environment where it can grow.',
+    emailLabel: 'Contact me',
+    email: 'Abdulaziz.bajkhaif@hotmail.com',
+    lensesTitle: 'The Lenses Behind My Writing',
+    journeyTitle: 'Milestones That Shaped The View',
+    journeySub: 'These are the moments that shaped how I read players, environments, and potential.',
+    albumTitle: 'Experience Album',
+    albumSub: 'A space for photos and stories: visits, shadowing, courses, lectures, events, and field moments worth documenting.',
+    whyTitle: 'Why BajoZone Is Worth Reading',
+    whyText: 'Because it goes beyond generic football talk and connects science, field observation, and lived experience.',
+    ctaTitle: 'Have an academy, idea, or experience worth discussing?',
+    ctaText: 'I am open to conversations around talent, youth football, player development, lectures, and Arabic football knowledge.',
+    stats: [['Sports Science','An academic lens for movement, performance, and player growth'],['Youth Football','A focus on early decisions that shape long-term pathways'],['Author','Turning experience and research into references people can use'],['Events & Lectures','Speaking, organizing, and contributing across sport settings']],
+    lenses: [['Talent ID','How do we identify potential beyond first impressions?'],['Player Development','How does a promising player become a growth project?'],['Recruitment Analysis','How do data, behavior, and context inform decisions?'],['Player Care','How do we protect the player psychologically, educationally, and socially?']],
+    journey: [['The first spark','Football became the entry point to understanding the human inside the game.'],['Movement and Sports Sciences','Academic study gave me a more precise language for performance and development.'],['Visits and field shadowing','Sport environments teach what slides cannot.'],['Courses, diplomas, and lectures','Every learning stop added a tool, a question, or a better way.'],['Writing and contribution','Books, lectures, and events organize knowledge and share it.']],
+    quotes: ['Sometimes talent is not lost because it is weak, but because it was read incorrectly.','A scout does not only see what happened. A scout asks what could happen in two years.','In football, context is half the truth.'],
+    services: [['Sports knowledge content','Writing and developing articles and guides that connect science with the field.'],['Scouting frameworks','Building practical templates that help scouts and coaches read players deeply.'],['Workshops and lectures','Knowledge sessions on talent identification and youth football.'],['Research or media collaboration','Turning sport ideas into publishable and practical projects.']]
+  };
+  return {
+    name: 'عبدالعزيز باجخيف',
+    title: 'أقرأ كرة القدم بعين العلم والميدان',
+    lead: 'باحث وممارس في علوم الرياضة وكرة القدم، مهتم باكتشاف المواهب وتطوير اللاعبين في الفئات السنية. BajoZone ليست صفحة تعريف تقليدية، بل دفتر ميدان أترجم فيه التجارب إلى معرفة قابلة للتطبيق.',
+    quote: 'الموهبة لا تكفي أن ترى. يجب أن تفهم، تقاس، ترعى، ثم تمنح البيئة التي تجعلها تكبر.',
+    emailLabel: 'تواصل معي',
+    email: 'Abdulaziz.bajkhaif@hotmail.com',
+    lensesTitle: 'العدسات التي أكتب من خلالها',
+    journeyTitle: 'محطات صنعت النظرة',
+    journeySub: 'ليست سيرة ذاتية مرتبة على الورق. هذه محطات صنعت طريقة تفكير مختلفة في اللاعب والموهبة.',
+    albumTitle: 'ألبوم المحطات',
+    albumSub: 'هنا مساحة الصور والقصص: زيارة، معايشة، دورة، محاضرة، فعالية، أو لحظة ميدانية تستحق أن تروى.',
+    whyTitle: 'لماذا تستحق BajoZone أن تقرأ؟',
+    whyText: 'لأنها لا تكتفي بالكلام العام عن كرة القدم. هنا أحاول أن أجمع بين العلم، الملاحظة، والتجربة الشخصية.',
+    ctaTitle: 'هل لديك تجربة، أكاديمية، أو فكرة تستحق النقاش؟',
+    ctaText: 'يسعدني التواصل حول المواهب، الفئات السنية، تطوير اللاعبين، المحاضرات، أو التعاون في محتوى يخدم كرة القدم العربية.',
+    stats: [['علوم الرياضة','خلفية أكاديمية في الحركة والأداء وفهم اللاعب'],['الفئات السنية','تركيز على القرارات التي تصنع مسار اللاعب مبكرا'],['كتاب مؤلف','تحويل التجربة والمعرفة إلى مرجع يمكن العودة له'],['محاضرات وفعاليات','مشاركة وتنظيم ومساهمة داخل بيئات رياضية متنوعة']],
+    lenses: [['Talent ID','كيف نميز الموهبة بعيدا عن الانطباع السريع؟'],['Player Development','كيف يتحول اللاعب الواعد إلى مشروع قابل للنمو؟'],['Recruitment Analysis','كيف تقرأ البيانات والسلوك قبل قرار الاختيار؟'],['Player Care','كيف نحمي اللاعب نفسيا وتعليميا وبيئيا؟']],
+    journey: [['البداية من الشغف','كرة القدم كانت المدخل الأول لفهم الإنسان داخل الملعب.'],['علوم الحركة والرياضة','دراسة أكاديمية منحتني لغة أدق لقراءة الأداء والتطور.'],['زيارات ومعايشات ميدانية','الاحتكاك بالبيئات الرياضية يعلم ما لا تقوله الشرائح.'],['دورات ودبلومات ومحاضرات','كل محطة تعلم أضافت أداة أو زاوية جديدة.'],['تأليف ومشاركة','الكتاب والفعاليات طريقة لتنظيم المعرفة ومشاركتها.']],
+    quotes: ['أحيانا لا تضيع الموهبة لأنها ضعيفة، بل لأنها قرئت بطريقة خاطئة.','الكشاف لا يرى ما حدث فقط، بل يسأل: ماذا يمكن أن يحدث بعد عامين؟','في كرة القدم، السياق نصف الحقيقة.'],
+    services: [['محتوى معرفي رياضي','كتابة وتطوير مقالات وأدلة تربط العلم بالميدان بلغة واضحة.'],['نماذج تقييم وكشف','بناء قوالب عملية تساعد الكشاف والمدرب على قراءة اللاعب بعمق.'],['ورش ومحاضرات','جلسات معرفية حول اكتشاف المواهب والفئات السنية وبيئات التطوير.'],['تعاون بحثي أو إعلامي','تحويل الأفكار الرياضية إلى محتوى أو مشاريع قابلة للنشر والتطبيق.']]
+  };
+}
+function aboutProfile(lang) {
+  return Object.assign({}, aboutProfileDefaults(lang), (DB.settings?.about_profile?.[lang] || {}));
+}
+function pairsToText(rows) {
+  return (rows || []).map(row => Array.isArray(row) ? `${row[0] || ''} | ${row[1] || ''}` : String(row || '')).join('\n');
+}
+function textToPairs(text) {
+  return String(text || '').split('\n').map(line => line.trim()).filter(Boolean).map(line => {
+    const parts = line.split('|');
+    return [parts.shift().trim(), parts.join('|').trim()];
+  }).filter(row => row[0] || row[1]);
+}
+function linesToText(rows) {
+  return (rows || []).map(x => String(x || '')).join('\n');
+}
+function textToLines(text) {
+  return String(text || '').split('\n').map(line => line.trim()).filter(Boolean);
+}
+function aboutProfileFields(lang, label, dir) {
+  const p = aboutProfile(lang);
+  const prefix = `abt-${lang}`;
+  return `<div class="a-card">
+    <div class="a-card-title">النصوص الأساسية - ${label}</div>
+    <div class="fr">
+      <div class="fg"><label class="fl">الاسم</label><input id="${prefix}-name" class="fi" dir="${dir}" value="${esc(p.name)}"></div>
+      <div class="fg"><label class="fl">العنوان المهني</label><input id="${prefix}-title" class="fi" dir="${dir}" value="${esc(p.title)}"></div>
+    </div>
+    <div class="fg"><label class="fl">النص الافتتاحي</label><textarea id="${prefix}-lead" class="fi" rows="4" dir="${dir}">${esc(p.lead)}</textarea></div>
+    <div class="fg"><label class="fl">الاقتباس الرئيسي</label><textarea id="${prefix}-quote" class="fi" rows="2" dir="${dir}">${esc(p.quote)}</textarea></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">نص زر التواصل</label><input id="${prefix}-emailLabel" class="fi" dir="${dir}" value="${esc(p.emailLabel)}"></div>
+      <div class="fg"><label class="fl">البريد أو رابط التواصل</label><input id="${prefix}-email" class="fi" dir="ltr" value="${esc(p.email)}"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">عنوان العدسات</label><input id="${prefix}-lensesTitle" class="fi" dir="${dir}" value="${esc(p.lensesTitle)}"></div>
+      <div class="fg"><label class="fl">عنوان المحطات النصية</label><input id="${prefix}-journeyTitle" class="fi" dir="${dir}" value="${esc(p.journeyTitle)}"></div>
+    </div>
+    <div class="fg"><label class="fl">وصف المحطات النصية</label><textarea id="${prefix}-journeySub" class="fi" rows="2" dir="${dir}">${esc(p.journeySub)}</textarea></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">عنوان ألبوم الصور</label><input id="${prefix}-albumTitle" class="fi" dir="${dir}" value="${esc(p.albumTitle)}"></div>
+      <div class="fg"><label class="fl">وصف ألبوم الصور</label><textarea id="${prefix}-albumSub" class="fi" rows="2" dir="${dir}">${esc(p.albumSub)}</textarea></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">عنوان الفكرة</label><input id="${prefix}-whyTitle" class="fi" dir="${dir}" value="${esc(p.whyTitle)}"></div>
+      <div class="fg"><label class="fl">نص الفكرة</label><textarea id="${prefix}-whyText" class="fi" rows="3" dir="${dir}">${esc(p.whyText)}</textarea></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">عنوان النداء الأخير</label><input id="${prefix}-ctaTitle" class="fi" dir="${dir}" value="${esc(p.ctaTitle)}"></div>
+      <div class="fg"><label class="fl">نص النداء الأخير</label><textarea id="${prefix}-ctaText" class="fi" rows="3" dir="${dir}">${esc(p.ctaText)}</textarea></div>
+    </div>
+    <p style="color:var(--warm-dark);font-size:.76rem;margin:8px 0 12px;">للقوائم التالية: اكتب كل عنصر في سطر بصيغة: العنوان | الوصف. أما الاقتباسات فاكتب كل اقتباس في سطر مستقل.</p>
+    <div class="fr">
+      <div class="fg"><label class="fl">الإحصاءات / البطاقات</label><textarea id="${prefix}-stats" class="fi" rows="6" dir="${dir}">${esc(pairsToText(p.stats))}</textarea></div>
+      <div class="fg"><label class="fl">العدسات</label><textarea id="${prefix}-lenses" class="fi" rows="6" dir="${dir}">${esc(pairsToText(p.lenses))}</textarea></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">المحطات النصية</label><textarea id="${prefix}-journey" class="fi" rows="7" dir="${dir}">${esc(pairsToText(p.journey))}</textarea></div>
+      <div class="fg"><label class="fl">الخدمات</label><textarea id="${prefix}-services" class="fi" rows="7" dir="${dir}">${esc(pairsToText(p.services))}</textarea></div>
+    </div>
+    <div class="fg"><label class="fl">الاقتباسات</label><textarea id="${prefix}-quotes" class="fi" rows="5" dir="${dir}">${esc(linesToText(p.quotes))}</textarea></div>
+  </div>`;
+}
+function collectAboutProfileLang(lang) {
+  const prefix = `abt-${lang}`;
+  const out = {};
+  ['name','title','lead','quote','emailLabel','email','lensesTitle','journeyTitle','journeySub','albumTitle','albumSub','whyTitle','whyText','ctaTitle','ctaText'].forEach(key => out[key] = gv(`${prefix}-${key}`));
+  out.stats = textToPairs(gv(`${prefix}-stats`));
+  out.lenses = textToPairs(gv(`${prefix}-lenses`));
+  out.journey = textToPairs(gv(`${prefix}-journey`));
+  out.services = textToPairs(gv(`${prefix}-services`));
+  out.quotes = textToLines(gv(`${prefix}-quotes`));
+  return out;
+}
 function galleryItemHtml(item = {}, idx = 0) {
   return `<div class="gallery-admin-item" data-gallery-item>
     <div class="gallery-admin-media">
@@ -2035,9 +2155,104 @@ function collectGallery() {
     story_en: item.querySelector('[data-g-story-en]')?.value.trim() || ''
   })).filter(item => item.image || item.title_ar || item.title_en || item.story_ar || item.story_en);
 }
+function galleryItemHtmlFixed(item = {}, idx = 0) {
+  return `<div class="gallery-admin-item" data-gallery-item>
+    <div class="gallery-admin-media">
+      ${item.image ? `<img src="${mediaSrc(item.image)}" alt="">` : `<div class="gallery-admin-ph">صورة</div>`}
+      <input type="hidden" data-g-image value="${esc(item.image || '')}">
+      <input type="file" accept="image/*" data-g-file>
+    </div>
+    <div class="gallery-admin-fields">
+      <div class="fr">
+        <div class="fg"><label class="fl">عنوان التجربة (عربي)</label><input class="fi" data-g-title-ar dir="rtl" value="${esc(item.title_ar || '')}"></div>
+        <div class="fg"><label class="fl">Experience title (English)</label><input class="fi" data-g-title-en dir="ltr" value="${esc(item.title_en || '')}"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label class="fl">القصة / النبذة (عربي)</label><textarea class="fi" data-g-story-ar rows="4" dir="rtl">${esc(item.story_ar || '')}</textarea></div>
+        <div class="fg"><label class="fl">Story / note (English)</label><textarea class="fi" data-g-story-en rows="4" dir="ltr">${esc(item.story_en || '')}</textarea></div>
+      </div>
+      <button class="ibtn red" type="button" data-g-remove>حذف هذه الصورة</button>
+    </div>
+  </div>`;
+}
+galleryItemHtml = galleryItemHtmlFixed;
+
+function bindGalleryEditorFixed() {
+  ge('btn-add-gallery')?.addEventListener('click', () => {
+    ge('about-gallery-editor').querySelector('.dash-empty')?.remove();
+    ge('about-gallery-editor').insertAdjacentHTML('beforeend', galleryItemHtml({}, Date.now()));
+    bindGalleryEditor();
+  }, { once: true });
+  document.querySelectorAll('[data-g-remove]').forEach(btn => {
+    if (btn.dataset.bound) return;
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', () => btn.closest('[data-gallery-item]')?.remove());
+  });
+  document.querySelectorAll('[data-g-file]').forEach(input => {
+    if (input.dataset.bound) return;
+    input.dataset.bound = '1';
+    input.addEventListener('change', function() {
+      const file = this.files[0];
+      if (!file) return;
+      const item = this.closest('[data-gallery-item]');
+      const hidden = item.querySelector('[data-g-image]');
+      const media = item.querySelector('.gallery-admin-media');
+      const ph = item.querySelector('.gallery-admin-ph');
+      const oldPh = ph?.textContent || 'صورة';
+      if (ph) ph.textContent = 'جاري معالجة الصورة...';
+      input.disabled = true;
+      compressImage(file, 1200, 1200, 0.78, async (err, dataUrl) => {
+        input.disabled = false;
+        if (err) {
+          if (ph) ph.textContent = oldPh;
+          showAdminToast('خطأ في الصورة: ' + err, true);
+          return;
+        }
+        let finalUrl = '';
+        if (window.BajoSupabase?.getAccessToken?.()) {
+          try {
+            if (ph) ph.textContent = 'جاري رفع الصورة...';
+            finalUrl = await window.BajoSupabase.uploadMedia(
+              dataUrlToBlob(dataUrl),
+              uploadPathFor('about-gallery', file),
+              'image/jpeg'
+            );
+          } catch (uploadErr) {
+            console.error(uploadErr);
+            const reason = uploadErr?.message ? `: ${uploadErr.message}` : '';
+            showAdminToast(`تعذر رفع صورة المحطة إلى Supabase${reason}`, true);
+          }
+        }
+        if (!finalUrl) {
+          if (dataUrl.length > 900 * 1024) {
+            if (ph) ph.textContent = oldPh;
+            showAdminToast('الصورة جاهزة لكن لا يمكن حفظها محليا لأنها كبيرة. سجل الدخول عبر Supabase أو استخدم صورة أصغر.', true);
+            return;
+          }
+          finalUrl = dataUrl;
+          showAdminToast('تم حفظ الصورة محليا مؤقتا. الأفضل تسجيل الدخول عبر Supabase حتى تظهر على الموقع المنشور.', true);
+        }
+        hidden.value = finalUrl;
+        media.querySelector('img')?.remove();
+        media.insertAdjacentHTML('afterbegin', `<img src="${mediaSrc(finalUrl)}" alt="">`);
+        item.querySelector('.gallery-admin-ph')?.remove();
+      });
+    });
+  });
+}
+bindGalleryEditor = bindGalleryEditorFixed;
+
 function renderSAbout() {
   const s = DB.settings || {};
   ge('main-content').innerHTML = `
+    <div data-tab-scope>
+    <div class="tabs" id="abt-profile-tabs" style="margin-bottom:16px;">
+      <button class="tab-btn on" data-tab="abt-profile-ar">عربي</button>
+      <button class="tab-btn" data-tab="abt-profile-en">English</button>
+    </div>
+    <div class="tc on" id="abt-profile-ar">${aboutProfileFields('ar', 'عربي', 'rtl')}</div>
+    <div class="tc" id="abt-profile-en">${aboutProfileFields('en', 'English', 'ltr')}</div>
+    </div>
     <div class="a-card">
       <div class="a-card-title">محتوى صفحة "إعرف عني"</div>
       <p style="color:var(--warm-mid);font-size:.83rem;margin-bottom:20px;">
@@ -2114,6 +2329,7 @@ function renderSAbout() {
   ge('abt-rte-ar').innerHTML = s.about_content_ar || `<p>${esc(s.about_ar||'')}</p>`;
   ge('abt-rte-en').innerHTML = s.about_content_en || `<p>${esc(s.about_en||'')}</p>`;
 
+  initTabs('abt-profile-tabs');
   initTabs('abt-pg-tabs');
   initRTE('abt-rte-ar-bar', 'abt-rte-ar');
   initRTE('abt-rte-en-bar', 'abt-rte-en');
@@ -2121,9 +2337,207 @@ function renderSAbout() {
 
   ge('btn-save-sabout').addEventListener('click', () => {
     if (!DB.settings) DB.settings = {};
+    DB.settings.about_profile = {
+      ar: collectAboutProfileLang('ar'),
+      en: collectAboutProfileLang('en')
+    };
     DB.settings.about_content_ar = ge('abt-rte-ar').innerHTML;
     DB.settings.about_content_en = ge('abt-rte-en').innerHTML;
     DB.settings.about_gallery = collectGallery();
+    dbSave();
+  });
+}
+
+function logoItemHtml(item = {}) {
+  const src = item.src || '';
+  const displaySrc = src ? mediaSrc(src) : '';
+  return `<div class="gallery-admin-item" data-logo-item>
+    <div class="gallery-admin-media">
+      ${displaySrc ? `<img src="${displaySrc}" alt="">` : `<div class="gallery-admin-ph">لوقو</div>`}
+      <input type="hidden" data-l-src value="${esc(src)}">
+      <input type="file" accept="image/*" data-l-file>
+    </div>
+    <div class="gallery-admin-fields">
+      <div class="fr">
+        <div class="fg"><label class="fl">اسم الجهة (عربي)</label><input class="fi" data-l-alt-ar dir="rtl" value="${esc(item.alt_ar || '')}"></div>
+        <div class="fg"><label class="fl">Institution name (English)</label><input class="fi" data-l-alt-en dir="ltr" value="${esc(item.alt_en || '')}"></div>
+      </div>
+      <button class="ibtn red" type="button" data-l-remove>حذف هذا الشعار</button>
+    </div>
+  </div>`;
+}
+function bindLogoEditor() {
+  ge('btn-add-logo')?.addEventListener('click', () => {
+    ge('about-logos-editor').querySelector('.dash-empty')?.remove();
+    ge('about-logos-editor').insertAdjacentHTML('beforeend', logoItemHtml({}));
+    bindLogoEditor();
+  }, { once: true });
+  document.querySelectorAll('[data-l-remove]').forEach(btn => {
+    if (btn.dataset.bound) return;
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', () => btn.closest('[data-logo-item]')?.remove());
+  });
+  document.querySelectorAll('[data-l-file]').forEach(input => {
+    if (input.dataset.bound) return;
+    input.dataset.bound = '1';
+    input.addEventListener('change', function() {
+      const file = this.files[0];
+      if (!file) return;
+      const item = this.closest('[data-logo-item]');
+      const hidden = item.querySelector('[data-l-src]');
+      const media = item.querySelector('.gallery-admin-media');
+      const ph = item.querySelector('.gallery-admin-ph');
+      const oldPh = ph?.textContent || 'لوقو';
+      if (ph) ph.textContent = 'جاري المعالجة...';
+      this.disabled = true;
+      compressImage(file, 400, 400, 0.85, async (err, dataUrl) => {
+        this.disabled = false;
+        if (err) {
+          if (ph) ph.textContent = oldPh;
+          showAdminToast('خطأ في الصورة: ' + err, true);
+          return;
+        }
+        let finalUrl = '';
+        if (window.BajoSupabase?.getAccessToken?.()) {
+          try {
+            if (ph) ph.textContent = 'جاري الرفع...';
+            finalUrl = await window.BajoSupabase.uploadMedia(
+              dataUrlToBlob(dataUrl),
+              uploadPathFor('about-logos', file),
+              'image/png'
+            );
+          } catch (uploadErr) {
+            const reason = uploadErr?.message ? `: ${uploadErr.message}` : '';
+            showAdminToast(`تعذر رفع الشعار${reason}`, true);
+          }
+        }
+        if (!finalUrl) finalUrl = dataUrl;
+        hidden.value = finalUrl;
+        media.querySelector('img')?.remove();
+        media.insertAdjacentHTML('afterbegin', `<img src="${mediaSrc(finalUrl)}" alt="">`);
+        item.querySelector('.gallery-admin-ph')?.remove();
+      });
+    });
+  });
+}
+function collectLogos() {
+  return Array.from(document.querySelectorAll('[data-logo-item]')).map(item => ({
+    src: item.querySelector('[data-l-src]')?.value.trim() || '',
+    alt_ar: item.querySelector('[data-l-alt-ar]')?.value.trim() || '',
+    alt_en: item.querySelector('[data-l-alt-en]')?.value.trim() || ''
+  })).filter(item => item.src);
+}
+
+function renderSAbout() {
+  const s = DB.settings || {};
+  const varData = s.about_var_data || {};
+  ge('main-content').innerHTML = `
+    <div class="a-card">
+      <div class="a-card-title">الصورة الشخصية</div>
+      <p style="color:var(--warm-mid);font-size:.86rem;line-height:1.8;margin-bottom:18px;">
+        تظهر كبطاقة مستطيلة طولية في القسم الأول من صفحة "تعرف علي". الأفضل صورة شخصية بإضاءة جيدة، ويُنصح بصورة طولية Portrait.
+      </p>
+      <div class="fg">
+        <label class="fl">الصورة الشخصية</label>
+        <div class="upzone">
+          <input type="file" id="about-profile-file" accept="image/*">
+          <div class="upzone-txt">ارفع صورة شخصية مربعة أو قريبة من المربع</div>
+        </div>
+        <input type="hidden" id="about-profile-val" value="${esc(s.about_image || '')}">
+        <img id="about-profile-prev" class="up-prev" ${s.about_image ? `src="${mediaSrc(s.about_image)}" style="display:block;"` : ''}>
+      </div>
+    </div>
+
+    <div class="a-card">
+      <div class="a-card-title">لقطات من الرحلة</div>
+      <p style="color:var(--warm-mid);font-size:.86rem;line-height:1.8;margin-bottom:18px;">
+        تظهر هذه الصور في قسم "لقطات ومحطات من الرحلة" مع شريط الشعارات أدناه. أضف 3 إلى 6 صور.
+      </p>
+      <div id="about-gallery-editor" class="gallery-admin-list">
+        ${(s.about_gallery || []).map((item, idx) => galleryItemHtml(item, idx)).join('') || `<div class="dash-empty">لا توجد صور بعد. اضغط إضافة صورة.</div>`}
+      </div>
+      <button class="ibtn" type="button" id="btn-add-gallery" style="margin-top:12px;">+ إضافة لقطة</button>
+    </div>
+
+    <div class="a-card">
+      <div class="a-card-title">شعارات الجهات (اللوقوهات)</div>
+      <p style="color:var(--warm-mid);font-size:.86rem;line-height:1.8;margin-bottom:18px;">
+        تظهر كشريط أفقي متحرك أسفل قسم "لقطات ومحطات". أضف شعارات الجهات التي عملت بها أو تعلمت منها.
+      </p>
+      <div id="about-logos-editor" class="gallery-admin-list">
+        ${(s.about_journey_logos || []).map((item) => logoItemHtml(item)).join('') || `<div class="dash-empty">لا توجد شعارات بعد. اضغط إضافة شعار.</div>`}
+      </div>
+      <button class="ibtn" type="button" id="btn-add-logo" style="margin-top:12px;">+ إضافة شعار</button>
+    </div>
+
+    <div class="a-card">
+      <div class="a-card-title">الكلمات المفتاحية (تاقات التخصص)</div>
+      <p style="color:var(--warm-mid);font-size:.86rem;line-height:1.8;margin-bottom:14px;">
+        تظهر كتاقات ثابتة فوق الصورة الشخصية من الأسفل في القسم الأول. اكتب كلمة أو عبارة واحدة في كل سطر.
+      </p>
+      <div class="fg">
+        <label class="fl">الكلمات المفتاحية (عربي/English — كل كلمة في سطر)</label>
+        <textarea id="about-keywords" class="fi" dir="rtl" rows="8" style="resize:vertical;" placeholder="اكتشاف المواهب&#10;علوم الرياضة&#10;تطوير المواهب&#10;رعاية المواهب&#10;أكاديميات كرة القدم&#10;الفئات السنية&#10;بناء الفريق&#10;استقطاب اللاعبين">${esc((s.about_keywords || []).join('\n'))}</textarea>
+      </div>
+    </div>
+
+    <div class="a-card">
+      <div class="a-card-title">نص التواصل في الخاتمة</div>
+      <p style="color:var(--warm-mid);font-size:.86rem;line-height:1.8;margin-bottom:14px;">
+        يظهر هذا النص قبل أيقونات التواصل الاجتماعي في آخر قسم. اتركه فارغاً لإخفائه.
+      </p>
+      <div class="fg">
+        <label class="fl">النص (عربي)</label>
+        <input id="about-invite-ar" class="fi" dir="rtl" value="${esc(s.about_contact_invite_ar || '')}" placeholder="لديك سؤال أو تريد التواصل؟">
+      </div>
+      <div class="fg">
+        <label class="fl">النص (English)</label>
+        <input id="about-invite-en" class="fi" dir="ltr" value="${esc(s.about_contact_invite_en || '')}" placeholder="Have a question or want to get in touch?">
+      </div>
+    </div>
+
+    <div class="a-card">
+      <div class="a-card-title">VAR Check — البيضة المخفية</div>
+      <p style="color:var(--warm-mid);font-size:.86rem;line-height:1.8;margin-bottom:14px;">
+        مشهد تفاعلي ظريف يظهر بين قسم المحطات والخاتمة. يمكن تعطيله تماماً.
+      </p>
+      <div class="fg">
+        <label class="fl">الحالة</label>
+        <div class="tog-wrap">
+          <label class="tog"><input type="checkbox" id="about-var-enabled" ${s.about_var_enabled !== false ? 'checked' : ''}><span class="tog-sl"></span></label>
+          <span style="font-size:.84rem;color:var(--warm-mid);">${s.about_var_enabled !== false ? 'مفعّل' : 'معطّل'}</span>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">نص المراجعة (يظهر عند الضغط)</label>
+        <input id="about-var-reviewing" class="fi" dir="rtl" value="${esc(varData.reviewing || '')}" placeholder="... جارٍ مراجعة القرار">
+      </div>
+      <div class="fg">
+        <label class="fl">نتيجة القرار النهائي</label>
+        <input id="about-var-result" class="fi" dir="rtl" value="${esc(varData.result || '')}" placeholder="القرار النهائي: الموهبة الحقيقية لا تُوقف.">
+      </div>
+    </div>
+
+    <button class="btn btn-fill" id="btn-save-sabout" style="padding:11px 36px;">حفظ صفحة تعرف علي</button>`;
+
+  initUpload('about-profile-file', 'about-profile-prev', 'about-profile-val');
+  bindGalleryEditor();
+  bindLogoEditor();
+
+  ge('btn-save-sabout').addEventListener('click', () => {
+    if (!DB.settings) DB.settings = {};
+    DB.settings.about_image = gv('about-profile-val');
+    DB.settings.about_gallery = collectGallery();
+    DB.settings.about_journey_logos = collectLogos();
+    DB.settings.about_keywords = gv('about-keywords').split('\n').map(s => s.trim()).filter(Boolean);
+    DB.settings.about_contact_invite_ar = gv('about-invite-ar');
+    DB.settings.about_contact_invite_en = gv('about-invite-en');
+    DB.settings.about_var_enabled = ge('about-var-enabled').checked;
+    const varReviewing = gv('about-var-reviewing');
+    const varResult = gv('about-var-result');
+    DB.settings.about_var_data = (varReviewing || varResult)
+      ? { reviewing: varReviewing, result: varResult }
+      : null;
     dbSave();
   });
 }
