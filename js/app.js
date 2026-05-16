@@ -2890,7 +2890,7 @@ function renderAboutPremium() {
           <p class="about-scene-intro">${c.journey.intro}</p>
           ${c.journey.para2 ? `<p class="about-scene-para">${c.journey.para2}</p>` : ''}
           <div class="about-journey-path">
-            ${c.journey.items.map(([title, text], idx) => `<div class="about-journey-step" style="--step-delay:${idx * 95}ms"><div class="about-journey-marker"><span>${String(idx + 1).padStart(2, '0')}</span></div><div class="about-journey-copy"><p class="about-journey-title">${title}</p>${text ? `<p class="about-journey-text">${text}</p>` : ''}</div></div>`).join('')}
+            ${c.journey.items.map(([title, text], idx) => `<div class="about-journey-step" style="--step-delay:${idx * 80}ms"><span class="about-journey-marker" aria-hidden="true"></span><div class="about-journey-copy"><p class="about-journey-title">${title}</p>${text ? `<p class="about-journey-text">${text}</p>` : ''}</div></div>`).join('')}
           </div>
         </div>
 
@@ -2917,7 +2917,7 @@ function renderAboutPremium() {
             </div>
             <div class="about-moments-photos-col">
               <div class="about-film-reel" id="about-film-reel" data-count="${filmItems.length}">
-                <div class="about-film-grid">${filmSlotsHtml}</div>
+                <div class="about-film-grid" dir="${isAr ? 'rtl' : 'ltr'}">${filmSlotsHtml}</div>
                 <div class="about-film-meta">
                   <span class="about-film-count" id="about-film-count">${filmItems.length ? `01 / ${String(Math.max(1, Math.ceil(filmItems.length / 4))).padStart(2, '0')}` : '00 / 00'}</span>
                   <span class="about-film-line" aria-hidden="true"></span>
