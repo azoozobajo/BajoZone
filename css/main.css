@@ -3013,7 +3013,7 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   overflow: hidden;
   border-radius: 8px;
   border: 1px solid rgba(255,255,255,.08);
-  background: rgba(255,255,255,.025);
+  background: rgba(0,0,0,.18);
   opacity: 1;
   transform: translateY(0) scale(1);
   transition: opacity .36s ease, transform .42s cubic-bezier(.2,.8,.2,1), border-color .3s ease;
@@ -3028,17 +3028,16 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
 .about-film-slot img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
   filter: brightness(.84) saturate(.9);
-  transition: filter .35s ease, transform .5s ease;
+  transition: filter .35s ease;
 }
 .about-film-slot:hover {
   border-color: rgba(200,168,110,.32);
 }
 .about-film-slot:hover img {
   filter: brightness(1) saturate(1);
-  transform: scale(1.025);
 }
 .about-film-slot figcaption {
   position: absolute;
@@ -3074,6 +3073,35 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
 }
 [dir="rtl"] .about-film-line {
   background: linear-gradient(270deg, rgba(200,168,110,.5), transparent);
+}
+.about-film-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.about-film-btn {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgba(200,168,110,.34);
+  background: rgba(200,168,110,.08);
+  color: var(--gold);
+  font: 700 1rem/1 var(--ff-body);
+  cursor: pointer;
+  transition: background .25s ease, border-color .25s ease, color .25s ease, transform .25s ease;
+}
+.about-film-btn:hover {
+  background: rgba(200,168,110,.16);
+  border-color: rgba(200,168,110,.58);
+  color: #fff;
+  transform: translateY(-1px);
+}
+.about-film-btn:disabled {
+  opacity: .35;
+  cursor: default;
+  transform: none;
 }
 .about-moments-text-col {
   width: 220px;

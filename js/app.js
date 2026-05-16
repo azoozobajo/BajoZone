@@ -2921,6 +2921,10 @@ function renderAboutPremium() {
                 <div class="about-film-meta">
                   <span class="about-film-count" id="about-film-count">${filmItems.length ? `01 / ${String(Math.max(1, Math.ceil(filmItems.length / 4))).padStart(2, '0')}` : '00 / 00'}</span>
                   <span class="about-film-line" aria-hidden="true"></span>
+                  <div class="about-film-controls" aria-label="${isAr ? 'التنقل بين مجموعات الصور' : 'Navigate photo groups'}">
+                    <button type="button" class="about-film-btn" data-film-prev aria-label="${isAr ? 'المجموعة السابقة' : 'Previous group'}">‹</button>
+                    <button type="button" class="about-film-btn" data-film-next aria-label="${isAr ? 'المجموعة التالية' : 'Next group'}">›</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -2988,6 +2992,8 @@ function initAboutFilmReel(items) {
   if (!reel) return;
   const slots = [...reel.querySelectorAll('[data-film-slot]')];
   const count = document.getElementById('about-film-count');
+  const prevBtn = reel.querySelector('[data-film-prev]');
+  const nextBtn = reel.querySelector('[data-film-next]');
   const photos = Array.isArray(items) ? items.filter(item => item && item.src) : [];
   if (!slots.length || !photos.length) return;
 
@@ -3020,15 +3026,17 @@ function initAboutFilmReel(items) {
     }, 230);
   };
 
-  const next = () => {
+  const go = (direction) => {
     if (!document.getElementById('about-film-reel')) { stop(); return; }
-    batch = (batch + 1) % totalBatches;
+    batch = (batch + direction + totalBatches) % totalBatches;
     renderBatch(batch);
   };
+  const next = () => go(1);
+  const prev = () => go(-1);
 
   const start = () => {
     if (timer || photos.length <= size) return;
-    timer = window.setInterval(next, 4200);
+    timer = window.setInterval(next, 4000);
   };
   const stop = () => {
     if (!timer) return;
@@ -3036,6 +3044,21 @@ function initAboutFilmReel(items) {
     timer = null;
   };
 
+  if (totalBatches <= 1) {
+    reel.classList.add('has-one-batch');
+    prevBtn?.setAttribute('disabled', 'disabled');
+    nextBtn?.setAttribute('disabled', 'disabled');
+  }
+  prevBtn?.addEventListener('click', () => {
+    stop();
+    prev();
+    start();
+  });
+  nextBtn?.addEventListener('click', () => {
+    stop();
+    next();
+    start();
+  });
   reel.addEventListener('mouseenter', stop);
   reel.addEventListener('mouseleave', start);
   renderBatch(0);
