@@ -566,7 +566,7 @@ async function dbLoad() {
   }
 }
 
-function dbSave() {
+function dbSave(sync = true) {
   if (!DB) return;
   try {
     localStorage.setItem(LS_KEY, JSON.stringify(DB));
@@ -583,7 +583,7 @@ function dbSave() {
     headers: { 'Content-Type':'application/json', 'X-Admin-Token': sessionStorage.getItem('bzt')||'' },
     body: JSON.stringify(DB)
   }).catch(() => {});
-  saveSupabaseNow();
+  if (sync) saveSupabaseNow();
   return;
   showToast('تم الحفظ بنجاح ✓', 'ok');
 }
@@ -1441,7 +1441,7 @@ async function saveResourceAdmin() {
   } else {
     DB.resources.unshift(res);
   }
-  dbSave();
+  dbSave(false);
   if (window.BajoSupabase?.hasAuthSession?.()) {
     const ok = await saveSupabaseNow();
     if (!ok) return;
@@ -1640,8 +1640,10 @@ async function saveArticle() {
   let tags = [];
   try { tags = JSON.parse(ge('f-art-tags-val').value || '[]'); } catch(_) {}
   const sources = collectSources();
+  const articleId = id || String(Date.now());
+  const titleForSlug = gv('f-art-title-en') || gv('f-art-title-ar') || `article-${articleId}`;
   const article = {
-    id:          id || String(Date.now()),
+    id:          articleId,
     title_ar:    gv('f-art-title-ar'),
     title_en:    gv('f-art-title-en'),
     excerpt_ar:  gv('f-art-exc-ar'),
@@ -1658,7 +1660,7 @@ async function saveArticle() {
     video_url:   gv('f-art-videourl'),
     tags,
     sources,
-    slug:        slugify(gv('f-art-title-en') || gv('f-art-title-ar'))
+    slug:        uniqueSlug(titleForSlug, DB.articles || [], articleId, `article-${articleId}`)
   };
   if (!DB.articles) DB.articles = [];
   if (id) {
@@ -1667,6 +1669,7 @@ async function saveArticle() {
   } else {
     DB.articles.unshift(article);
   }
+  normalizeArticleSlugs();
 
   // Check approximate size before saving
   const dbSize = JSON.stringify(DB).length;
@@ -1676,7 +1679,7 @@ async function saveArticle() {
     return;
   }
 
-  dbSave();
+  dbSave(false);
   if (window.BajoSupabase?.hasAuthSession?.()) {
     const ok = await saveSupabaseNow();
     if (!ok) {
@@ -1777,7 +1780,7 @@ async function saveProgramAdmin() {
   } else {
     DB.programs.push(prog);
   }
-  dbSave();
+  dbSave(false);
   if (window.BajoSupabase?.hasAuthSession?.()) {
     const ok = await saveSupabaseNow();
     if (!ok) return;
@@ -2039,7 +2042,45 @@ function bindEditBtns() {
 function ge(id) { return document.getElementById(id); }
 function gv(id) { const el = ge(id); return el ? (el.value || '').trim() : ''; }
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function slugify(s) { return (s||'').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9\u0600-\u06FF-]/g,'').substring(0,60); }
+function slugify(s, fallback = 'item') {
+  const slug = (s||'').toLowerCase()
+    .replace(/\s+/g,'-')
+    .replace(/[^a-z0-9\u0600-\u06FF-]/g,'')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .substring(0,60)
+    .replace(/-+$/g, '');
+  return slug || fallback;
+}
+function uniqueSlug(base, collection, currentId, fallback = 'item') {
+  const root = slugify(base, fallback);
+  const used = new Set((collection || [])
+    .filter(item => String(item.id || '') !== String(currentId || ''))
+    .map(item => String(item.slug || '').trim())
+    .filter(Boolean));
+  if (!used.has(root)) return root;
+  let i = 2;
+  let next = `${root}-${i}`;
+  while (used.has(next)) {
+    i += 1;
+    next = `${root}-${i}`;
+  }
+  return next;
+}
+function normalizeArticleSlugs() {
+  const used = new Set();
+  (DB.articles || []).forEach(article => {
+    const base = article.slug || article.title_en || article.title_ar || `article-${article.id || Date.now()}`;
+    let slug = slugify(base, `article-${article.id || Date.now()}`);
+    let i = 2;
+    while (used.has(slug)) {
+      slug = `${slugify(base, `article-${article.id || Date.now()}`)}-${i}`;
+      i += 1;
+    }
+    article.slug = slug;
+    used.add(slug);
+  });
+}
 
 function showToast(msg, type='ok') {
   const el = document.createElement('div');

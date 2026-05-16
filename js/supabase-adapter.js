@@ -176,6 +176,36 @@
     return id;
   }
 
+  function slugify(value, fallback) {
+    const slug = String(value || '').toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9\u0600-\u06FF-]/g, '')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 60)
+      .replace(/-+$/g, '');
+    return slug || fallback || 'item';
+  }
+
+  function normalizeUniqueSlugs(rows, fallbackPrefix, getBase) {
+    const used = new Set();
+    return (rows || []).map((item, index) => {
+      const row = Object.assign({}, item);
+      const fallback = `${fallbackPrefix}-${row.id || index + 1}`;
+      const base = row.slug || getBase?.(row) || fallback;
+      const root = slugify(base, fallback);
+      let slug = root;
+      let suffix = 2;
+      while (used.has(slug)) {
+        slug = `${root}-${suffix}`;
+        suffix += 1;
+      }
+      row.slug = slug;
+      used.add(slug);
+      return row;
+    });
+  }
+
   function payloadArticle(item, refs) {
     const row = Object.assign({}, item);
     row.tag_ids = Array.isArray(item.tags) ? item.tags : (item.tag_ids || []);
@@ -288,12 +318,16 @@
   async function saveDb(db) {
     await ensureAuthSession();
     const settings = payloadSettings(Object.assign({}, db.settings || {}, { id: 'main' }));
-    const programIds = new Set((db.programs || []).map(item => nullIfBlank(item.id)).filter(Boolean));
+    const programs = normalizeUniqueSlugs(db.programs || [], 'program', row => row.name_en || row.name_ar);
+    const tags = normalizeUniqueSlugs(db.tags || [], 'tag', row => row.name);
+    const articles = normalizeUniqueSlugs(db.articles || [], 'article', row => row.title_en || row.title_ar);
+    const resources = normalizeUniqueSlugs(db.resources || [], 'resource', row => row.title_en || row.title_ar);
+    const programIds = new Set(programs.map(item => nullIfBlank(item.id)).filter(Boolean));
     const categoryIds = new Set((db.categories || []).map(item => nullIfBlank(item.id)).filter(Boolean));
     const articleRefs = { programIds, categoryIds };
 
     await upsertTable('site_settings', [settings]);
-    await upsertTable('programs', (db.programs || []).map(item => payloadClean(item, [
+    await upsertTable('programs', programs.map(item => payloadClean(item, [
       'id', 'slug', 'name_ar', 'name_en', 'short_description_ar',
       'short_description_en', 'description_ar', 'description_en',
       'logo_url', 'cover_image', 'accent_color', 'sort_order', 'is_active',
@@ -302,16 +336,16 @@
     await upsertTable('categories', (db.categories || []).map(item => payloadClean(item, [
       'id', 'name_ar', 'name_en', 'sort_order'
     ])));
-    await upsertTable('tags', (db.tags || []).map(item => payloadClean(item, [
+    await upsertTable('tags', tags.map(item => payloadClean(item, [
       'id', 'name', 'slug'
     ])));
-    await upsertTable('articles', (db.articles || []).map(item => payloadArticle(item, articleRefs)));
+    await upsertTable('articles', articles.map(item => payloadArticle(item, articleRefs)));
     await upsertTable('books', (db.books || []).map(item => payloadClean(item, [
       'id', 'title_ar', 'title_en', 'subtitle_ar', 'subtitle_en',
       'description_ar', 'description_en', 'cover', 'amazon_url',
       'price', 'available', 'download_count'
     ])));
-    await upsertTable('resources', (db.resources || []).map(payloadResource));
+    await upsertTable('resources', resources.map(payloadResource));
 
     await deleteMissing('programs', (db.programs || []).map(x => x.id));
     await deleteMissing('categories', (db.categories || []).map(x => x.id));
