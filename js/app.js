@@ -2881,8 +2881,8 @@ function renderAboutPremium() {
           <div class="about-divider" aria-hidden="true"></div>
           <p class="about-scene-intro">${c.journey.intro}</p>
           ${c.journey.para2 ? `<p class="about-scene-para">${c.journey.para2}</p>` : ''}
-          <div class="about-journey-cards">
-            ${c.journey.items.map(([title, text], idx) => `<div class="about-journey-card"><span class="about-journey-card-num">${String(idx + 1).padStart(2, '0')}</span><p class="about-journey-card-title">${title}</p>${text ? `<p class="about-journey-card-text">${text}</p>` : ''}</div>`).join('')}
+          <div class="about-journey-path">
+            ${c.journey.items.map(([title, text], idx) => `<div class="about-journey-step" style="--step-delay:${idx * 95}ms"><div class="about-journey-marker"><span>${String(idx + 1).padStart(2, '0')}</span></div><div class="about-journey-copy"><p class="about-journey-title">${title}</p>${text ? `<p class="about-journey-text">${text}</p>` : ''}</div></div>`).join('')}
           </div>
         </div>
 

@@ -2879,44 +2879,89 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   letter-spacing: .01em;
 }
 
-/* ══ SCENE 2 — JOURNEY MILESTONE CARDS ══ */
-.about-journey-cards {
+/* ══ SCENE 2 — LUXURY VERTICAL JOURNEY PATH ══ */
+.about-journey-path {
+  position: relative;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-top: 22px;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  max-width: 860px;
+  max-height: min(42vh, 350px);
+  margin-top: 18px;
+  padding-inline-start: 36px;
+  padding-block: 4px 8px;
+  overflow: hidden;
 }
-.about-journey-card {
-  padding: 16px 15px;
-  border: 1px solid rgba(200,168,110,.14);
-  border-radius: 12px;
-  background: rgba(255,255,255,.025);
-  transition: border-color 0.3s, background 0.3s;
+[dir="rtl"] .about-journey-path {
+  padding-inline-start: 0;
+  padding-inline-end: 36px;
 }
-.about-journey-card:hover {
-  border-color: rgba(200,168,110,.32);
-  background: rgba(200,168,110,.05);
+.about-journey-path::before {
+  content: '';
+  position: absolute;
+  inset-block: 14px 18px;
+  inset-inline-start: 11px;
+  width: 1px;
+  background: linear-gradient(180deg, transparent 0%, rgba(200,168,110,.68) 16%, rgba(200,168,110,.34) 78%, transparent 100%);
+  box-shadow: 0 0 18px rgba(200,168,110,.22);
 }
-.about-journey-card-num {
-  display: inline-block;
-  font-family: var(--ff-mono, 'Space Mono', monospace);
-  font-size: .68rem;
+[dir="rtl"] .about-journey-path::before {
+  inset-inline-start: auto;
+  inset-inline-end: 11px;
+}
+.about-journey-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 14px;
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity .58s ease, transform .62s cubic-bezier(.2,.8,.2,1);
+  transition-delay: var(--step-delay, 0ms);
+}
+[dir="rtl"] .about-journey-step {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.about-scene.is-active .about-journey-step {
+  opacity: 1;
+  transform: translateY(0);
+}
+.about-journey-marker {
+  width: 23px;
+  height: 23px;
+  border-radius: 999px;
+  border: 1px solid rgba(200,168,110,.58);
+  background: rgba(10,10,10,.74);
   color: var(--gold);
-  opacity: .7;
-  margin-bottom: 7px;
-  letter-spacing: .04em;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 0 0 5px rgba(200,168,110,.045), 0 0 16px rgba(200,168,110,.16);
 }
-.about-journey-card-title {
-  font-size: .84rem;
-  font-weight: 700;
-  color: rgba(255,255,255,.88);
-  margin-bottom: 5px;
-  line-height: 1.4;
+[dir="rtl"] .about-journey-marker { grid-column: 2; }
+.about-journey-marker span {
+  font-family: var(--ff-mono, 'Space Mono', monospace);
+  font-size: .54rem;
+  letter-spacing: .02em;
+  line-height: 1;
 }
-.about-journey-card-text {
-  font-size: .75rem;
-  line-height: 1.65;
-  color: rgba(255,255,255,.44);
+.about-journey-copy {
+  padding: 0 0 9px;
+  border-bottom: 1px solid rgba(255,255,255,.055);
+}
+[dir="rtl"] .about-journey-copy { grid-column: 1; grid-row: 1; }
+.about-journey-title {
+  font-size: .9rem;
+  font-weight: 800;
+  color: rgba(255,255,255,.9);
+  margin-bottom: 4px;
+  line-height: 1.45;
+}
+.about-journey-text {
+  font-size: .76rem;
+  line-height: 1.62;
+  color: rgba(255,255,255,.48);
+  max-width: 760px;
 }
 
 /* ══ SCENE 3 — FOCUS CARDS ══ */
@@ -3295,7 +3340,7 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
 @media (max-width: 900px) {
   .about-scene { padding: 28px 6% 80px; }
   .about-focus-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-  .about-journey-cards { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .about-journey-path { max-height: min(46vh, 360px); }
   .about-hero-side { width: 200px; }
   .about-hero-card { height: 300px; }
 }
@@ -3305,7 +3350,9 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   .about-headline { font-size: clamp(1.5rem, 6.5vw, 2.2rem); }
   .about-scene-title { font-size: clamp(1.3rem, 6vw, 1.9rem); }
   .about-focus-grid { grid-template-columns: 1fr 1fr; }
-  .about-journey-cards { grid-template-columns: 1fr 1fr; }
+  .about-journey-path { max-height: min(48vh, 360px); padding-inline-start: 30px; }
+  [dir="rtl"] .about-journey-path { padding-inline-start: 0; padding-inline-end: 30px; }
+  .about-journey-text { font-size: .72rem; line-height: 1.55; }
   .about-hero-row { gap: 16px; flex-wrap: wrap; }
   .about-hero-text { max-width: 100%; }
   .about-hero-side { width: 100%; }
