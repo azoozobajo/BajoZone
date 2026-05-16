@@ -19,7 +19,35 @@
   }
 
   function getAccessToken() {
+    const token = getStoredAccessToken();
+    if (token && tokenExpiresSoon(token, 0)) return '';
+    return token;
+  }
+
+  function getStoredAccessToken() {
     return sessionStorage.getItem('bz_supabase_access_token') || '';
+  }
+
+  function getRefreshToken() {
+    return sessionStorage.getItem('bz_supabase_refresh_token') || '';
+  }
+
+  function decodeJwtPayload(token) {
+    try {
+      const payload = String(token || '').split('.')[1];
+      if (!payload) return null;
+      const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
+      const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
+      return JSON.parse(atob(padded));
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function tokenExpiresSoon(token, seconds) {
+    const payload = decodeJwtPayload(token);
+    if (!payload?.exp) return false;
+    return payload.exp * 1000 <= Date.now() + (seconds || 0) * 1000;
   }
 
   function setAuthSession(session) {
@@ -29,13 +57,54 @@
     if (refreshToken) sessionStorage.setItem('bz_supabase_refresh_token', refreshToken);
   }
 
+  async function refreshAuthSession() {
+    const refreshToken = getRefreshToken();
+    if (!refreshToken) return false;
+    const res = await fetch(`${baseUrl}/auth/v1/token?grant_type=refresh_token`, {
+      method: 'POST',
+      headers: {
+        apikey: anonKey,
+        Authorization: `Bearer ${anonKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ refresh_token: refreshToken })
+    });
+    const body = await res.json().catch(() => null);
+    if (!res.ok) {
+      authSignOut();
+      return false;
+    }
+    setAuthSession(body);
+    return true;
+  }
+
+  async function ensureAuthSession() {
+    const token = getStoredAccessToken();
+    if (token && !tokenExpiresSoon(token, 60)) return token;
+    if (await refreshAuthSession()) return getStoredAccessToken();
+    authSignOut();
+    throw new Error('Supabase login expired. Please sign in again.');
+  }
+
   async function rest(path, options) {
     if (!ready()) throw new Error('Supabase config is missing');
-    const res = await fetch(`${baseUrl}/rest/v1/${path}`, Object.assign({
+    if (getStoredAccessToken() && tokenExpiresSoon(getStoredAccessToken(), 60)) {
+      await refreshAuthSession();
+    }
+    let res = await fetch(`${baseUrl}/rest/v1/${path}`, Object.assign({
       headers: headers()
     }, options || {}));
     if (!res.ok) {
       const text = await res.text().catch(() => '');
+      if (res.status === 401 && /JWT expired|invalid JWT|expired/i.test(text) && await refreshAuthSession()) {
+        res = await fetch(`${baseUrl}/rest/v1/${path}`, Object.assign({
+          headers: headers()
+        }, options || {}));
+        if (res.ok) {
+          if (res.status === 204) return null;
+          return res.json();
+        }
+      }
       throw new Error(text || `Supabase HTTP ${res.status}`);
     }
     if (res.status === 204) return null;
@@ -197,7 +266,7 @@
   }
 
   async function saveDb(db) {
-    if (!getAccessToken()) throw new Error('Supabase Auth session is required for saving');
+    await ensureAuthSession();
     const settings = payloadSettings(Object.assign({}, db.settings || {}, { id: 'main' }));
 
     await upsertTable('site_settings', [settings]);
@@ -230,7 +299,7 @@
   }
 
   async function uploadMedia(blob, path, contentType) {
-    if (!getAccessToken()) throw new Error('Supabase Auth session is required for upload');
+    await ensureAuthSession();
     if (!ready()) throw new Error('Supabase config is missing');
     const safePath = String(path || `${Date.now()}.bin`).replace(/^\/+/, '');
     const objectUrl = `${baseUrl}/storage/v1/object/bajozone-media/${safePath.split('/').map(encodeURIComponent).join('/')}`;
