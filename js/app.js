@@ -2651,13 +2651,15 @@ const AboutPremium = {
     },
     journey: {
       title: 'رحلتي باختصار',
-      intro: 'لم تكن رحلتي مع كرة القدم مجرد متابعة للعبة، بل محاولة مستمرة لفهم اللاعب: كيف يُكتشف؟ كيف يتطور؟ وكيف يمكن رعايته بطريقة تساعده على الوصول إلى أفضل نسخة من نفسه؟',
+      intro: 'لم تبدأ رحلتي مع كرة القدم من فكرة واحدة، بل من تراكم تجارب بين الملعب، التدريب، الدراسة، البحث، والتحليل. مع الوقت أصبح اهتمامي أعمق من متابعة الأداء داخل المباراة؛ أصبحت أبحث في سؤال أكبر: كيف نكتشف الموهبة؟ كيف نفهم مسار تطورها؟ وكيف نبني بيئة تساعد اللاعب على النمو بدل الحكم عليه من لقطة أو اختبار واحد؟',
+      para2: 'من خلال عملي مع الفئات السنية، ودراستي في علوم الرياضة في ألمانيا، واهتمامي بالكشافين، تحليل الأداء، وتطوير المواهب، بدأت أرى كرة القدم كمنظومة مترابطة تجمع بين اللاعب، المدرب، النادي، البيئة، البيانات، والثقافة التدريبية.',
       items: [
-        ['البداية مع كرة القدم', ''],
-        ['العمل مع الفئات السنية', ''],
-        ['الدراسة والبحث', ''],
-        ['التحليل والتقنية', ''],
-        ['BajoZone', '']
+        ['من الملعب إلى الفكرة', 'بدأ اهتمامي من تفاصيل التدريب والمنافسة وسلوك اللاعب داخل الملعب، حيث تظهر الموهبة أحيانًا في القرار، الحركة، الشخصية، وليس فقط في المهارة الواضحة.'],
+        ['العمل مع الفئات السنية', 'الاقتراب من اللاعبين الصغار جعلني أؤمن أن تقييم الموهبة لا يجب أن يكون حكمًا سريعًا، بل قراءة طويلة لمسار النمو، البيئة، الفرصة، والاستعداد للتطور.'],
+        ['الدراسة في ألمانيا', 'دراستي في علوم الرياضة منحتني أساسًا علميًا لفهم الأداء من جوانبه البدنية، الفنية، التكتيكية، النفسية والاجتماعية، وربط المعرفة الأكاديمية بالواقع الميداني.'],
+        ['البحث في الكشف والتطوير', 'اهتمامي البحثي اتجه نحو scouting، تشخيص الموهبة، ومعايير التقييم، مع قناعة أن عين المدرب والخبرة الميدانية يجب أن تتكامل مع البيانات والتحليل لا أن تتنافس معها.'],
+        ['التحليل والتقنية', 'مع دخول الفيديو، البيانات، والذكاء الاصطناعي إلى كرة القدم، أصبح سؤالي: كيف يمكن للتقنية أن تساعدنا على فهم اللاعب بشكل أعمق دون أن تختزل الإنسان في أرقام فقط؟'],
+        ['BajoZone', 'BajoZone هو المساحة التي أجمع فيها بين هذه التجارب: كرة القدم، البحث، تطوير المواهب، التحليل، والتقنية؛ بهدف تقديم محتوى ومشاريع تساعد على فهم اللعبة واللاعب بطريقة أكثر وعيًا واحترافية.']
       ]
     },
     focus: {
@@ -2665,9 +2667,11 @@ const AboutPremium = {
       intro: 'أركز على فهم الموهبة الرياضية من زاوية أوسع: اكتشافها، تطويرها، رعايتها، وتحليل العوامل التي تساعدها على النمو داخل وخارج الملعب.',
       cards: [
         ['المواهب الرياضية', 'اكتشاف المواهب لا يعني البحث عن اللاعب الأفضل اليوم فقط، بل فهم الإمكانات التي قد تظهر غداً.'],
-        ['تطوير اللاعبين', 'الموهبة تحتاج بيئة، توجيه، متابعة، وصبر.'],
-        ['رعاية الموهوبين', 'رعاية اللاعب لا تتوقف عند التدريب، بل تشمل الإنسان خلف الأداء.'],
-        ['البحث والتحليل', 'أحاول أن أفهم كرة القدم بعين الباحث، لا بعين المشاهد فقط.']
+        ['تطوير اللاعبين', 'الموهبة تحتاج بيئة، توجيه، متابعة، وصبر. ولا يُبنى لاعب ناجح بتدريب واحد أو قرار سريع.'],
+        ['رعاية الموهوبين', 'رعاية اللاعب لا تتوقف عند التدريب، بل تشمل الإنسان خلف الأداء والبيئة المحيطة به.'],
+        ['البحث والتحليل', 'أحاول أن أفهم كرة القدم بعين الباحث، لا بعين المشاهد فقط. البيانات والدراسات أداة للفهم لا للحكم.'],
+        ['بناء الفريق', 'لا تُبنى الفرق القوية بجمع أفضل الأفراد فقط، بل بفهم الأدوار، التوازن، الانسجام، والهوية المشتركة داخل الملعب وخارجه.'],
+        ['فهم اللعبة', 'أهتم بقراءة كرة القدم كمنظومة مترابطة: قرارات، مساحات، علاقات بين اللاعبين، وسياقات تكشف لماذا يحدث الأداء وليس فقط ماذا حدث.']
       ]
     },
     experience: {
@@ -2706,13 +2710,15 @@ const AboutPremium = {
     },
     journey: {
       title: 'My Journey in Brief',
-      intro: 'My journey with football has never been only about watching the game. It has always been about understanding the player: how talent is identified, how it develops, and how it can be supported in the right environment.',
+      intro: 'My journey with football did not start from one single idea, but from a combination of experiences across the pitch, coaching, study, research, and analysis. Over time, my interest moved beyond simply observing performance during a match. I became more focused on a deeper question: how can talent be identified, how does it develop, and how can we build environments that help players grow instead of judging them from a single moment or test?',
+      para2: 'Through working with youth players, studying sport science in Germany, and developing a strong interest in scouting, performance analysis, and talent development, I began to see football as a connected system shaped by the player, the coach, the club, the environment, data, and coaching culture.',
       items: [
-        ['The Beginning with Football', ''],
-        ['Working with Youth Players', ''],
-        ['Study and Research', ''],
-        ['Analysis and Technology', ''],
-        ['BajoZone', '']
+        ['From the Pitch to the Idea', 'My interest began with the details of training, competition, and player behavior on the pitch, where talent often appears through decisions, movement, personality, and not only obvious technical skill.'],
+        ['Working with Youth Players', 'Being close to young players shaped my belief that talent evaluation should not be a quick judgment, but a long-term reading of growth, environment, opportunity, and the willingness to develop.'],
+        ['Studying in Germany', 'Studying sport science gave me a scientific foundation to understand performance through physical, technical, tactical, psychological, and social dimensions, while connecting academic knowledge with the reality of the field.'],
+        ['Researching Scouting and Development', 'My research interest moved toward scouting, talent diagnostics, and evaluation criteria, with the belief that the coach\'s eye and field experience should work together with data and analysis, not against them.'],
+        ['Analysis and Technology', 'As video, data, and artificial intelligence became more present in football, my question became: how can technology help us understand players more deeply without reducing the human side of performance to numbers only?'],
+        ['BajoZone', 'BajoZone is the space where I bring these experiences together: football, research, talent development, analysis, and technology, with the goal of creating content and projects that help understand the game and the player in a more conscious and professional way.']
       ]
     },
     focus: {
@@ -2720,9 +2726,11 @@ const AboutPremium = {
       intro: 'I focus on understanding sports talent from a wider perspective: identifying it, developing it, supporting it, and analyzing the factors that help it grow inside and outside the game.',
       cards: [
         ['Sports Talent', 'Talent identification is not only about finding the best player today, but about understanding the potential that may appear tomorrow.'],
-        ['Player Development', 'Talent needs environment, guidance, monitoring, and patience.'],
-        ['Talent Care', 'Supporting a player does not stop at training; it includes the person behind the performance.'],
-        ['Research and Analysis', 'I try to understand football through the eyes of a researcher, not only as a spectator.']
+        ['Player Development', 'Talent needs environment, guidance, monitoring, and patience. A successful player is not built through one training session or a quick decision.'],
+        ['Talent Care', 'Supporting a player does not stop at training; it includes the person behind the performance and the surrounding environment.'],
+        ['Research and Analysis', 'I try to understand football through the eyes of a researcher, not only as a spectator. Data and studies are tools for understanding, not for judging.'],
+        ['Team Building', 'Strong teams are not built by collecting the best individuals only, but by understanding roles, balance, cohesion, and a shared identity on and off the pitch.'],
+        ['Understanding the Game', 'I am interested in reading football as a connected system: decisions, spaces, relationships between players, and contexts that explain why performance happens, not only what happened.']
       ]
     },
     experience: {
@@ -2777,15 +2785,15 @@ function renderAboutPremium() {
 
   const gallery = CMS.s('about_gallery', []);
   const galleryWithImages = Array.isArray(gallery) ? gallery.filter(item => item && item.image) : [];
-  const galleryPhotos = galleryWithImages.length > 0 ? galleryWithImages :
-    ['01','02','03','04','05','06'].map(n => ({ image: `/images/about/gallery/journey-${n}.jpg`, title_ar: '', title_en: '' }));
-  const albumRepeat = Math.max(1, Math.ceil(8 / Math.max(galleryPhotos.length, 1)));
-  const albumItems = galleryPhotos.map(item =>
-    `<div class="about-photo-album-item"><img src="${mediaSrc(item.image || '')}" alt="${isAr ? (item.title_ar || '') : (item.title_en || '')}" loading="eager" decoding="async" onerror="this.closest('.about-photo-album-item').classList.add('is-missing')"></div>`
-  ).join('');
+  const albumRepeat = Math.max(1, Math.ceil(8 / Math.max(galleryWithImages.length || 6, 1)));
+  const albumItems = galleryWithImages.length > 0
+    ? galleryWithImages.map(item =>
+        `<div class="about-photo-album-item"><img src="${mediaSrc(item.image || '')}" alt="${isAr ? (item.title_ar || '') : (item.title_en || '')}" loading="eager" decoding="async" onerror="this.closest('.about-photo-album-item').classList.add('is-missing')"></div>`
+      ).join('')
+    : Array.from({length: 6}, () => `<div class="about-photo-album-item about-photo-album-item--ph"></div>`).join('');
   const albumGroup = albumItems.repeat(albumRepeat);
   const albumTrack = `<div class="about-photo-album-group">${albumGroup}</div><div class="about-photo-album-group" aria-hidden="true">${albumGroup}</div>`;
-  galleryPhotos.forEach(item => {
+  galleryWithImages.forEach(item => {
     const src = mediaSrc(item.image || '');
     if (!src) return;
     const img = new Image();
@@ -2872,9 +2880,10 @@ function renderAboutPremium() {
           <h2 class="about-scene-title">${c.journey.title}</h2>
           <div class="about-divider" aria-hidden="true"></div>
           <p class="about-scene-intro">${c.journey.intro}</p>
-          <ol class="about-timeline" role="list">
-            ${c.journey.items.map(([label]) => `<li class="about-timeline-item"><span class="about-timeline-dot" aria-hidden="true"></span><span class="about-timeline-label">${label}</span></li>`).join('')}
-          </ol>
+          ${c.journey.para2 ? `<p class="about-scene-para">${c.journey.para2}</p>` : ''}
+          <div class="about-journey-cards">
+            ${c.journey.items.map(([title, text], idx) => `<div class="about-journey-card"><span class="about-journey-card-num">${String(idx + 1).padStart(2, '0')}</span><p class="about-journey-card-title">${title}</p>${text ? `<p class="about-journey-card-text">${text}</p>` : ''}</div>`).join('')}
+          </div>
         </div>
 
         <!-- Scene 2: Focus -->

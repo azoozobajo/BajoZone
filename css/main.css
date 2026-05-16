@@ -2879,10 +2879,50 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   letter-spacing: .01em;
 }
 
+/* ══ SCENE 2 — JOURNEY MILESTONE CARDS ══ */
+.about-journey-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 22px;
+}
+.about-journey-card {
+  padding: 16px 15px;
+  border: 1px solid rgba(200,168,110,.14);
+  border-radius: 12px;
+  background: rgba(255,255,255,.025);
+  transition: border-color 0.3s, background 0.3s;
+}
+.about-journey-card:hover {
+  border-color: rgba(200,168,110,.32);
+  background: rgba(200,168,110,.05);
+}
+.about-journey-card-num {
+  display: inline-block;
+  font-family: var(--ff-mono, 'Space Mono', monospace);
+  font-size: .68rem;
+  color: var(--gold);
+  opacity: .7;
+  margin-bottom: 7px;
+  letter-spacing: .04em;
+}
+.about-journey-card-title {
+  font-size: .84rem;
+  font-weight: 700;
+  color: rgba(255,255,255,.88);
+  margin-bottom: 5px;
+  line-height: 1.4;
+}
+.about-journey-card-text {
+  font-size: .75rem;
+  line-height: 1.65;
+  color: rgba(255,255,255,.44);
+}
+
 /* ══ SCENE 3 — FOCUS CARDS ══ */
 .about-focus-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
 }
 .about-focus-card {
@@ -2981,7 +3021,12 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   filter: brightness(.82) saturate(.88);
   transition: filter 0.35s ease;
 }
-.about-photo-album-item.is-missing { display: none; }
+.about-photo-album-item.is-missing img { display: none; }
+.about-photo-album-item.is-missing,
+.about-photo-album-item--ph {
+  background: linear-gradient(135deg, rgba(200,168,110,.07) 0%, rgba(200,168,110,.02) 100%);
+  border: 1px solid rgba(200,168,110,.12);
+}
 .about-photo-album-item:hover img { filter: brightness(1) saturate(1); }
 .about-moments-text-col {
   width: 220px;
@@ -3249,11 +3294,8 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
 
 @media (max-width: 900px) {
   .about-scene { padding: 28px 6% 80px; }
-  .about-focus-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-}
-
-@media (max-width: 900px) {
-  .about-focus-grid { grid-template-columns: repeat(2, 1fr); }
+  .about-focus-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .about-journey-cards { grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .about-hero-side { width: 200px; }
   .about-hero-card { height: 300px; }
 }
@@ -3263,6 +3305,7 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   .about-headline { font-size: clamp(1.5rem, 6.5vw, 2.2rem); }
   .about-scene-title { font-size: clamp(1.3rem, 6vw, 1.9rem); }
   .about-focus-grid { grid-template-columns: 1fr 1fr; }
+  .about-journey-cards { grid-template-columns: 1fr 1fr; }
   .about-hero-row { gap: 16px; flex-wrap: wrap; }
   .about-hero-text { max-width: 100%; }
   .about-hero-side { width: 100%; }
