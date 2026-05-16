@@ -2983,6 +2983,8 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   width: 100%;
   overflow: hidden;
   border-radius: 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 9%, #000 91%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 9%, #000 91%, transparent 100%);
 }
 .about-logo-strip-wrap::before,
 .about-logo-strip-wrap::after {
@@ -3005,22 +3007,23 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
 .about-logo-track {
   display: flex;
   align-items: center;
-  gap: 54px;
-  padding: 18px 0;
-  animation: aboutLogoScroll 34s linear infinite;
+  gap: 46px;
+  padding: 12px 0;
+  animation: aboutLogoScroll 38s linear infinite;
   width: max-content;
+  will-change: transform;
 }
 .about-logo-strip-wrap:hover .about-logo-track { animation-play-state: paused; }
 @keyframes aboutLogoScroll {
   from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  to   { transform: translateX(-12.5%); }
 }
 [dir="rtl"] .about-logo-track { animation-direction: reverse; }
 .about-logo-item { flex-shrink: 0; }
 .about-logo-item img {
-  height: clamp(48px, 6vw, 78px);
+  height: clamp(42px, 5.2vw, 66px);
   width: auto;
-  max-width: 190px;
+  max-width: 170px;
   object-fit: contain;
   filter: none;
   opacity: 1;
