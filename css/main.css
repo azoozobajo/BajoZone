@@ -2694,8 +2694,10 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   transform: translateY(2px);
 }
 .about-scene-next.is-last {
-  opacity: 0;
-  pointer-events: none;
+  opacity: 1;
+  pointer-events: auto;
+  border-color: rgba(200,168,110,.5);
+  background: rgba(200,168,110,.1);
 }
 
 /* ══ SCENE 1 — INTRO (shared typography kept from static hero) ══ */

@@ -2951,12 +2951,51 @@ function initAboutScenes() {
   const scenes = [...document.querySelectorAll('.about-scene')];
   const dots   = [...document.querySelectorAll('.about-dot')];
   const nextBtn = document.getElementById('about-next-btn');
+  const stage = document.querySelector('.about-page');
+  const footer = document.getElementById('site-footer');
   if (!scenes.length) return;
 
   let cur = 0;
   let locked = false;
+  let releasedToFooter = false;
+  let returningToStage = false;
+  let wheelDebt = 0;
   const TOTAL = scenes.length;
-  const LOCK_MS = 680;
+  const LOCK_MS = 760;
+  const WHEEL_THRESHOLD = 86;
+
+  function isStageInView() {
+    if (!stage) return false;
+    const rect = stage.getBoundingClientRect();
+    return rect.top < window.innerHeight - 8 && rect.bottom > 8;
+  }
+
+  function isStageAligned() {
+    if (!stage) return false;
+    return Math.abs(stage.getBoundingClientRect().top) <= 8;
+  }
+
+  function scrollToStage() {
+    if (returningToStage) return;
+    returningToStage = true;
+    releasedToFooter = false;
+    locked = true;
+    wheelDebt = 0;
+    if (stage) stage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => {
+      returningToStage = false;
+      locked = false;
+    }, LOCK_MS + 260);
+  }
+
+  function releaseToFooter() {
+    if (releasedToFooter || locked) return;
+    releasedToFooter = true;
+    locked = true;
+    const target = footer || stage?.nextElementSibling;
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => { locked = false; }, LOCK_MS);
+  }
 
   function goTo(idx) {
     if (locked) return;
@@ -2979,12 +3018,21 @@ function initAboutScenes() {
     });
   }
 
-  if (nextBtn) nextBtn.addEventListener('click', () => { if (cur < TOTAL - 1) goTo(cur + 1); });
-  dots.forEach((dot, i) => dot.addEventListener('click', () => goTo(i)));
+  if (nextBtn) nextBtn.addEventListener('click', () => {
+    if (cur < TOTAL - 1) goTo(cur + 1);
+    else releaseToFooter();
+  });
+  dots.forEach((dot, i) => dot.addEventListener('click', () => {
+    if (!isStageInView()) scrollToStage();
+    goTo(i);
+  }));
 
   const keyHandler = (e) => {
     if (!document.getElementById('about-shell')) { document.removeEventListener('keydown', keyHandler); return; }
-    if (e.key === 'ArrowDown') { e.preventDefault(); goTo(cur + 1); }
+    if (releasedToFooter && e.key === 'ArrowUp') { e.preventDefault(); scrollToStage(); return; }
+    if (!isStageInView()) return;
+    if (!isStageAligned()) { e.preventDefault(); scrollToStage(); return; }
+    if (e.key === 'ArrowDown') { e.preventDefault(); cur === TOTAL - 1 ? releaseToFooter() : goTo(cur + 1); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); goTo(cur - 1); }
   };
   document.addEventListener('keydown', keyHandler);
@@ -2992,6 +3040,22 @@ function initAboutScenes() {
   let lastWheel = 0;
   const wheelHandler = (e) => {
     if (!document.getElementById('about-shell')) { window.removeEventListener('wheel', wheelHandler); return; }
+    if (releasedToFooter) {
+      if (e.deltaY < -20 && window.scrollY <= (stage?.offsetTop || 0) + window.innerHeight * 1.15) {
+        e.preventDefault();
+        scrollToStage();
+      }
+      return;
+    }
+    if (!isStageInView()) return;
+    if (!isStageAligned()) {
+      if (e.deltaY < -12) {
+        e.preventDefault();
+        scrollToStage();
+      }
+      return;
+    }
+    if (returningToStage) { e.preventDefault(); return; }
     const active = scenes[cur];
     const isLast = cur === TOTAL - 1;
     if (active) {
@@ -3000,14 +3064,22 @@ function initAboutScenes() {
       const atTop = scrollTop <= 2;
       if (e.deltaY > 0 && !atBottom) return;
       if (e.deltaY < 0 && !atTop) return;
-      if (isLast && e.deltaY > 20) return; // release to footer
     }
     e.preventDefault();
     const now = Date.now();
+    if (now - lastWheel > 420) wheelDebt = 0;
+    wheelDebt += e.deltaY;
+    if (Math.abs(wheelDebt) < WHEEL_THRESHOLD) return;
+    const dir = wheelDebt > 0 ? 1 : -1;
+    wheelDebt = 0;
     if (now - lastWheel < 900) return;
     lastWheel = now;
-    if (e.deltaY > 20) goTo(cur + 1);
-    else if (e.deltaY < -20) goTo(cur - 1);
+    if (dir > 0) {
+      if (isLast) releaseToFooter();
+      else goTo(cur + 1);
+    } else {
+      goTo(cur - 1);
+    }
   };
   window.addEventListener('wheel', wheelHandler, { passive: false });
 
@@ -3016,7 +3088,17 @@ function initAboutScenes() {
   window.addEventListener('touchend', (e) => {
     if (!document.getElementById('about-shell')) return;
     const diff = touchY - e.changedTouches[0].clientY;
-    if (Math.abs(diff) > 48) { if (diff > 0) goTo(cur + 1); else goTo(cur - 1); }
+    if (releasedToFooter) {
+      if (diff < -48 && window.scrollY <= (stage?.offsetTop || 0) + window.innerHeight * 1.15) scrollToStage();
+      return;
+    }
+    if (!isStageInView()) return;
+    if (!isStageAligned()) { if (diff < -48) scrollToStage(); return; }
+    if (returningToStage) return;
+    if (Math.abs(diff) > 58) {
+      if (diff > 0) { cur === TOTAL - 1 ? releaseToFooter() : goTo(cur + 1); }
+      else goTo(cur - 1);
+    }
   }, { passive: true });
 }
 
