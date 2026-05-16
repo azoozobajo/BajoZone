@@ -2598,10 +2598,9 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   box-sizing: border-box;
 }
 
-/* ── Scene shell — takes remaining height ── */
+/* ── Scene shell — full width ── */
 .about-scene-shell {
   position: relative;
-  max-width: 620px;
   width: 100%;
   flex: 1;
   min-height: 0;
@@ -2612,7 +2611,7 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
 .about-scene {
   position: absolute;
   inset: 0;
-  padding: 32px 8% 88px;
+  padding: 36px 8% 92px;
   box-sizing: border-box;
   opacity: 0;
   pointer-events: none;
@@ -2738,13 +2737,11 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   line-height: 1.82;
   color: rgba(255,255,255,.86);
   margin-bottom: 10px;
-  max-width: 500px;
 }
 .about-bio {
   font-size: .88rem;
   line-height: 1.78;
   color: rgba(255,255,255,.58);
-  max-width: 500px;
   margin-bottom: 26px;
 }
 .about-actions {
@@ -2813,14 +2810,14 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   font-size: clamp(.84rem, .98vw, .96rem);
   line-height: 1.82;
   color: rgba(255,255,255,.68);
-  max-width: 500px;
+  max-width: 720px;
   margin-bottom: 18px;
 }
 .about-scene-para {
   font-size: clamp(.84rem, .98vw, .96rem);
   line-height: 1.82;
   color: rgba(255,255,255,.68);
-  max-width: 500px;
+  max-width: 720px;
   margin-bottom: 12px;
 }
 
@@ -2863,9 +2860,8 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
 /* ══ SCENE 3 — FOCUS CARDS ══ */
 .about-focus-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 9px;
-  max-width: 500px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
 }
 .about-focus-card {
   padding: 15px;
@@ -2895,10 +2891,10 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
 /* ══ SCENE 4 — MOMENTS & MILESTONES ══ */
 .about-moments-main {
   display: flex;
-  gap: 24px;
-  height: 220px;
+  gap: 32px;
+  height: 240px;
   margin-top: 4px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 .about-moments-photos-col {
   flex: 1;
@@ -2956,7 +2952,7 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
 }
 .about-photo-album-item:hover img { filter: brightness(1) saturate(1); }
 .about-moments-text-col {
-  width: 148px;
+  width: 220px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -3037,7 +3033,7 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   font-size: clamp(.88rem, 1.05vw, 1.05rem);
   line-height: 1.72;
   color: var(--gold);
-  max-width: 480px;
+  max-width: 780px;
   margin-bottom: 22px;
   opacity: .9;
 }
@@ -3047,18 +3043,23 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   display: flex;
   align-items: flex-start;
   flex-direction: row;
-  gap: 28px;
+  gap: 40px;
+  height: 100%;
 }
-.about-hero-text { flex: 1; min-width: 0; }
+.about-hero-text {
+  flex: 1;
+  min-width: 0;
+  max-width: 700px;
+}
 .about-hero-side {
   flex-shrink: 0;
-  width: 180px;
+  width: 260px;
 }
 .about-hero-card {
   position: relative;
   width: 100%;
-  height: 270px;
-  border-radius: 14px;
+  height: 340px;
+  border-radius: 16px;
   overflow: hidden;
   background: rgba(255,255,255,.04);
   border: 1px solid rgba(255,255,255,.07);
@@ -3123,7 +3124,7 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   letter-spacing: .18em;
   text-transform: uppercase;
   color: rgba(255,255,255,.32);
-  max-width: 400px;
+  max-width: 560px;
   line-height: 1.7;
 }
 .about-var-btn {
@@ -3213,20 +3214,24 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   .about-focus-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
 }
 
+@media (max-width: 900px) {
+  .about-focus-grid { grid-template-columns: repeat(2, 1fr); }
+  .about-hero-side { width: 200px; }
+  .about-hero-card { height: 300px; }
+}
+
 @media (max-width: 680px) {
-  .about-page { align-items: flex-start; }
-  .about-scene-shell { max-width: 100%; }
   .about-scene { padding: 24px 5% 80px; }
   .about-headline { font-size: clamp(1.5rem, 6.5vw, 2.2rem); }
   .about-scene-title { font-size: clamp(1.3rem, 6vw, 1.9rem); }
-  .about-lead, .about-bio, .about-scene-intro, .about-scene-para { max-width: 100%; }
-  .about-focus-grid { grid-template-columns: 1fr; }
-  .about-hero-row { gap: 16px; }
-  .about-hero-side { width: 140px; }
-  .about-hero-card { height: 210px; }
+  .about-focus-grid { grid-template-columns: 1fr 1fr; }
+  .about-hero-row { gap: 16px; flex-wrap: wrap; }
+  .about-hero-text { max-width: 100%; }
+  .about-hero-side { width: 100%; }
+  .about-hero-card { height: 220px; }
   .about-var-btn { padding: 14px 32px; font-size: 1.1rem; }
-  .about-moments-main { height: 170px; gap: 16px; }
-  .about-moments-text-col { width: 120px; }
+  .about-moments-main { height: 180px; gap: 16px; }
+  .about-moments-text-col { width: 150px; }
 }
 
 @media (max-width: 400px) {
