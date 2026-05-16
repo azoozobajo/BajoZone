@@ -624,7 +624,7 @@ function doLogin() {
         goSection('overview');
         showToast('تم تسجيل الدخول عبر Supabase ✓', 'ok');
       })
-      .catch(() => showLoginError());
+      .catch(err => showLoginError(err?.message || 'Supabase login failed'));
     return;
   }
   if (u === DB?.admin?.username && p === DB?.admin?.password) {
@@ -637,10 +637,11 @@ function doLogin() {
   }
 }
 
-function showLoginError() {
+function showLoginError(message) {
   const err = ge('li-err');
+  if (message) err.textContent = message;
   err.style.display = 'block';
-  setTimeout(() => err.style.display = 'none', 3000);
+  setTimeout(() => err.style.display = 'none', 6000);
 }
 
 // ── Section Navigation ────────────────────────
