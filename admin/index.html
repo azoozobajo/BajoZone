@@ -1485,19 +1485,37 @@ function renderSGeneral() {
         </div>
       </div>
     </div>
+    <div class="a-card">
+      <div class="a-card-title">اللغة الإنجليزية</div>
+      <p style="color:var(--warm-mid);font-size:.83rem;margin-bottom:20px;">
+        عند التعطيل يختفي زر تبديل اللغة من الموقع ويُجبر الموقع على العرض بالعربية فقط.
+      </p>
+      <div class="fg">
+        <label class="fl">تفعيل اللغة الإنجليزية</label>
+        <div class="tog-wrap">
+          <label class="tog"><input type="checkbox" id="sg-en-enabled" ${s.english_enabled !== false ? 'checked' : ''}><span class="tog-sl"></span></label>
+          <span id="sg-en-enabled-lbl" style="font-size:.84rem;color:var(--warm-mid);">${s.english_enabled !== false ? 'مفعّل' : 'معطّل'}</span>
+        </div>
+      </div>
+    </div>
     <button class="btn btn-fill" id="btn-save-sgeneral" style="padding:11px 36px;">حفظ الإعدادات ✓</button>`;
 
   initUpload('sg-logo-file', 'sg-logo-prev', 'sg-logo-val');
   initUpload('sg-abt-file', 'sg-abt-prev', 'sg-abt-val');
 
+  ge('sg-en-enabled').addEventListener('change', e => {
+    ge('sg-en-enabled-lbl').textContent = e.target.checked ? 'مفعّل' : 'معطّل';
+  });
+
   ge('btn-save-sgeneral').addEventListener('click', () => {
     if (!DB.settings) DB.settings = {};
-    DB.settings.site_name_ar = gv('sg-na');
-    DB.settings.site_name_en = gv('sg-ne');
-    DB.settings.tagline_ar   = gv('sg-ta');
-    DB.settings.tagline_en   = gv('sg-te');
-    DB.settings.about_ar     = gv('sg-aa');
-    DB.settings.about_en     = gv('sg-ae');
+    DB.settings.site_name_ar    = gv('sg-na');
+    DB.settings.site_name_en    = gv('sg-ne');
+    DB.settings.tagline_ar      = gv('sg-ta');
+    DB.settings.tagline_en      = gv('sg-te');
+    DB.settings.about_ar        = gv('sg-aa');
+    DB.settings.about_en        = gv('sg-ae');
+    DB.settings.english_enabled = ge('sg-en-enabled').checked;
     const lv = gv('sg-logo-val'); if (lv) DB.settings.logo = lv;
     const av = gv('sg-abt-val'); if (av) DB.settings.about_image = av;
     dbSave();
@@ -2714,6 +2732,20 @@ function renderSPopup() {
   const notif = s.new_article_bar || {};
   ge('main-content').innerHTML = `
     <div class="a-card">
+      <div class="a-card-title">شريط الكتاب التشويقي</div>
+      <p style="color:var(--warm-mid);font-size:.83rem;margin-bottom:20px;">
+        شريط يظهر في الصفحة الرئيسية يشوّق الزوار لصفحة كتاب الموهبة الكروية. يمكن تفعيله أو إيقافه.
+      </p>
+      <div class="fg">
+        <label class="fl">الحالة</label>
+        <div class="tog-wrap">
+          <label class="tog"><input type="checkbox" id="bt-enabled" ${s.book_teaser_enabled !== false ? 'checked' : ''}><span class="tog-sl"></span></label>
+          <span id="bt-enabled-lbl" style="font-size:.84rem;color:var(--warm-mid);">${s.book_teaser_enabled !== false ? 'مفعّل' : 'معطّل'}</span>
+        </div>
+      </div>
+      <button class="btn btn-fill" id="btn-save-booktsr" style="padding:11px 36px;margin-top:8px;">حفظ ✓</button>
+    </div>
+    <div class="a-card">
       <div class="a-card-title">شريط إشعار المقال الجديد</div>
       <p style="color:var(--warm-mid);font-size:.83rem;margin-bottom:20px;">
         يظهر أعلى الموقع إذا كان هناك مقال عليه علامة is_new: true. يمكن للزائر إغلاقه خلال الجلسة.
@@ -2761,6 +2793,14 @@ function renderSPopup() {
       <button class="btn btn-fill" id="btn-save-spopup" style="padding:11px 36px;margin-top:8px;">حفظ ✓</button>
     </div>`;
 
+  ge('bt-enabled').addEventListener('change', e => {
+    ge('bt-enabled-lbl').textContent = e.target.checked ? 'مفعّل' : 'معطّل';
+  });
+  ge('btn-save-booktsr').addEventListener('click', () => {
+    if (!DB.settings) DB.settings = {};
+    DB.settings.book_teaser_enabled = ge('bt-enabled').checked;
+    dbSave();
+  });
   ge('pp-enabled').addEventListener('change', e => {
     ge('pp-enabled-lbl').textContent = e.target.checked ? 'مفعّل' : 'معطّل';
   });

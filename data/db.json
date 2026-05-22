@@ -31,7 +31,9 @@
       "message_en": "Welcome to BajoZone — your platform for football talent discovery and development.",
       "image": "assets/images/logo-bajo.png"
     },
-    "new_article_bar": { "enabled": true }
+    "new_article_bar": { "enabled": true },
+    "book_teaser_enabled": true,
+    "english_enabled": true
   },
   "programs": [
     {
@@ -284,6 +286,21 @@
     }
   ],
   "books": [
+    {
+      "id": "mojal",
+      "title_ar": "الموهبة الكروية بين الحدس والبيانات",
+      "title_en": "Football Talent: Between Intuition and Data",
+      "subtitle_ar": "دراسة مقارنة لأساليب اكتشاف المواهب في كرة القدم للفئات السنية",
+      "subtitle_en": "A Comparative Study of Talent Identification Methods in Youth Football",
+      "description_ar": "هذا الكتاب يفتح لك باباً مهماً لفهم عالم اكتشاف المواهب في كرة القدم، خاصة في الفئات السنية، ويأخذك في قراءة تجمع بين الخبرة الميدانية، والرؤية العلمية، والتطور الحديث في أدوات التقييم والاختيار. بأسلوب مقارن، يستعرض الكتاب أبرز الاتجاهات والأساليب المستخدمة في اكتشاف المواهب وتطويرها، مستنداً إلى دراسات وأبحاث وعالمية، دون أن ينحاز إلى طريقة واحدة.",
+      "description_en": "This book opens an important door to understanding the world of talent identification in football, especially in youth age groups, taking you through a reading that combines field experience, scientific vision, and modern developments in evaluation and selection tools.",
+      "cover": "images/books/mojal-cover.jpeg",
+      "external_url": "https://mstql.com",
+      "price": "",
+      "available": true,
+      "has_landing": true,
+      "landing_route": "/mybook1"
+    },
     {
       "id": "b1",
       "title_ar": "صراع المواهب",

@@ -7,7 +7,7 @@
 
 /* ── CMS ─────────────────────────────────────── */
 const CMS = {
-  db: null, LS_KEY: 'bz_db_v8',
+  db: null, LS_KEY: 'bz_db_v9',
   async init() {
     if (window.BajoSupabase?.ready?.()) {
       try {
@@ -234,6 +234,7 @@ const Router = {
   },
   init() {
     window.addEventListener('popstate', () => this.go(location.hash.replace('#', '') || '/', false));
+    window.addEventListener('hashchange', () => this.go(location.hash.replace('#', '') || '/', false));
     this.go(location.hash.replace('#', '') || '/', false);
   }
 };
@@ -255,10 +256,18 @@ function initReveal() {
 }
 
 function applyLang() {
+  const englishOn = CMS.s('english_enabled', true) !== false;
+  if (!englishOn && Lang.cur === 'en') {
+    Lang.cur = 'ar';
+    localStorage.setItem('bz_lang', 'ar');
+  }
   document.documentElement.lang = Lang.cur;
   document.documentElement.dir  = Lang.cur === 'ar' ? 'rtl' : 'ltr';
   const btn = document.getElementById('lang-btn');
-  if (btn) btn.textContent = Lang.cur === 'ar' ? 'EN' : 'عربي';
+  if (btn) {
+    btn.style.display = englishOn ? '' : 'none';
+    btn.textContent   = Lang.cur === 'ar' ? 'EN' : 'عربي';
+  }
 }
 function showToast(msg) {
   const el = document.createElement('div');
@@ -532,16 +541,16 @@ function renderNav() {
   if (li) li.src = imgSrc(CMS.s('logo', 'assets/images/logo-bajo.png'));
   const ul = document.getElementById('nav-links');
   if (ul) ul.innerHTML = `
-    <li><a href="#/" onclick="Router.go('/')">${Lang.t('home')}</a></li>
-    <li><a href="#/programs" onclick="Router.go('/programs')">${Lang.t('programs')}</a></li>
-    <li><a href="#/books" onclick="Router.go('/books')">${Lang.t('library')}</a></li>
-    <li><a href="#/about" onclick="Router.go('/about')">${Lang.t('about')}</a></li>`;
+    <li><a href="#/" onclick="Router.go('/');return false;">${Lang.t('home')}</a></li>
+    <li><a href="#/programs" onclick="Router.go('/programs');return false;">${Lang.t('programs')}</a></li>
+    <li><a href="#/books" onclick="Router.go('/books');return false;">${Lang.t('library')}</a></li>
+    <li><a href="#/about" onclick="Router.go('/about');return false;">${Lang.t('about')}</a></li>`;
   const mob = document.getElementById('mobile-links');
   if (mob) mob.innerHTML = `
-    <li><a href="#/" onclick="document.getElementById('mobile-nav').classList.remove('open');Router.go('/')">${Lang.t('home')}</a></li>
-    <li><a href="#/programs" onclick="document.getElementById('mobile-nav').classList.remove('open');Router.go('/programs')">${Lang.t('programs')}</a></li>
-    <li><a href="#/books" onclick="document.getElementById('mobile-nav').classList.remove('open');Router.go('/books')">${Lang.t('library')}</a></li>
-    <li><a href="#/about" onclick="document.getElementById('mobile-nav').classList.remove('open');Router.go('/about')">${Lang.t('about')}</a></li>`;
+    <li><a href="#/" onclick="document.getElementById('mobile-nav').classList.remove('open');Router.go('/');return false;">${Lang.t('home')}</a></li>
+    <li><a href="#/programs" onclick="document.getElementById('mobile-nav').classList.remove('open');Router.go('/programs');return false;">${Lang.t('programs')}</a></li>
+    <li><a href="#/books" onclick="document.getElementById('mobile-nav').classList.remove('open');Router.go('/books');return false;">${Lang.t('library')}</a></li>
+    <li><a href="#/about" onclick="document.getElementById('mobile-nav').classList.remove('open');Router.go('/about');return false;">${Lang.t('about')}</a></li>`;
 }
 
 /* ── Footer ──────────────────────────────────── */
@@ -1403,6 +1412,50 @@ function renderHomeStory() {
       </div>
     </section>
 
+    ${CMS.s('book_teaser_enabled', true) !== false ? `
+    <section class="hbt-strip">
+      <div class="hbt-glow" aria-hidden="true"></div>
+      <div class="container">
+        <div class="hbt-body">
+          <div class="hbt-text">
+            <div class="hbt-eyebrow">
+              <span class="hbt-badge">${isAr ? 'إصدار جديد' : 'New Release'}</span>
+              <span class="hbt-pipe">|</span>
+              <span class="hbt-cat">${isAr ? 'كتاب · علوم الرياضة' : 'Book · Sports Science'}</span>
+            </div>
+            <h2 class="hbt-title">
+              ${isAr
+                ? 'الموهبة الكروية<em>بين الحدس والبيانات</em>'
+                : 'Football Talent<em>Intuition vs Data</em>'}
+            </h2>
+            <p class="hbt-tagline">
+              ${isAr
+                ? 'بين حدس الكشاف ودقة الأرقام — دراسة مقارنة في اكتشاف المواهب في كرة القدم للفئات السنية'
+                : 'Between the scout\'s intuition and the precision of data — a comparative study in youth football talent identification'}
+            </p>
+            <div class="hbt-meta">
+              <span class="hbt-author">${isAr ? 'عبدالعزيز باجخيف' : 'Abdulaziz Bajkhaif'}</span>
+              <span class="hbt-dot">·</span>
+              <span class="hbt-avail">${isAr ? 'متاح الآن' : 'Available Now'}</span>
+            </div>
+            <div class="hbt-cta-row">
+              <a class="hbt-btn" href="#/mybook1" onclick="Router.go('/mybook1');return false;">
+                ${isAr ? 'تصفح صفحة الكتاب' : 'View Book Page'}
+                <span class="hbt-btn-arrow">←</span>
+              </a>
+              <span class="hbt-hint">${isAr ? 'اكتشف التفاصيل' : 'Explore details'}</span>
+            </div>
+          </div>
+          <div class="hbt-visual">
+            <div class="hbt-cover-shadow" aria-hidden="true"></div>
+            <img class="hbt-cover-img" src="images/books/mojal-cover.jpeg"
+              alt="${isAr ? 'غلاف كتاب الموهبة الكروية' : 'Football Talent book cover'}"
+              loading="lazy" onerror="this.style.display='none'">
+          </div>
+        </div>
+      </div>
+    </section>` : ''}
+
     <section class="home-topics-split" id="home-topics-split">
       <div class="container">
         <div class="topics-split-wrap">
@@ -1999,6 +2052,203 @@ function _reRenderLibGrid() {
       : `<div class="lib-empty"><p>${isAr ? 'لا توجد موارد مطابقة لهذا التصنيف.' : 'No resources match this filter.'}</p></div>`;
     initReveal();
   }
+}
+
+/* ── MYBOOK1 LANDING PAGE ─────────────────────── */
+function renderMyBook1() {
+  const isAr = Lang.cur === 'ar';
+  const storeUrl = 'https://mstql.com';
+  const coverSrc = 'images/books/mojal-cover.jpeg';
+
+  document.getElementById('app').innerHTML = `
+  <div class="book-lp" dir="${isAr ? 'rtl' : 'ltr'}">
+
+    <!-- HERO -->
+    <section class="blp-hero">
+      <div class="blp-hero-bg" aria-hidden="true"></div>
+      <div class="blp-hero-inner container reveal">
+        <div class="blp-hero-cover" id="blp-cover">
+          ${coverSrc
+            ? `<img src="${coverSrc}" alt="${isAr ? 'غلاف الكتاب' : 'Book cover'}" onerror="this.parentElement.classList.add('no-img');this.style.display='none'">`
+            : `<div class="ph-title">${isAr ? 'الموهبة الكروية بين الحدس والبيانات' : 'Football Talent'}</div>`}
+        </div>
+        <div class="blp-hero-text">
+          <div class="blp-eyebrow">${isAr ? 'إصدار جديد' : 'New Release'}</div>
+          <h1 class="blp-hero-title">
+            ${isAr
+              ? 'الموهبة الكروية<br><span class="ol">بين الحدس والبيانات</span>'
+              : 'Football Talent<br><span class="ol">Intuition vs Data</span>'}
+          </h1>
+          <p class="blp-hero-subtitle">
+            ${isAr
+              ? 'دراسة مقارنة لأساليب اكتشاف المواهب في كرة القدم للفئات السنية'
+              : 'A Comparative Study of Talent Identification Methods in Youth Football'}
+          </p>
+          <blockquote class="blp-hero-hook">
+            ${isAr
+              ? 'بين حدس الكشاف... ودقة الأرقام... تبدأ الحكاية.'
+              : 'Between the scout\'s intuition and the precision of data — the story begins.'}
+          </blockquote>
+          <div class="blp-hero-author">
+            ${isAr ? 'عبدالعزيز باجخيف' : 'Abdulaziz Bajkhaif'}
+          </div>
+          <a class="blp-hero-btn" href="${storeUrl}" target="_blank" rel="noopener">
+            ${isAr ? 'احصل على الكتاب ←' : 'Get the Book →'}
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY -->
+    <section class="blp-why">
+      <div class="container">
+        <div class="blp-why-body">
+          <div class="blp-why-text reveal">
+            <div class="blp-section-label">${isAr ? 'لماذا هذا الكتاب؟' : 'Why This Book?'}</div>
+            <h2 class="blp-section-title">
+              ${isAr
+                ? 'هل يمكن للبيانات أن ترى ما يفوت عين الخبير؟'
+                : 'Can Data See What the Expert\'s Eye Misses?'}
+            </h2>
+            <p>
+              ${isAr
+                ? 'لعقود طويلة، اعتمد الكشافون على الخبرة والحدس لاكتشاف المواهب. واليوم، تدخل البيانات والتحليل الرقمي إلى الملعب بقوة. لكن السؤال الحقيقي ليس: أيهما أفضل؟ بل: كيف نفهم كلاً منهما ونستفيد من الاثنين معاً؟'
+                : 'For decades, scouts relied on experience and intuition to discover talent. Today, data and digital analysis enter the field with force. But the real question is not: which is better? Rather: how do we understand each and benefit from both?'}
+            </p>
+            <p>
+              ${isAr
+                ? 'هذا الكتاب لا ينحاز لطريقة واحدة. هدفه توسيع زاوية الرؤية، وتمكين القارئ من فهم الفروق، ورؤية الصورة بشكل أعمق.'
+                : 'This book does not favor one method. Its goal is to widen the angle of vision, enable the reader to understand the differences, and see the picture more deeply.'}
+            </p>
+          </div>
+          <div class="blp-why-stat reveal">
+            <div class="blp-why-stat-item">
+              <span class="blp-why-stat-num">بحث</span>
+              <span class="blp-why-stat-desc">${isAr ? 'وُلد من بحث جامعي أُنجز في ألمانيا وأُعيدت صياغته للمكتبة العربية' : 'Born from university research completed in Germany, rewritten for the Arabic library'}</span>
+            </div>
+            <div class="blp-why-stat-divider"></div>
+            <div class="blp-why-stat-item">
+              <span class="blp-why-stat-num">مقارن</span>
+              <span class="blp-why-stat-desc">${isAr ? 'يعرض أبرز الاتجاهات والأساليب العالمية دون الانحياز لطريقة واحدة' : 'Presents the leading international trends and methods without bias toward any single approach'}</span>
+            </div>
+            <div class="blp-why-stat-divider"></div>
+            <div class="blp-why-stat-item">
+              <span class="blp-why-stat-num">عربي</span>
+              <span class="blp-why-stat-desc">${isAr ? 'إضافة حقيقية للمكتبة العربية في علوم الرياضة ومستقبل المواهب' : 'A genuine addition to the Arabic library in sports science and the future of talent'}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- IDEAS -->
+    <section class="blp-ideas">
+      <div class="container">
+        <div class="reveal">
+          <div class="blp-section-label">${isAr ? 'ماذا ستجد بداخله؟' : 'What\'s Inside?'}</div>
+          <h2 class="blp-section-title">
+            ${isAr ? 'أربعة محاور تبني فهمك من الصفر' : 'Four Pillars That Build Your Understanding'}
+          </h2>
+        </div>
+        <div class="blp-ideas-grid">
+          <div class="blp-idea-card reveal">
+            <div class="blp-idea-icon">⚡</div>
+            <div class="blp-idea-title">${isAr ? 'الحدس في مواجهة البيانات' : 'Intuition vs Data'}</div>
+            <div class="blp-idea-desc">${isAr ? 'مقارنة معمّقة بين منهج الكشاف التقليدي القائم على الخبرة والحكم البشري، ومنهج التحليل الرقمي وأدوات القياس الحديثة.' : 'An in-depth comparison between the traditional scout\'s method based on experience and human judgment, and digital analysis with modern measurement tools.'}</div>
+          </div>
+          <div class="blp-idea-card reveal">
+            <div class="blp-idea-icon">📊</div>
+            <div class="blp-idea-title">${isAr ? 'نماذج عالمية مقارنة' : 'Comparative Global Models'}</div>
+            <div class="blp-idea-desc">${isAr ? 'استعراض للأساليب المعتمدة في دول كرة القدم الكبرى، وكيف تتعامل الأندية والاتحادات مع اكتشاف المواهب في الفئات السنية.' : 'A review of methods adopted in major football countries, and how clubs and federations handle talent identification in youth categories.'}</div>
+          </div>
+          <div class="blp-idea-card reveal">
+            <div class="blp-idea-icon">🎯</div>
+            <div class="blp-idea-title">${isAr ? 'الفئات السنية ومتطلباتها' : 'Age Groups and Their Requirements'}</div>
+            <div class="blp-idea-desc">${isAr ? 'فهم خصوصية كل مرحلة عمرية وما يتطلبه اكتشاف الموهبة فيها من أدوات تقييم ومؤشرات ملائمة.' : 'Understanding the specifics of each age stage and what talent identification requires in terms of appropriate evaluation tools and indicators.'}</div>
+          </div>
+          <div class="blp-idea-card reveal">
+            <div class="blp-idea-icon">🔬</div>
+            <div class="blp-idea-title">${isAr ? 'من البحث إلى الملعب' : 'From Research to the Pitch'}</div>
+            <div class="blp-idea-desc">${isAr ? 'كيف يمكن تحويل هذا الفهم إلى مشروع حقيقي يخدم النادي أو الاتحاد أو الأكاديمية الرياضية بأكملها.' : 'How to translate this understanding into a real project that serves the club, federation, or sports academy as a whole.'}</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AUDIENCE -->
+    <section class="blp-audience">
+      <div class="container">
+        <div class="reveal">
+          <div class="blp-section-label">${isAr ? 'لمن هذا الكتاب؟' : 'Who Is This Book For?'}</div>
+          <h2 class="blp-section-title">
+            ${isAr ? 'كل من يريد أن يفهم الموهبة بعمق' : 'Everyone Who Wants to Understand Talent Deeply'}
+          </h2>
+          <div class="blp-audience-chips">
+            ${[
+              isAr ? ['🔎', 'الكشاف والمراقب'] : ['🔎', 'Scout & Observer'],
+              isAr ? ['🏃', 'مدرب الأكاديمية'] : ['🏃', 'Academy Coach'],
+              isAr ? ['🏟️', 'مسؤول التطوير'] : ['🏟️', 'Development Manager'],
+              isAr ? ['🎓', 'الباحث الأكاديمي'] : ['🎓', 'Academic Researcher'],
+              isAr ? ['👨‍👦', 'ولي الأمر المهتم'] : ['👨‍👦', 'Engaged Parent'],
+              isAr ? ['📋', 'صانع القرار الرياضي'] : ['📋', 'Sports Decision Maker']
+            ].map(([icon, label]) => `<span class="blp-chip">${icon} ${label}</span>`).join('')}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AUTHOR -->
+    <section class="blp-author">
+      <div class="container">
+        <div class="blp-author-inner reveal">
+          <div class="blp-author-badge">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="blp-author-name">${isAr ? 'عبدالعزيز باجخيف' : 'Abdulaziz Bajkhaif'}</div>
+            <div class="blp-author-role">${isAr ? 'مؤسس باجو زون — كاتب وباحث في علوم الموهبة الكروية' : 'Founder of BajoZone — Writer & Researcher in Football Talent Science'}</div>
+            <p class="blp-author-bio">
+              ${isAr
+                ? 'يكتب عبدالعزيز في منصة BajoZone من نقطة التقاء العلم بالميدان: علوم الرياضة، اكتشاف المواهب، تطوير اللاعبين، وتجارب كرة القدم في الفئات السنية. هذا الكتاب وُلد من بحث جامعي أُنجز في ألمانيا، ثم أُعيدت صياغته وترجمته إلى العربية إيماناً بأهمية إثراء المكتبة العربية في مجال يمس مستقبل الرياضة.'
+                : 'Abdulaziz writes at BajoZone from the intersection of science and the field: sports science, talent identification, player development, and football experiences in youth categories. This book was born from university research completed in Germany, then rewritten for the Arabic library, driven by a belief in enriching Arabic sports literature.'}
+            </p>
+            <div class="blp-author-logo">
+              <img src="assets/images/logo-bajo.png" alt="BajoZone" onerror="this.style.display='none'">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="blp-final-cta">
+      <div class="container reveal">
+        <div class="blp-final-cta-label">${isAr ? 'احصل على نسختك الآن' : 'Get Your Copy Now'}</div>
+        <h2 class="blp-final-cta-title">
+          ${isAr ? 'ابدأ رحلتك في فهم الموهبة' : 'Begin Your Journey in Understanding Talent'}
+        </h2>
+        <p class="blp-final-cta-sub">
+          ${isAr
+            ? 'متاح الآن على منصة مستقل'
+            : 'Available now on the Mustaql platform'}
+        </p>
+        <a class="blp-final-btn" href="${storeUrl}" target="_blank" rel="noopener">
+          ${isAr ? 'اشتر الكتاب ←' : 'Buy the Book →'}
+        </a>
+      </div>
+    </section>
+
+  </div>`;
+
+  updatePageMeta(
+    isAr ? 'الموهبة الكروية بين الحدس والبيانات — BajoZone' : 'Football Talent: Intuition vs Data — BajoZone',
+    isAr ? 'دراسة مقارنة لأساليب اكتشاف المواهب في كرة القدم للفئات السنية' : 'A Comparative Study of Talent Identification Methods in Youth Football',
+    coverSrc || 'assets/images/logo-bajo.png',
+    location.origin + location.pathname + '#/mybook1'
+  );
+  initReveal();
 }
 
 function renderBooks() {
@@ -3340,13 +3590,16 @@ function initAboutPinnedStory(scenes) {
     updateNavLogoMode();
   }, { passive: true });
   document.getElementById('hamburger')?.addEventListener('click', () => document.getElementById('mobile-nav')?.classList.toggle('open'));
-  document.getElementById('lang-btn')?.addEventListener('click', () => Lang.toggle());
+  document.getElementById('lang-btn')?.addEventListener('click', () => {
+    if (CMS.s('english_enabled', true) !== false) Lang.toggle();
+  });
   Router.reg('/',        ()  => renderHomeStory());
   Router.reg('/programs',()  => renderPrograms());
   Router.reg('/articles',()  => renderPrograms()); // backward-compat redirect
   Router.reg('/article', id  => renderArticleSingle(id));
   Router.reg('/books',   ()  => renderBooks());
   Router.reg('/book',    id  => renderBookSingle(id));
+  Router.reg('/mybook1', ()  => renderMyBook1());
   Router.reg('/about',   ()  => renderAboutPremium());
   renderNav(); renderFooter(); Router.init();
   maybeShowNewArticleBar();
