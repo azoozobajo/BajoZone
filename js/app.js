@@ -29,7 +29,7 @@ const CMS = {
     }
     if (this.db) return true;
     try {
-      const r = await fetch('data/db.json?t=' + Date.now());
+      const r = await fetch('/data/db.json?t=' + Date.now());
       if (!r.ok) throw 0;
       this.db = await r.json();
       localStorage.setItem(this.LS_KEY, JSON.stringify(this.db));
@@ -223,15 +223,20 @@ const SI = {
 /* ── Router ──────────────────────────────────── */
 const Router = {
   routes: {}, cur: '/',
+  currentPath() {
+    if (location.hash) return location.hash.replace('#', '') || '/';
+    const path = location.pathname.replace(/\/+$/, '') || '/';
+    return path === '/index.php' || path === '/index.html' ? '/' : path;
+  },
   reg(p, fn) { this.routes[p] = fn; },
   go(path, push = true) {
-    if (push) history.pushState({}, '', '#' + path);
+    if (push) history.pushState({}, '', path);
     if (!path.startsWith('/article/')) document.body.classList.remove('focus-reading');
     document.body.classList.remove('is-about-page');
     this.cur = path;
     const parts = path.replace(/^\//, '').split('/');
     const base = '/' + (parts[0] || '');
-    const param = parts[1] || null;
+    const param = parts.slice(1).join('/') || null;
     (this.routes[base] || this.routes['/'])?.(param);
     document.querySelectorAll('.nav-links a, .mobile-nav a').forEach(a => {
       const h = (a.getAttribute('href') || '').replace('#', '');
@@ -242,9 +247,9 @@ const Router = {
     updateNavLogoMode();
   },
   init() {
-    window.addEventListener('popstate', () => this.go(location.hash.replace('#', '') || '/', false));
-    window.addEventListener('hashchange', () => this.go(location.hash.replace('#', '') || '/', false));
-    this.go(location.hash.replace('#', '') || '/', false);
+    window.addEventListener('popstate', () => this.go(this.currentPath(), false));
+    window.addEventListener('hashchange', () => this.go(this.currentPath(), false));
+    this.go(this.currentPath(), false);
   }
 };
 
@@ -304,24 +309,49 @@ function setMetaTag(name, content, property = false) {
   }
   tag.setAttribute('content', content);
 }
+function setCanonical(url) {
+  if (!url) return;
+  let link = document.head.querySelector('link[rel="canonical"]');
+  if (!link) {
+    link = document.createElement('link');
+    link.setAttribute('rel', 'canonical');
+    document.head.appendChild(link);
+  }
+  link.setAttribute('href', url);
+}
+function cleanMetaDescription(text, min = 150, max = 160) {
+  const clean = String(text || '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (clean.length <= max) return clean;
+  const suffix = '...';
+  const bodyMax = max - suffix.length;
+  let candidate = clean.slice(0, bodyMax);
+  const lastSpace = Math.max(candidate.lastIndexOf(' '), candidate.lastIndexOf('\t'), candidate.lastIndexOf('\n'));
+  if (lastSpace >= min - suffix.length) candidate = candidate.slice(0, lastSpace);
+  return candidate.replace(/[\s.,،;؛:\-ـ]+$/g, '') + suffix;
+}
 function updatePageMeta(title, description, image, url) {
+  const cleanDescription = cleanMetaDescription(description);
   document.title = title;
-  setMetaTag('description', description);
+  setMetaTag('description', cleanDescription);
   setMetaTag('og:title', title, true);
-  setMetaTag('og:description', description, true);
+  setMetaTag('og:description', cleanDescription, true);
   setMetaTag('og:image', imgSrc(image || CMS.s('logo', 'assets/images/logo-bajo.png')), true);
   setMetaTag('og:url', url || location.href, true);
   setMetaTag('twitter:card', 'summary_large_image');
   setMetaTag('twitter:title', title);
-  setMetaTag('twitter:description', description);
+  setMetaTag('twitter:description', cleanDescription);
   setMetaTag('twitter:image', imgSrc(image || CMS.s('logo', 'assets/images/logo-bajo.png')));
+  setCanonical(url || location.href);
 }
 function mediaSrc(url) {
   if (!url) return '';
   const value = String(url).trim();
   if (/^(data:|blob:|https?:\/\/|\/)/i.test(value)) return value;
   if (value.startsWith('public/')) return '/' + value.replace(/^public\//, '');
-  return value;
+  return '/' + value.replace(/^\.\//, '');
 }
 function imgSrc(url) {
   return mediaSrc(url);
@@ -348,7 +378,7 @@ function copyTextToClipboard(text) {
   });
 }
 function getShareUrl(id) {
-  return `${location.origin}${location.pathname}#/article/${id}`;
+  return `${location.origin}/article/${id}`;
 }
 function trackBookDownload(id) {
   Stats.recordBookDownload(id);
@@ -360,7 +390,8 @@ function jsArg(s) {
   return String(s || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\r?\n/g, ' ');
 }
 function shareArticle(channel, id, title) {
-  const url = getShareUrl(id);
+  const article = CMS.list('articles').find(x => x.id === id || x.slug === id);
+  const url = getShareUrl(article?.slug || id);
   const text = `${title}\n${url}`;
   Stats.recordShare(channel, id);
   if (channel === 'whatsapp') {
@@ -401,7 +432,7 @@ function downloadArticlePDF(id) {
   const t = Lang.str({ ar: a.title_ar, en: a.title_en });
   const c = Lang.str({ ar: a.category_ar, en: a.category_en });
   const con = parseCallouts(Lang.str({ ar: a.content_ar, en: a.content_en }));
-  const url = getShareUrl(id);
+  const url = getShareUrl(a.slug || a.id);
   const isAr = Lang.cur === 'ar';
   const dir = isAr ? 'rtl' : 'ltr';
   const align = isAr ? 'right' : 'left';
@@ -550,16 +581,16 @@ function renderNav() {
   if (li) li.src = imgSrc(CMS.s('logo', 'assets/images/logo-bajo.png'));
   const ul = document.getElementById('nav-links');
   if (ul) ul.innerHTML = `
-    <li><a href="#/" onclick="Router.go('/');return false;">${Lang.t('home')}</a></li>
-    <li><a href="#/programs" onclick="Router.go('/programs');return false;">${Lang.t('programs')}</a></li>
-    <li><a href="#/books" onclick="Router.go('/books');return false;">${Lang.t('library')}</a></li>
-    <li><a href="#/about" onclick="Router.go('/about');return false;">${Lang.t('about')}</a></li>`;
+    <li><a href="/" onclick="Router.go('/');return false;">${Lang.t('home')}</a></li>
+    <li><a href="/programs" onclick="Router.go('/programs');return false;">${Lang.t('programs')}</a></li>
+    <li><a href="/books" onclick="Router.go('/books');return false;">${Lang.t('library')}</a></li>
+    <li><a href="/about" onclick="Router.go('/about');return false;">${Lang.t('about')}</a></li>`;
   const mob = document.getElementById('mobile-links');
   if (mob) mob.innerHTML = `
-    <li><a href="#/" onclick="document.getElementById('mobile-nav').classList.remove('open');Router.go('/');return false;">${Lang.t('home')}</a></li>
-    <li><a href="#/programs" onclick="document.getElementById('mobile-nav').classList.remove('open');Router.go('/programs');return false;">${Lang.t('programs')}</a></li>
-    <li><a href="#/books" onclick="document.getElementById('mobile-nav').classList.remove('open');Router.go('/books');return false;">${Lang.t('library')}</a></li>
-    <li><a href="#/about" onclick="document.getElementById('mobile-nav').classList.remove('open');Router.go('/about');return false;">${Lang.t('about')}</a></li>`;
+    <li><a href="/" onclick="document.getElementById('mobile-nav').classList.remove('open');Router.go('/');return false;">${Lang.t('home')}</a></li>
+    <li><a href="/programs" onclick="document.getElementById('mobile-nav').classList.remove('open');Router.go('/programs');return false;">${Lang.t('programs')}</a></li>
+    <li><a href="/books" onclick="document.getElementById('mobile-nav').classList.remove('open');Router.go('/books');return false;">${Lang.t('library')}</a></li>
+    <li><a href="/about" onclick="document.getElementById('mobile-nav').classList.remove('open');Router.go('/about');return false;">${Lang.t('about')}</a></li>`;
 }
 
 /* ── Footer ──────────────────────────────────── */
@@ -797,6 +828,33 @@ function renderBookSingle(id) {
 /* ── Published-only helpers ──────────────────── */
 function pubArts()  { return CMS.list('articles').filter(a => a.is_published !== false); }
 function pubProgs() { return CMS.list('programs').filter(p => p.is_active   !== false); }
+function categorySlug(cat) {
+  const source = cat?.slug || cat?.name_en || cat?.id || '';
+  return String(source).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+function getCategoryForArticle(a) {
+  if (!a?.category_id) return null;
+  return CMS.list('categories').find(c => c.id === a.category_id) || null;
+}
+function getCategoryBySlug(slug) {
+  return CMS.list('categories').find(c => categorySlug(c) === slug) || null;
+}
+function categoryName(cat, isAr = Lang.cur === 'ar') {
+  return isAr ? (cat?.name_ar || cat?.name_en || '') : (cat?.name_en || cat?.name_ar || '');
+}
+function tagSlug(tag) {
+  const source = tag?.slug || tag?.name || tag?.id || '';
+  return String(source).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+function getTagBySlug(slug) {
+  return CMS.list('tags').find(t => tagSlug(t) === slug) || null;
+}
+function getTagsForArticle(a) {
+  if (!Array.isArray(a?.tags)) return [];
+  return a.tags
+    .map(tid => CMS.list('tags').find(t => t.id === tid || t.slug === tid))
+    .filter(Boolean);
+}
 
 /* ── Program helpers ─────────────────────────── */
 function getProgramForArticle(a) {
@@ -808,9 +866,12 @@ function tagChipsHtml(a) {
   if (!Array.isArray(a.tags) || !a.tags.length) return '';
   const allTags = CMS.list('tags');
   return a.tags.map(tid => {
-    const tag = allTags.find(t => t.id === tid);
+    const tag = allTags.find(t => t.id === tid || t.slug === tid);
     const name = tag ? tag.name : tid;
-    return `<span class="tag-chip" title="${name}">${name}</span>`;
+    const slug = tag ? tagSlug(tag) : '';
+    return slug
+      ? `<a class="tag-chip" href="/articles/tag/${slug}" onclick="Router.go('/articles/tag/${slug}');return false;" title="${name}">${name}</a>`
+      : `<span class="tag-chip" title="${name}">${name}</span>`;
   }).join('');
 }
 
@@ -863,19 +924,20 @@ function artCard(a) {
   const ex   = Lang.str({ ar: a.excerpt_ar, en: a.excerpt_en });
   const prog = getProgramForArticle(a);
   const isAr = Lang.cur === 'ar';
+  const href = `/article/${a.slug || a.id}`;
   const progBadge = prog ? `<div class="prog-badge">
       ${prog.logo_url ? `<img src="${imgSrc(prog.logo_url)}" alt="" class="prog-badge-logo" loading="lazy">` : `<span class="prog-badge-initial">${(isAr ? prog.name_ar : (prog.name_en || prog.name_ar)).slice(0,1)}</span>`}
       <span>${isAr ? prog.name_ar : (prog.name_en || prog.name_ar)}</span>
     </div>` : '';
   const tags = tagChipsHtml(a);
   return `
-    <article class="card reveal" onclick="Router.go('/article/${a.id}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')Router.go('/article/${a.id}')">
+    <article class="card reveal" onclick="Router.go('${href}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')Router.go('${href}')">
       ${a.image
         ? `<img class="card-thumb" src="${imgSrc(a.image)}" alt="${t}" loading="lazy" onerror="this.style.display='none'">`
         : `<div class="card-thumb-ph">✍</div>`}
       <div class="card-body">
         ${progBadge}
-        <h3 class="card-title">${t}</h3>
+        <h3 class="card-title"><a href="${href}" onclick="Router.go('${href}');return false;">${t}</a></h3>
         <div class="card-meta-line">
           <span>${readingLabel(a)}</span>
           <span>${levelLabel(a)}</span>
@@ -1580,13 +1642,111 @@ function renderHomeStory() {
     `${Lang.t('home')} — ${CMS.s('site_name_en', 'BajoZone')}`,
     isAr ? CMS.s('tagline_ar', 'منصة عربية لاكتشاف وتطوير المواهب الكروية.') : CMS.s('tagline_en', 'A football talent identification and development platform.'),
     CMS.s('logo', 'assets/images/logo-bajo.png'),
-    location.origin + location.pathname + '#/'
+    location.origin + '/'
   );
 }
 
 /* /articles redirects to /programs for backward compat */
-function renderArticles() {
+function renderArticles(param = null) {
+  if (param && param.startsWith('category/')) {
+    renderArticleCategory(param.replace(/^category\//, ''));
+    return;
+  }
+  if (param && param.startsWith('tag/')) {
+    renderArticleTag(param.replace(/^tag\//, ''));
+    return;
+  }
   renderPrograms();
+}
+
+function renderArticleCategory(slug) {
+  const isAr = Lang.cur === 'ar';
+  const category = getCategoryBySlug(slug);
+  if (!category) { Router.go('/articles'); return; }
+  const name = categoryName(category, isAr);
+  const articles = pubArts().filter(a => a.category_id === category.id);
+  if (!articles.length) { Router.go('/articles'); return; }
+  const description = category.description || category.description_ar || category.description_en || (isAr
+    ? `مقالات BajoZone ضمن تصنيف ${name}، مع قراءات معرفية وتحليلية في كرة القدم وتطوير المواهب.`
+    : `BajoZone articles in ${name}, with knowledge-based football and talent development analysis.`);
+
+  document.getElementById('app').innerHTML = `
+    <div class="programs-page category-page">
+      <div class="page-header"><div class="container">
+        <div class="section-label">${isAr ? 'تصنيف المقالات' : 'Article Category'}</div>
+        <h1 class="section-title">${name}</h1>
+        <p class="programs-page-sub">${description}</p>
+      </div></div>
+
+      <section class="programs-grid-section">
+        <div class="container">
+          <div class="section-header reveal" style="margin-bottom:28px;">
+            <div>
+              <div class="section-label">${isAr ? 'المقالات' : 'Articles'}</div>
+              <h2 class="section-title">${isAr ? 'مواضيع التصنيف' : 'Category Articles'}</h2>
+            </div>
+            <a class="btn btn-ghost" href="/articles" onclick="Router.go('/articles');return false;">${isAr ? 'العودة إلى المقالات' : 'Back to Articles'}</a>
+          </div>
+          <div class="cards-grid">
+            ${articles.map(a => artCard(a)).join('')}
+          </div>
+        </div>
+      </section>
+    </div>`;
+
+  initReveal();
+  updatePageMeta(
+    `${name} — ${CMS.s('site_name_en', 'BajoZone')}`,
+    description,
+    CMS.s('logo', 'assets/images/logo-bajo.png'),
+    location.origin + `/articles/category/${slug}`
+  );
+}
+
+function renderArticleTag(slug) {
+  const isAr = Lang.cur === 'ar';
+  const tag = getTagBySlug(slug);
+  if (!tag) { Router.go('/articles'); return; }
+  const articles = pubArts().filter(a => Array.isArray(a.tags) && a.tags.includes(tag.id));
+  if (!articles.length) { Router.go('/articles'); return; }
+  const name = tag.name || slug;
+  const robots = articles.length >= 3 ? 'index, follow' : 'noindex, follow';
+  const description = isAr
+    ? `مقالات BajoZone المرتبطة بوسم ${name} ضمن محتوى كرة القدم وتطوير المواهب.`
+    : `BajoZone articles tagged ${name}, covering football knowledge and talent development.`;
+
+  document.getElementById('app').innerHTML = `
+    <div class="programs-page tag-page">
+      <div class="page-header"><div class="container">
+        <div class="section-label">${isAr ? 'وسم المقالات' : 'Article Tag'}</div>
+        <h1 class="section-title">${name}</h1>
+        <p class="programs-page-sub">${description}</p>
+      </div></div>
+
+      <section class="programs-grid-section">
+        <div class="container">
+          <div class="section-header reveal" style="margin-bottom:28px;">
+            <div>
+              <div class="section-label">${isAr ? 'المقالات' : 'Articles'}</div>
+              <h2 class="section-title">${isAr ? 'مواضيع الوسم' : 'Tagged Articles'}</h2>
+            </div>
+            <a class="btn btn-ghost" href="/articles" onclick="Router.go('/articles');return false;">${isAr ? 'العودة إلى المقالات' : 'Back to Articles'}</a>
+          </div>
+          <div class="cards-grid">
+            ${articles.map(a => artCard(a)).join('')}
+          </div>
+        </div>
+      </section>
+    </div>`;
+
+  initReveal();
+  updatePageMeta(
+    `${name} — ${CMS.s('site_name_en', 'BajoZone')}`,
+    description,
+    CMS.s('logo', 'assets/images/logo-bajo.png'),
+    location.origin + `/articles/tag/${slug}`
+  );
+  setMetaTag('robots', robots);
 }
 
 /* ── PROGRAMS PAGE ───────────────────────────── */
@@ -1649,7 +1809,7 @@ function renderPrograms() {
       ? 'برامج باجو زون المعرفية في كرة القدم، الموهبة، واكتشاف المواهب وتطويرها.'
       : 'BajoZone knowledge programs on football, talent identification, and player development.',
     CMS.s('logo', 'assets/images/logo-bajo.png'),
-    location.origin + location.pathname + '#/programs'
+    location.origin + '/articles'
   );
 }
 
@@ -1791,17 +1951,23 @@ function renderArticleSingle(id) {
   const isAr = Lang.cur === 'ar';
   const t   = Lang.str({ ar: a.title_ar, en: a.title_en });
   const con = parseCallouts(Lang.str({ ar: a.content_ar, en: a.content_en }));
+  const articleImage = a.featured_image || a.image || 'assets/images/story/research-desk.png';
   const titleArg = jsArg(t);
   const prog = getProgramForArticle(a);
+  const category = getCategoryForArticle(a);
+  const articleTags = getTagsForArticle(a);
+  const catSlug = category ? categorySlug(category) : '';
+  const catName = category ? categoryName(category, isAr) : '';
 
-  // Related: program > shared tags > same category > recent
-  const others = CMS.list('articles').filter(x => x.id !== a.id);
-  const byProg = prog ? others.filter(x => x.program_id === prog.id) : [];
-  const byTags = Array.isArray(a.tags) && a.tags.length
-    ? others.filter(x => Array.isArray(x.tags) && x.tags.some(t => a.tags.includes(t)))
+  // Related: same category first, shared tags second, then latest published topics.
+  const others = pubArts().filter(x => x.id !== a.id);
+  const sameCategory = category ? others.filter(x => x.category_id === category.id) : [];
+  const tagIds = articleTags.map(t => t.id);
+  const sharedTags = tagIds.length
+    ? others.filter(x => Array.isArray(x.tags) && x.tags.some(tid => tagIds.includes(tid)))
     : [];
   const seen = new Set();
-  const related = [...byProg, ...byTags, ...others].filter(x => {
+  const related = [...sameCategory, ...sharedTags, ...others].filter(x => {
     if (seen.has(x.id)) return false;
     seen.add(x.id); return true;
   }).slice(0, 3);
@@ -1832,7 +1998,8 @@ function renderArticleSingle(id) {
         ${tags ? `<div class="article-detail-tags">${tags}</div>` : ''}
         <div class="article-detail-grid">
           <span>${fmtDate(a.date)}</span>
-          <span class="art-author-chip">${SI.author} ${isAr ? 'عبدالعزيز باجخيف' : 'Abdulaziz Bajkhaif'}</span>
+          <a class="art-author-chip" href="/author/abdulaziz-bajkhaif" onclick="Router.go('/author/abdulaziz-bajkhaif');return false;">${SI.author} ${isAr ? 'بقلم: ' : 'By '}Abdulaziz Bajkhaif</a>
+          ${category ? `<a class="art-author-chip" href="/articles/category/${catSlug}" onclick="Router.go('/articles/category/${catSlug}');return false;">${isAr ? 'ضمن: ' : 'In: '}${catName}</a>` : ''}
           <span>${readingLabel(a)}</span>
           <span>${isAr ? 'المستوى' : 'Level'}: ${levelLabel(a)}</span>
           <span>${isAr ? 'مشاهدات' : 'Views'} ${views}</span>
@@ -1852,13 +2019,14 @@ function renderArticleSingle(id) {
           <button type="button" class="share-btn pdf" title="PDF" aria-label="PDF" onclick="downloadArticlePDF('${a.id}')">PDF</button>
         </div>
       </div>
-      ${a.image ? `<figure class="art-hero-frame"><img class="art-hero" src="${imgSrc(a.image)}" alt="${t}"></figure>` : ''}
+      ${articleTags.length ? `<div class="article-detail-tags"><span>${isAr ? 'وسوم:' : 'Tags:'}</span> ${tagChipsHtml(a)}</div>` : ''}
+      ${(a.featured_image || a.image) ? `<figure class="art-hero-frame"><img class="art-hero" src="${imgSrc(a.featured_image || a.image)}" alt="${t}"></figure>` : ''}
       ${youtubeEmbedHtml(a.youtube_url)}
       <div class="art-body">${con}</div>
       ${sourcesAccordionHtml(a)}
       ${related.length ? `
         <section class="related-articles">
-          <div class="related-title">${isAr ? 'مواضيع ذات صلة' : 'Related Topics'}</div>
+          <div class="related-title">${isAr ? 'مقالات مرتبطة' : 'Related Articles'}</div>
           <div class="related-grid">
             ${related.map(r => artCard(r)).join('')}
           </div>
@@ -1868,9 +2036,78 @@ function renderArticleSingle(id) {
   initReveal();
   updatePageMeta(
     `${t} — ${CMS.s('site_name_en', 'BajoZone')}`,
-    con.replace(/<[^>]+>/g, '').slice(0, 140),
-    imgSrc(a.image || CMS.s('logo', 'assets/images/logo-bajo.png')),
-    getShareUrl(a.id)
+    con,
+    imgSrc(articleImage),
+    getShareUrl(a.slug || a.id)
+  );
+}
+
+function renderAuthorPage() {
+  const isAr = Lang.cur === 'ar';
+  const articles = pubArts();
+  const authorName = 'Abdulaziz Bajkhaif';
+  const description = isAr
+    ? 'كاتب ومهتم بعلوم الرياضة والكشافة الكروية واكتشاف المواهب وتحليل الأداء. يكتب في BajoZone محتوى معرفيًا وتحليليًا يربط البحث بالميدان.'
+    : 'Sports science and football talent writer focused on scouting, talent identification, performance analysis, and connecting research with the field.';
+  const focusAreas = [
+    [isAr ? 'علوم الرياضة' : 'Sports Science', isAr ? 'قراءة الأداء والتطور من منظور علمي يربط علوم الرياضة بواقع كرة القدم.' : 'Reading performance and development through a sports-science lens connected to football practice.'],
+    [isAr ? 'الكشافة الكروية' : 'Football Scouting', isAr ? 'تحليل عملية الكشافة وملاحظة اللاعبين وتحويل المشاهدة إلى تقييم منظم.' : 'Analyzing scouting, player observation, and turning watching into structured evaluation.'],
+    [isAr ? 'اكتشاف المواهب' : 'Talent Identification', isAr ? 'فهم مؤشرات الموهبة وسياق ظهورها ومسارات تطورها في الفئات السنية.' : 'Understanding talent indicators, context, and development pathways in youth football.'],
+    [isAr ? 'تحليل الأداء' : 'Performance Analysis', isAr ? 'تحليل الأداء والقرارات والسلوك داخل الملعب بعيدًا عن القراءة السطحية للأرقام.' : 'Analyzing performance, decisions, and on-pitch behavior beyond surface-level numbers.'],
+    [isAr ? 'رعاية وحماية اللاعبين' : 'Player Care & Protection', isAr ? 'الاهتمام ببيئة اللاعب النفسية والاجتماعية والتربوية، وحمايته خلال رحلة التطور.' : 'Focusing on the psychological, social, and educational environment that protects players during development.'],
+    [isAr ? 'الخطط الاستراتيجية وبناء الفرق' : 'Strategic Team Building', isAr ? 'تحليل بناء الفرق والتشكيلة داخل الأندية، واختيار اللاعبين بما يخدم الهوية والأدوار والتوازن.' : 'Analyzing squad planning, team identity, roles, balance, and player selection inside clubs.']
+  ];
+
+  document.getElementById('app').innerHTML = `
+    <div class="programs-page author-page">
+      <div class="page-header"><div class="container">
+        <div class="section-label">${isAr ? 'صفحة الكاتب' : 'Author'}</div>
+        <h1 class="section-title">${authorName}</h1>
+        <p class="programs-page-sub">${description}</p>
+      </div></div>
+
+      <section class="programs-grid-section">
+        <div class="container">
+          <div class="section-header reveal" style="margin-bottom:28px;">
+            <div>
+              <div class="section-label">${isAr ? 'التخصص' : 'Expertise'}</div>
+              <h2 class="section-title">${isAr ? 'مجالات الكتابة والتحليل' : 'Editorial Focus'}</h2>
+            </div>
+          </div>
+          <div class="cards-grid">
+            ${focusAreas.map(([title, text]) => `
+              <article class="card reveal">
+                <div class="card-body">
+                  <h3>${title}</h3>
+                  <p>${text}</p>
+                </div>
+              </article>`).join('')}
+          </div>
+        </div>
+      </section>
+
+      <section class="program-topics-section">
+        <div class="container">
+          <div class="section-header reveal" style="margin-bottom:28px;">
+            <div>
+              <div class="section-label">${isAr ? 'المقالات المنشورة' : 'Published Articles'}</div>
+              <h2 class="section-title">${isAr ? 'مقالات الكاتب' : 'Author Articles'}</h2>
+            </div>
+            <a class="btn btn-ghost" href="/articles" onclick="Router.go('/articles');return false;">${isAr ? 'كل المقالات' : 'All Articles'}</a>
+          </div>
+          <div class="cards-grid">
+            ${articles.length ? articles.map(a => artCard(a)).join('') : `<div class="empty-state">${Lang.t('noArticles')}</div>`}
+          </div>
+        </div>
+      </section>
+    </div>`;
+
+  initReveal();
+  updatePageMeta(
+    `${authorName} — ${CMS.s('site_name_en', 'BajoZone')}`,
+    description,
+    CMS.s('logo', 'assets/images/logo-bajo.png'),
+    location.origin + '/author/abdulaziz-bajkhaif'
   );
 }
 
@@ -3216,7 +3453,15 @@ function renderAboutPremium() {
           <p class="about-closing-statement">${c.closing.statement}</p>
           ${contactInvite ? `<p class="about-contact-invite">${contactInvite}</p>` : ''}
           ${socialLinksHtml ? `<div class="about-social-row">${socialLinksHtml}</div>` : ''}
-          <a class="about-btn-fill" href="#/" onclick="Router.go('/')">${c.closing.button}</a>
+          <div class="about-social-row">
+            <a class="about-btn-fill" href="/articles" onclick="Router.go('/articles');return false;">${isAr ? 'المقالات' : 'Articles'}</a>
+            <a class="about-btn-fill" href="/programs" onclick="Router.go('/programs');return false;">${Lang.t('programs')}</a>
+            <a class="about-btn-fill" href="/author/abdulaziz-bajkhaif" onclick="Router.go('/author/abdulaziz-bajkhaif');return false;">${isAr ? 'صفحة الكاتب' : 'Author'}</a>
+          </div>
+          <p class="about-scene-para">${isAr
+            ? 'المحتوى في BajoZone معرفي وتحليلي، ولا يمثل نصيحة قانونية أو طبية أو قرارًا رسميًا في تقييم اللاعبين.'
+            : 'BajoZone content is educational and analytical, and should not be treated as legal, medical, or official player-evaluation advice.'}</p>
+          <a class="about-btn-fill" href="/" onclick="Router.go('/');return false;">${c.closing.button}</a>
         </div>
 
       </div>
@@ -3233,10 +3478,12 @@ function renderAboutPremium() {
     </div>`;
 
   updatePageMeta(
-    `${c.hero.name} — ${CMS.s('site_name_en', 'BajoZone')}`,
-    c.hero.tagline,
+    `${isAr ? 'عن BajoZone' : 'About BajoZone'} — ${CMS.s('site_name_en', 'BajoZone')}`,
+    isAr
+      ? 'تعرف على BajoZone: مساحة معرفية وتحليلية في اكتشاف المواهب، الكشافة الكروية، تطوير الناشئين، تحليل الأداء، التقنية والمسارات الرياضية.'
+      : 'Learn about BajoZone, a knowledge and analysis space for football scouting, talent identification, youth development, performance analysis, technology, and careers.',
     'images/about/about-bg.png',
-    location.origin + location.pathname + '#/about'
+    location.origin + '/about'
   );
 
   requestAnimationFrame(() => {
@@ -3604,12 +3851,13 @@ function initAboutPinnedStory(scenes) {
   });
   Router.reg('/',        ()  => renderHomeStory());
   Router.reg('/programs',()  => renderPrograms());
-  Router.reg('/articles',()  => renderPrograms()); // backward-compat redirect
+  Router.reg('/articles',param => renderArticles(param));
   Router.reg('/article', id  => renderArticleSingle(id));
   Router.reg('/books',   ()  => renderBooks());
   Router.reg('/book',    id  => renderBookSingle(id));
   Router.reg('/mybook1', ()  => renderMyBook1());
   Router.reg('/about',   ()  => renderAboutPremium());
+  Router.reg('/author',  id  => id === 'abdulaziz-bajkhaif' ? renderAuthorPage() : Router.go('/about'));
   renderNav(); renderFooter(); Router.init();
   maybeShowNewArticleBar();
   setTimeout(hideBootLoader, 180);
