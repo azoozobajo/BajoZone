@@ -9,18 +9,14 @@
 const CMS = {
   db: null, LS_KEY: 'bz_db_v9',
   async init() {
-    if (window.BajoSupabase?.ready?.()) {
-      try {
-        const remoteDb = await window.BajoSupabase.loadDb();
-        const hasRemoteContent = ['articles', 'programs', 'books', 'resources'].some(k => (remoteDb[k] || []).length);
-        if (hasRemoteContent) {
-          this.db = remoteDb;
-          localStorage.setItem(this.LS_KEY, JSON.stringify(this.db));
-          return true;
-        }
-      } catch (err) {
-        console.warn('Supabase load failed, falling back to local db.json', err);
-      }
+    try {
+      const r = await fetch('/api/content.php?t=' + Date.now());
+      if (!r.ok) throw 0;
+      this.db = await r.json();
+      localStorage.setItem(this.LS_KEY, JSON.stringify(this.db));
+      return true;
+    } catch(err) {
+      console.warn('MySQL content API unavailable, trying development fallback', err);
     }
 
     const s = localStorage.getItem(this.LS_KEY);
@@ -29,6 +25,7 @@ const CMS = {
     }
     if (this.db) return true;
     try {
+      // Do not use data/db.json in production. This is only a temporary local-development fallback.
       const r = await fetch('/data/db.json?t=' + Date.now());
       if (!r.ok) throw 0;
       this.db = await r.json();

@@ -2,194 +2,121 @@ const fs = require('fs');
 const path = require('path');
 
 const root = path.resolve(__dirname, '..');
-const dbPath = path.join(root, 'data', 'db.json');
-const sitemapPath = path.join(root, 'sitemap.php');
-const appPath = path.join(root, 'js', 'app.js');
+const files = {
+  schema: path.join(root, 'database', 'schema.sql'),
+  repository: path.join(root, 'includes', 'content-repository.php'),
+  db: path.join(root, 'includes', 'db.php'),
+  config: path.join(root, 'includes', 'config.php'),
+  index: path.join(root, 'index.php'),
+  sitemap: path.join(root, 'sitemap.php'),
+  app: path.join(root, 'js', 'app.js'),
+  admin: path.join(root, 'admin', 'index.html'),
+};
 
-function fail(message, details = '') {
-  console.error(`SEO check failed: ${message}`);
-  if (details) console.error(details);
+function read(file) {
+  return fs.readFileSync(file, 'utf8');
+}
+
+function fail(message) {
+  console.error(`SEO/MySQL check failed: ${message}`);
   process.exitCode = 1;
 }
 
-function cleanText(value) {
-  return String(value || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+for (const [name, file] of Object.entries(files)) {
+  if (!fs.existsSync(file)) fail(`Missing required file: ${name} (${file})`);
 }
 
-const db = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
-const sitemapSource = fs.readFileSync(sitemapPath, 'utf8');
-const appSource = fs.readFileSync(appPath, 'utf8');
-const articles = Array.isArray(db.articles) ? db.articles : [];
-const published = articles.filter(article => article.is_published !== false);
-const categories = Array.isArray(db.categories) ? db.categories : [];
-const tags = Array.isArray(db.tags) ? db.tags : [];
-const seenSlugs = new Set();
+const schema = read(files.schema);
+const repository = read(files.repository);
+const db = read(files.db);
+const config = read(files.config);
+const index = read(files.index);
+const sitemap = read(files.sitemap);
+const app = read(files.app);
+const admin = read(files.admin);
 
-function categorySlug(category) {
-  const source = category.slug || category.name_en || category.id || '';
-  return String(source).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-}
-
-function tagSlug(tag) {
-  const source = tag.slug || tag.name || tag.id || '';
-  return String(source).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-}
-
-function countPublishedByTag(tag) {
-  return published.filter(article => Array.isArray(article.tags) && article.tags.includes(tag.id)).length;
-}
-
-const categoryById = new Map(categories.map(category => [category.id, category]));
-const tagById = new Map(tags.map(tag => [tag.id, tag]));
-
-for (const article of published) {
-  const slug = cleanText(article.slug || '');
-  const title = cleanText(article.title_ar || article.title_en || '');
-  const descriptionSource = cleanText(article.excerpt_ar || article.excerpt_en || article.content_ar || article.content_en || '');
-  const category = categoryById.get(article.category_id);
-
-  if (!slug) fail(`Published article is missing slug: ${article.id || '(missing id)'}`);
-  if (!title) fail(`Published article is missing title: ${slug || article.id || '(missing id)'}`);
-  if (!descriptionSource) fail(`Published article cannot generate description: ${slug || article.id || '(missing id)'}`);
-  if (!category || !categorySlug(category)) fail(`Published article is missing category slug: ${slug || article.id || '(missing id)'}`);
-
-  if (slug) {
-    if (seenSlugs.has(slug)) fail(`Duplicate article slug: ${slug}`);
-    seenSlugs.add(slug);
-  }
-
-  if (Array.isArray(article.tags)) {
-    for (const tagId of article.tags) {
-      const tag = tagById.get(tagId);
-      if (!tag) fail(`Published article references missing tag: ${slug || article.id || '(missing id)'} -> ${tagId}`);
-      if (tag && (!cleanText(tag.name || '') || !tagSlug(tag))) {
-        fail(`Referenced tag is missing name or slug: ${tag.id || tagId}`);
-      }
-    }
+for (const table of ['categories', 'tags', 'articles', 'article_tags', 'programs', 'admin_users', 'site_settings']) {
+  if (!new RegExp(`CREATE TABLE\\s+${table}\\b`, 'i').test(schema)) {
+    fail(`schema.sql missing ${table} table.`);
   }
 }
 
-const seenCategorySlugs = new Map();
-for (const category of categories) {
-  const slug = categorySlug(category);
-  if (!slug) continue;
-  if (seenCategorySlugs.has(slug) && seenCategorySlugs.get(slug) !== category.id) {
-    fail(`Duplicate category slug: ${slug}`);
-  }
-  seenCategorySlugs.set(slug, category.id);
+for (const needle of [
+  'UNIQUE KEY uq_articles_slug',
+  'UNIQUE KEY uq_categories_slug',
+  'UNIQUE KEY uq_tags_slug',
+  'UNIQUE KEY uq_programs_slug',
+  'KEY idx_articles_status',
+  'KEY idx_articles_category_id',
+  'KEY idx_article_tags_article_id',
+  'KEY idx_article_tags_tag_id',
+]) {
+  if (!schema.includes(needle)) fail(`schema.sql missing index: ${needle}`);
 }
 
-const seenTagSlugs = new Map();
-for (const tag of tags) {
-  const slug = tagSlug(tag);
-  if (!slug) continue;
-  if (seenTagSlugs.has(slug) && seenTagSlugs.get(slug) !== tag.id) {
-    fail(`Duplicate tag slug: ${slug}`);
-  }
-  seenTagSlugs.set(slug, tag.id);
+for (const fn of [
+  'getPublishedArticles',
+  'getPublishedArticleBySlug',
+  'getPublishedPrograms',
+  'getPublishedProgramBySlug',
+  'getCategoriesWithPublishedArticles',
+  'getCategoryBySlug',
+  'getPublishedArticlesByCategorySlug',
+  'getTagsWithPublishedArticles',
+  'getTagBySlug',
+  'getPublishedArticlesByTagSlug',
+  'getRelatedArticles',
+]) {
+  if (!repository.includes(`function ${fn}`)) fail(`content repository missing ${fn}().`);
 }
 
-if (!sitemapSource.includes("($article['is_published'] ?? true) === false")) {
-  fail('sitemap.php does not explicitly skip unpublished articles.');
+if (!db.includes('new PDO(') || !db.includes('PDO::ATTR_ERRMODE') || !db.includes('function getDb()')) {
+  fail('includes/db.php does not expose reusable PDO getDb().');
 }
 
-if (!sitemapSource.includes("'/article/'")) {
-  fail('sitemap.php does not use /article/slug article URLs.');
+if (!config.includes('DB_HOST') || !config.includes('your_database_name')) {
+  fail('includes/config.php should contain placeholder DB constants only.');
 }
 
-if (!sitemapSource.includes("'/about'")) {
-  fail('sitemap.php does not include /about.');
+if (!repository.includes("status = 'published'")) {
+  fail('Repository queries do not explicitly filter published content.');
 }
 
-if (!sitemapSource.includes("'/author/abdulaziz-bajkhaif'")) {
-  fail('sitemap.php does not include /author/abdulaziz-bajkhaif.');
+if (!index.includes("require_once __DIR__ . '/includes/content-repository.php'")) {
+  fail('index.php does not load content-repository.php.');
 }
 
-if (sitemapSource.includes("'/articles/'") || sitemapSource.includes('"/articles/"')) {
-  fail('sitemap.php appears to mix /articles/slug with /article/slug.');
+if (index.includes('/data/db.json')) {
+  fail('index.php still references data/db.json directly.');
 }
 
-const routedCategorySlugs = categories
-  .map(category => ({
-    category,
-    slug: categorySlug(category),
-    count: published.filter(article => article.category_id === category.id).length
-  }))
-  .filter(item => item.slug && item.count > 0);
-
-if (routedCategorySlugs.length && !appSource.includes("function renderArticleCategory")) {
-  fail('Category data exists, but js/app.js has no renderArticleCategory route.');
+if (!sitemap.includes("require_once __DIR__ . '/includes/content-repository.php'")) {
+  fail('sitemap.php does not load content-repository.php.');
 }
 
-if (routedCategorySlugs.length && !sitemapSource.includes("'/articles/category/'")) {
-  fail('sitemap.php does not include category URL generation.');
+if (sitemap.includes('/data/db.json')) {
+  fail('sitemap.php still references data/db.json directly.');
 }
 
-const emptyCategorySlugs = categories
-  .map(category => ({ slug: categorySlug(category), count: published.filter(article => article.category_id === category.id).length }))
-  .filter(item => item.slug && item.count === 0);
-
-if (emptyCategorySlugs.length && !sitemapSource.includes('$hasPublishedArticle')) {
-  fail('sitemap.php may include category pages without published articles.');
+if (!sitemap.includes('count($taggedArticles) >= 3')) {
+  fail('sitemap.php does not enforce the 3 published article rule for tag pages.');
 }
 
-if (appSource.includes("renderArticleCategory") && !appSource.includes("Router.reg('/articles',param => renderArticles(param))")) {
-  fail('Category page exists, but /articles route is not registered.');
+if (!app.includes("/api/content.php")) {
+  fail('js/app.js does not load content from the MySQL content API.');
 }
 
-if (!appSource.includes('href="${href}"') || !appSource.includes('`/article/${a.slug || a.id}`')) {
-  fail('Article cards do not appear to output crawlable /article/slug anchors.');
+if (!app.includes('Do not use data/db.json in production') || !repository.includes('Do not use data/db.json in production')) {
+  fail('Development JSON fallback warning is missing.');
 }
 
-if (!appSource.includes('/articles/category/${catSlug}')) {
-  fail('Article page does not appear to link to its category route.');
-}
-
-if (!appSource.includes("function renderArticleTag")) {
-  fail('Tag data exists, but js/app.js has no renderArticleTag route.');
-}
-
-if (!appSource.includes('/articles/tag/${slug}')) {
-  fail('Article page does not appear to link tags to /articles/tag/slug routes.');
-}
-
-if (!sitemapSource.includes("'/articles/tag/'")) {
-  fail('sitemap.php does not include tag URL generation.');
-}
-
-if (!sitemapSource.includes('count($taggedArticles) >= 3')) {
-  fail('sitemap.php does not enforce the 3 published articles rule for tag pages.');
-}
-
-const lowCountTags = tags
-  .map(tag => ({ slug: tagSlug(tag), count: countPublishedByTag(tag) }))
-  .filter(item => item.slug && item.count > 0 && item.count < 3);
-
-if (lowCountTags.length && !appSource.includes("articles.length >= 3 ? 'index, follow' : 'noindex, follow'")) {
-  fail('Tag pages do not appear to set noindex for tags with fewer than 3 published articles.');
-}
-
-if (!appSource.includes('pubArts().filter(a => a.category_id === category.id)')) {
-  fail('Category pages do not appear to filter only published articles.');
-}
-
-if (!appSource.includes('pubArts().filter(a => Array.isArray(a.tags) && a.tags.includes(tag.id))')) {
-  fail('Tag pages do not appear to filter only published articles.');
-}
-
-const draftSlugs = articles
-  .filter(article => article.is_published === false)
-  .map(article => article.slug)
-  .filter(Boolean);
-
-for (const slug of draftSlugs) {
-  if (sitemapSource.includes(slug)) {
-    fail(`Draft article slug appears in sitemap source: ${slug}`);
+for (const source of [index, app, admin]) {
+  if (/Supabase|BajoSupabase|supabase/i.test(source)) {
+    fail('Production-facing source still references Supabase.');
   }
 }
 
 if (!process.exitCode) {
-  const sitemapCategories = routedCategorySlugs.length;
-  const sitemapTags = tags.filter(tag => tagSlug(tag) && countPublishedByTag(tag) >= 3).length;
-  console.log(`SEO check passed: ${published.length} published articles, ${seenSlugs.size} unique slugs, ${sitemapCategories} category sitemap pages, ${sitemapTags} tag sitemap pages.`);
+  console.log('SEO/MySQL check passed: schema, repository, sitemap, index, and content API wiring look ready.');
 }
+

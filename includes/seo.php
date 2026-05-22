@@ -138,13 +138,13 @@ function renderArticleSchema($article, $pageSeo): void
         return;
     }
 
-    $datePublished = schemaDate($article['date'] ?? null);
-    $dateModified = schemaDate($article['updated_at'] ?? $article['updated'] ?? $article['date'] ?? null);
+    $datePublished = schemaDate($article['published_at'] ?? $article['date'] ?? $article['created_at'] ?? null);
+    $dateModified = schemaDate($article['updated_at'] ?? $article['updated'] ?? $article['published_at'] ?? $article['date'] ?? null);
 
     renderJsonLd([
         '@context' => 'https://schema.org',
         '@type' => 'BlogPosting',
-        'headline' => cleanSchemaText($article['title_ar'] ?? $article['title_en'] ?? $pageSeo['title'] ?? 'BajoZone'),
+        'headline' => cleanSchemaText($article['title'] ?? $article['title_ar'] ?? $article['title_en'] ?? $pageSeo['title'] ?? 'BajoZone'),
         'description' => buildSeoDescription($pageSeo['description'] ?? ''),
         'image' => schemaAbsoluteUrl($pageSeo['image'] ?? ''),
         'author' => [

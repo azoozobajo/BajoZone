@@ -1,5 +1,8 @@
 <?php
+declare(strict_types=1);
+
 require_once __DIR__ . '/includes/seo.php';
+require_once __DIR__ . '/includes/content-repository.php';
 
 function currentBaseUrl(): string
 {
@@ -25,30 +28,13 @@ function seoDescription(string $description, int $limit = 160): string
     return buildSeoDescription($description, 150, $limit);
 }
 
-function categorySlug(array $category): string
-{
-    $source = $category['slug'] ?? $category['name_en'] ?? $category['id'] ?? '';
-    $slug = strtolower((string) $source);
-    $slug = preg_replace('/[^a-z0-9]+/', '-', $slug);
-    return trim((string) $slug, '-');
-}
-
-function tagSlug(array $tag): string
-{
-    $source = $tag['slug'] ?? $tag['name'] ?? $tag['id'] ?? '';
-    $slug = strtolower((string) $source);
-    $slug = preg_replace('/[^a-z0-9]+/', '-', $slug);
-    return trim((string) $slug, '-');
-}
-
 $baseUrl = currentBaseUrl();
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $path = '/' . trim($path, '/');
 $path = $path === '/' ? '/' : rtrim($path, '/');
 
-$dbPath = __DIR__ . '/data/db.json';
-$db = is_file($dbPath) ? json_decode((string) file_get_contents($dbPath), true) : [];
-$settings = $db['settings'] ?? [];
+$content = getContentSnapshot();
+$settings = $content['settings'] ?? [];
 $siteName = $settings['site_name_en'] ?? 'BajoZone';
 $logo = absoluteAssetUrl($settings['logo'] ?? 'assets/images/logo-bajo.png', $baseUrl);
 $currentArticle = null;
@@ -68,7 +54,7 @@ foreach (($settings['social'] ?? []) as $social) {
 
 $pageSeo = [
     'title' => 'BajoZone | باجو زون',
-    'description' => 'منصة متخصصة في اكتشاف وتطوير المواهب الكروية، وتقديم محتوى معرفي في كرة القدم وعلوم الرياضة.',
+    'description' => 'منصة متخصصة في اكتشاف وتطوير المواهب الكروية، وتقديم محتوى معرفي وتحليلي في كرة القدم وعلوم الرياضة.',
     'canonical' => $baseUrl . '/',
     'image' => $logo,
     'type' => 'website',
@@ -102,20 +88,21 @@ if ($path === '/articles' || $path === '/programs') {
     ]);
 } elseif (preg_match('#^/articles/category/([^/]+)$#', $path, $matches)) {
     $categoryKey = urldecode($matches[1]);
-    foreach (($db['categories'] ?? []) as $category) {
-        if (categorySlug($category) === $categoryKey) {
+    foreach (($content['categories'] ?? []) as $category) {
+        if (($category['slug'] ?? '') === $categoryKey) {
             $categoryPage = $category;
             break;
         }
     }
 
     if ($categoryPage) {
-        $categoryArticles = array_filter(($db['articles'] ?? []), function ($article) use ($categoryPage) {
-            return ($article['is_published'] ?? true) !== false && ($article['category_id'] ?? '') === ($categoryPage['id'] ?? '');
+        $categoryArticles = array_filter(($content['articles'] ?? []), function ($article) use ($categoryPage) {
+            return ($article['status'] ?? 'published') === 'published' && ($article['category_id'] ?? '') === ($categoryPage['id'] ?? '');
         });
+
         if ($categoryArticles) {
-            $categoryName = $categoryPage['name_ar'] ?? $categoryPage['name_en'] ?? 'تصنيف المقالات';
-            $categoryDescription = $categoryPage['description'] ?? $categoryPage['description_ar'] ?? $categoryPage['description_en'] ?? ('مقالات BajoZone ضمن تصنيف ' . $categoryName . '، مع قراءات معرفية وتحليلية في كرة القدم وتطوير المواهب.');
+            $categoryName = $categoryPage['name'] ?? $categoryPage['name_ar'] ?? $categoryPage['name_en'] ?? 'تصنيف المقالات';
+            $categoryDescription = $categoryPage['description'] ?: ('مقالات BajoZone ضمن تصنيف ' . $categoryName . '، مع قراءات معرفية وتحليلية في كرة القدم وتطوير المواهب.');
             $pageSeo = array_merge($pageSeo, [
                 'title' => $categoryName . ' | مقالات BajoZone',
                 'description' => $categoryDescription,
@@ -134,19 +121,20 @@ if ($path === '/articles' || $path === '/programs') {
     }
 } elseif (preg_match('#^/articles/tag/([^/]+)$#', $path, $matches)) {
     $tagKey = urldecode($matches[1]);
-    foreach (($db['tags'] ?? []) as $tag) {
-        if (tagSlug($tag) === $tagKey) {
+    foreach (($content['tags'] ?? []) as $tag) {
+        if (($tag['slug'] ?? '') === $tagKey) {
             $tagPage = $tag;
             break;
         }
     }
 
     if ($tagPage) {
-        $tagArticles = array_filter(($db['articles'] ?? []), function ($article) use ($tagPage) {
-            return ($article['is_published'] ?? true) !== false
+        $tagArticles = array_filter(($content['articles'] ?? []), function ($article) use ($tagPage) {
+            return ($article['status'] ?? 'published') === 'published'
                 && is_array($article['tags'] ?? null)
                 && in_array($tagPage['id'] ?? '', $article['tags'], true);
         });
+
         if ($tagArticles) {
             $tagName = $tagPage['name'] ?? 'وسم المقالات';
             $robots = count($tagArticles) >= 3 ? 'index, follow' : 'noindex, follow';
@@ -169,20 +157,18 @@ if ($path === '/articles' || $path === '/programs') {
     }
 } elseif (preg_match('#^/article/([^/]+)$#', $path, $matches)) {
     $articleKey = urldecode($matches[1]);
-    $article = null;
-    foreach (($db['articles'] ?? []) as $item) {
-        if (($item['id'] ?? '') === $articleKey || ($item['slug'] ?? '') === $articleKey) {
-            $article = $item;
+    foreach (($content['articles'] ?? []) as $item) {
+        if (($item['slug'] ?? '') === $articleKey && ($item['status'] ?? 'published') === 'published') {
+            $currentArticle = $item;
             break;
         }
     }
 
-    if ($article && ($article['is_published'] ?? true) !== false) {
-        $currentArticle = $article;
-        $title = $article['title_ar'] ?? $article['title_en'] ?? 'مقال BajoZone';
-        $description = $article['excerpt_ar'] ?? $article['excerpt_en'] ?? $article['content_ar'] ?? $article['content_en'] ?? $pageSeo['description'];
-        $canonicalKey = $article['slug'] ?? $article['id'] ?? $articleKey;
-        $articleImage = $article['featured_image'] ?? $article['image'] ?? '';
+    if ($currentArticle) {
+        $title = $currentArticle['title'] ?? $currentArticle['title_ar'] ?? $currentArticle['title_en'] ?? 'مقال BajoZone';
+        $description = $currentArticle['excerpt'] ?? $currentArticle['excerpt_ar'] ?? $currentArticle['content'] ?? $currentArticle['content_ar'] ?? $pageSeo['description'];
+        $canonicalKey = $currentArticle['slug'] ?? $articleKey;
+        $articleImage = $currentArticle['featured_image'] ?? $currentArticle['image'] ?? '';
         $pageSeo = array_merge($pageSeo, [
             'title' => $title . ' | BajoZone',
             'description' => seoDescription($description),
@@ -227,8 +213,6 @@ if ($path === '/articles' || $path === '/programs') {
   <link rel="icon" type="image/png" href="/assets/images/logo-bajo.png">
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script defer src="/js/supabase-config.js"></script>
-  <script defer src="/js/supabase-adapter.js"></script>
   <script defer src="/js/app.js"></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-4XCSKY8ECD"></script>
   <script>
@@ -273,6 +257,5 @@ if ($path === '/articles' || $path === '/programs') {
 
   <main id="app"></main>
   <div id="site-footer"></div>
-
 </body>
 </html>

@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/includes/content-repository.php';
+
 header('Content-Type: application/xml; charset=utf-8');
 
 const SITE_URL = 'https://bajozone.com';
@@ -31,24 +33,7 @@ function addUrl(array &$urls, string $path, string $lastmod = '', string $change
     ];
 }
 
-function categorySlug(array $category): string
-{
-    $source = $category['slug'] ?? $category['name_en'] ?? $category['id'] ?? '';
-    $slug = strtolower((string) $source);
-    $slug = preg_replace('/[^a-z0-9]+/', '-', $slug);
-    return trim((string) $slug, '-');
-}
-
-function tagSlug(array $tag): string
-{
-    $source = $tag['slug'] ?? $tag['name'] ?? $tag['id'] ?? '';
-    $slug = strtolower((string) $source);
-    $slug = preg_replace('/[^a-z0-9]+/', '-', $slug);
-    return trim((string) $slug, '-');
-}
-
-$dbPath = __DIR__ . '/data/db.json';
-$db = is_file($dbPath) ? json_decode((string) file_get_contents($dbPath), true) : [];
+$content = getContentSnapshot();
 $urls = [];
 
 addUrl($urls, '/', '', 'weekly', '1.0');
@@ -57,43 +42,65 @@ addUrl($urls, '/programs', '', 'weekly', '0.8');
 addUrl($urls, '/about', '', 'monthly', '0.7');
 addUrl($urls, '/author/abdulaziz-bajkhaif', '', 'monthly', '0.7');
 
-$publishedArticles = array_filter(($db['articles'] ?? []), fn($article) => ($article['is_published'] ?? true) !== false);
-foreach (($db['categories'] ?? []) as $category) {
-    $slug = categorySlug($category);
+$publishedArticles = array_values(array_filter(
+    $content['articles'] ?? [],
+    fn($article) => ($article['status'] ?? 'published') === 'published'
+));
+
+foreach (($content['categories'] ?? []) as $category) {
+    $slug = (string) ($category['slug'] ?? '');
     if ($slug === '') {
         continue;
     }
 
-    $hasPublishedArticle = (bool) array_filter($publishedArticles, fn($article) => ($article['category_id'] ?? '') === ($category['id'] ?? ''));
+    $hasPublishedArticle = (bool) array_filter(
+        $publishedArticles,
+        fn($article) => ($article['category_id'] ?? '') === ($category['id'] ?? '')
+    );
+
     if ($hasPublishedArticle) {
         addUrl($urls, '/articles/category/' . rawurlencode($slug), '', 'monthly', '0.6');
     }
 }
 
-foreach (($db['tags'] ?? []) as $tag) {
-    $slug = tagSlug($tag);
+foreach (($content['tags'] ?? []) as $tag) {
+    $slug = (string) ($tag['slug'] ?? '');
     if ($slug === '') {
         continue;
     }
 
-    $taggedArticles = array_filter($publishedArticles, fn($article) => is_array($article['tags'] ?? null) && in_array($tag['id'] ?? '', $article['tags'], true));
+    $taggedArticles = array_filter(
+        $publishedArticles,
+        fn($article) => is_array($article['tags'] ?? null) && in_array($tag['id'] ?? '', $article['tags'], true)
+    );
+
     if (count($taggedArticles) >= 3) {
         addUrl($urls, '/articles/tag/' . rawurlencode($slug), '', 'monthly', '0.5');
     }
 }
 
-foreach (($db['articles'] ?? []) as $article) {
-    if (($article['is_published'] ?? true) === false) {
-        continue;
-    }
-
-    $slug = $article['slug'] ?? $article['id'] ?? '';
+foreach ($publishedArticles as $article) {
+    $slug = $article['slug'] ?? '';
     if ($slug === '') {
         continue;
     }
 
-    $lastmod = normalizedDate($article['updated_at'] ?? $article['updated'] ?? $article['date'] ?? null);
+    $lastmod = normalizedDate($article['updated_at'] ?? $article['published_at'] ?? $article['date'] ?? null);
     addUrl($urls, '/article/' . rawurlencode((string) $slug), $lastmod, 'monthly', '0.7');
+}
+
+foreach (($content['programs'] ?? []) as $program) {
+    if (($program['status'] ?? 'published') !== 'published') {
+        continue;
+    }
+
+    $slug = $program['slug'] ?? '';
+    if ($slug === '') {
+        continue;
+    }
+
+    $lastmod = normalizedDate($program['updated_at'] ?? $program['created_at'] ?? null);
+    addUrl($urls, '/programs/' . rawurlencode((string) $slug), $lastmod, 'monthly', '0.6');
 }
 
 echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
