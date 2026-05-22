@@ -566,6 +566,14 @@ async function dbLoad() {
   }
 }
 
+function saveUiFlag(key, value) {
+  try {
+    const f = JSON.parse(localStorage.getItem('bz_ui_flags') || '{}');
+    f[key] = value;
+    localStorage.setItem('bz_ui_flags', JSON.stringify(f));
+  } catch(_) {}
+}
+
 function dbSave(sync = true) {
   if (!DB) return;
   try {
@@ -1516,6 +1524,7 @@ function renderSGeneral() {
     DB.settings.about_ar        = gv('sg-aa');
     DB.settings.about_en        = gv('sg-ae');
     DB.settings.english_enabled = ge('sg-en-enabled').checked;
+    saveUiFlag('english_enabled', ge('sg-en-enabled').checked);
     const lv = gv('sg-logo-val'); if (lv) DB.settings.logo = lv;
     const av = gv('sg-abt-val'); if (av) DB.settings.about_image = av;
     dbSave();
@@ -2799,6 +2808,7 @@ function renderSPopup() {
   ge('btn-save-booktsr').addEventListener('click', () => {
     if (!DB.settings) DB.settings = {};
     DB.settings.book_teaser_enabled = ge('bt-enabled').checked;
+    saveUiFlag('book_teaser_enabled', ge('bt-enabled').checked);
     dbSave();
   });
   ge('pp-enabled').addEventListener('change', e => {

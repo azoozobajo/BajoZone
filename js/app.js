@@ -38,7 +38,16 @@ const CMS = {
     }
     return !!this.db;
   },
-  s(k, fb) { return this.db?.settings?.[k] ?? fb ?? ''; },
+  s(k, fb) {
+    const UI_FLAGS = ['english_enabled', 'book_teaser_enabled'];
+    if (UI_FLAGS.includes(k)) {
+      try {
+        const f = JSON.parse(localStorage.getItem('bz_ui_flags') || '{}');
+        if (k in f) return f[k];
+      } catch(_) {}
+    }
+    return this.db?.settings?.[k] ?? fb ?? '';
+  },
   list(k)  { return this.db?.[k] ?? []; }
 };
 
