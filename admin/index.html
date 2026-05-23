@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BajoZone â€” Ù„ÙˆØ­Ø© Ø§Ù„ØªØ­ÙƒÙ…</title>
+  <title>BajoZone — لوحة التحكم</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Tajawal:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/main.css">
@@ -41,25 +41,25 @@
 </head>
 <body class="admin-body">
 
-<!-- â•â•â•â•â•â•â• LOGIN â•â•â•â•â•â•â• -->
+<!-- ═══════ LOGIN ═══════ -->
 <div id="login-screen" class="login-wrap">
   <div class="login-box">
     <div class="login-logo">
       <img src="../assets/images/logo-bajo.png" alt="BajoZone" onerror="this.style.display='none'">
-      <h2>BAJOZONE â€” ADMIN</h2>
+      <h2>BAJOZONE — ADMIN</h2>
     </div>
-    <div class="fg"><label class="fl">Ø§Ø³Ù… Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…</label>
+    <div class="fg"><label class="fl">اسم المستخدم</label>
       <input type="text" id="li-u" class="fi" placeholder="username" autocomplete="username">
     </div>
-    <div class="fg"><label class="fl">ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±</label>
-      <input type="password" id="li-p" class="fi" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" autocomplete="current-password">
+    <div class="fg"><label class="fl">كلمة المرور</label>
+      <input type="password" id="li-p" class="fi" placeholder="••••••••" autocomplete="current-password">
     </div>
-    <button class="btn btn-fill" id="li-btn" style="width:100%;padding:13px;font-size:.95rem;">Ø¯Ø®ÙˆÙ„ Ø¥Ù„Ù‰ Ù„ÙˆØ­Ø© Ø§Ù„ØªØ­ÙƒÙ…</button>
-    <div id="li-err" style="display:none;color:#ff6b6b;font-size:.84rem;text-align:center;margin-top:12px;">Ø§Ø³Ù… Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… Ø£Ùˆ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± ØºÙŠØ± ØµØ­ÙŠØ­Ø©</div>
+    <button class="btn btn-fill" id="li-btn" style="width:100%;padding:13px;font-size:.95rem;">دخول إلى لوحة التحكم</button>
+    <div id="li-err" style="display:none;color:#ff6b6b;font-size:.84rem;text-align:center;margin-top:12px;">اسم المستخدم أو كلمة المرور غير صحيحة</div>
   </div>
 </div>
 
-<!-- â•â•â•â•â•â•â• DASHBOARD â•â•â•â•â•â•â• -->
+<!-- ═══════ DASHBOARD ═══════ -->
 <div id="dashboard" style="display:none;">
   <div class="a-layout">
 
@@ -67,45 +67,45 @@
     <aside class="a-sidebar">
       <div class="a-sidebar-logo">
         <img src="../assets/images/logo-bajo.png" alt="" onerror="this.style.display='none'">
-        <span>ADMIN â€” BAJOZONE</span>
+        <span>ADMIN — BAJOZONE</span>
       </div>
       <div class="a-nav-group">
-        <div class="a-nav-group-lbl">Ù„ÙˆØ­Ø© Ø§Ù„ØªØ­ÙƒÙ…</div>
-        <button class="a-nav-btn" id="nav-overview">ðŸ“Š Ù†Ø¸Ø±Ø© Ø¹Ø§Ù…Ø©</button>
+        <div class="a-nav-group-lbl">لوحة التحكم</div>
+        <button class="a-nav-btn" id="nav-overview">📊 نظرة عامة</button>
       </div>
       <div class="a-nav-group">
-        <div class="a-nav-group-lbl">Ø§Ù„Ù…Ø­ØªÙˆÙ‰</div>
-        <button class="a-nav-btn" id="nav-programs">ðŸ“º Ø§Ù„Ø¨Ø±Ø§Ù…Ø¬</button>
-        <button class="a-nav-btn" id="nav-articles">âœ Ø§Ù„Ù…ÙˆØ§Ø¶ÙŠØ¹</button>
-        <button class="a-nav-btn" id="nav-tags">ðŸ· Ø§Ù„ØªØ§Ù‚Ø§Øª</button>
-        <button class="a-nav-btn" id="nav-resources">ðŸ—‚ Ø§Ù„Ù…ÙƒØªØ¨Ø© Ø§Ù„Ø±Ù‚Ù…ÙŠØ©</button>
+        <div class="a-nav-group-lbl">المحتوى</div>
+        <button class="a-nav-btn" id="nav-programs">📺 البرامج</button>
+        <button class="a-nav-btn" id="nav-articles">✍ المواضيع</button>
+        <button class="a-nav-btn" id="nav-tags">🏷 التاقات</button>
+        <button class="a-nav-btn" id="nav-resources">🗂 المكتبة الرقمية</button>
       </div>
       <div class="a-nav-group">
-        <div class="a-nav-group-lbl">Ø§Ù„ØµÙØ­Ø§Øª</div>
-        <button class="a-nav-btn" id="nav-sabout">ðŸ“ Ø¥Ø¹Ø±Ù Ø¹Ù†ÙŠ</button>
+        <div class="a-nav-group-lbl">الصفحات</div>
+        <button class="a-nav-btn" id="nav-sabout">📝 إعرف عني</button>
       </div>
       <div class="a-nav-group">
-        <div class="a-nav-group-lbl">Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª</div>
-        <button class="a-nav-btn" id="nav-sgeneral">âš™ï¸ Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø¹Ø§Ù…Ø©</button>
-        <button class="a-nav-btn" id="nav-sticker">ðŸ“° Ø§Ù„Ø´Ø±ÙŠØ· Ø§Ù„Ù…ØªØ­Ø±Ùƒ</button>
-        <button class="a-nav-btn" id="nav-spopup">ðŸ”” Ø§Ù„Ø¨ÙˆØ¨ Ø£Ø¨</button>
-        <button class="a-nav-btn" id="nav-ssocial">ðŸ”— ÙˆØ³Ø§Ø¦Ù„ Ø§Ù„ØªÙˆØ§ØµÙ„</button>
-        <button class="a-nav-btn" id="nav-ssec">ðŸ”’ Ø§Ù„Ø£Ù…Ø§Ù†</button>
+        <div class="a-nav-group-lbl">الإعدادات</div>
+        <button class="a-nav-btn" id="nav-sgeneral">⚙️ إعدادات عامة</button>
+        <button class="a-nav-btn" id="nav-sticker">📰 الشريط المتحرك</button>
+        <button class="a-nav-btn" id="nav-spopup">🔔 البوب أب</button>
+        <button class="a-nav-btn" id="nav-ssocial">🔗 وسائل التواصل</button>
+        <button class="a-nav-btn" id="nav-ssec">🔒 الأمان</button>
       </div>
       <div class="a-sidebar-spacer"></div>
       <div class="a-sidebar-bottom">
-        <button class="a-nav-btn" id="nav-site">ðŸŒ Ø¹Ø±Ø¶ Ø§Ù„Ù…ÙˆÙ‚Ø¹</button>
-        <button class="a-nav-btn" id="nav-logout">â†© ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø®Ø±ÙˆØ¬</button>
+        <button class="a-nav-btn" id="nav-site">🌐 عرض الموقع</button>
+        <button class="a-nav-btn" id="nav-logout">↩ تسجيل الخروج</button>
       </div>
     </aside>
 
     <!-- MAIN CONTENT -->
     <main class="a-main">
       <div class="a-topbar">
-        <h1 class="a-page-title" id="pg-title">Ù†Ø¸Ø±Ø© Ø¹Ø§Ù…Ø©</h1>
+        <h1 class="a-page-title" id="pg-title">نظرة عامة</h1>
         <div class="a-actions">
-          <button class="btn btn-ghost" id="btn-site" style="padding:8px 18px;font-size:.8rem;">ðŸŒ Ø§Ù„Ù…ÙˆÙ‚Ø¹</button>
-          <button class="btn btn-fill" id="btn-add" style="display:none;padding:9px 22px;font-size:.84rem;">+ Ø¥Ø¶Ø§ÙØ©</button>
+          <button class="btn btn-ghost" id="btn-site" style="padding:8px 18px;font-size:.8rem;">🌐 الموقع</button>
+          <button class="btn btn-fill" id="btn-add" style="display:none;padding:9px 22px;font-size:.84rem;">+ إضافة</button>
         </div>
       </div>
       <div id="main-content"></div>
@@ -113,29 +113,29 @@
   </div>
 </div>
 
-<!-- â•â•â•â•â•â•â• ARTICLE MODAL â•â•â•â•â•â•â• -->
+<!-- ═══════ ARTICLE MODAL ═══════ -->
 <div class="overlay" id="modal-article">
   <div class="modal">
     <div class="modal-hd">
-      <span class="modal-hd-title" id="modal-article-title">Ù…ÙˆØ¶ÙˆØ¹ Ø¬Ø¯ÙŠØ¯</span>
-      <button class="modal-x" id="modal-article-close">Ã—</button>
+      <span class="modal-hd-title" id="modal-article-title">موضوع جديد</span>
+      <button class="modal-x" id="modal-article-close">×</button>
     </div>
     <div class="modal-bd">
       <input type="hidden" id="f-art-id">
       <div class="tabs" id="art-tabs">
-        <button class="tab-btn on" data-tab="art-ar">Ø¹Ø±Ø¨ÙŠ ðŸ‡¸ðŸ‡¦</button>
-        <button class="tab-btn" data-tab="art-en">English ðŸ‡¬ðŸ‡§</button>
-        <button class="tab-btn" data-tab="art-meta">Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª</button>
+        <button class="tab-btn on" data-tab="art-ar">عربي 🇸🇦</button>
+        <button class="tab-btn" data-tab="art-en">English 🇬🇧</button>
+        <button class="tab-btn" data-tab="art-meta">إعدادات</button>
       </div>
 
       <div class="tc on" id="art-ar">
-        <div class="fg"><label class="fl">Ø§Ù„Ø¹Ù†ÙˆØ§Ù† (Ø¹Ø±Ø¨ÙŠ)</label>
-          <input id="f-art-title-ar" class="fi" dir="rtl" placeholder="Ø¹Ù†ÙˆØ§Ù† Ø§Ù„Ù…Ù‚Ø§Ù„ Ø¨Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©">
+        <div class="fg"><label class="fl">العنوان (عربي)</label>
+          <input id="f-art-title-ar" class="fi" dir="rtl" placeholder="عنوان المقال بالعربية">
         </div>
-        <div class="fg"><label class="fl">Ø§Ù„Ù…Ù‚ØªØ·Ù (Ø¹Ø±Ø¨ÙŠ)</label>
-          <textarea id="f-art-exc-ar" class="fi" rows="3" dir="rtl" placeholder="Ù…Ù„Ø®Øµ Ù‚ØµÙŠØ±..."></textarea>
+        <div class="fg"><label class="fl">المقتطف (عربي)</label>
+          <textarea id="f-art-exc-ar" class="fi" rows="3" dir="rtl" placeholder="ملخص قصير..."></textarea>
         </div>
-        <div class="fg"><label class="fl">Ø§Ù„Ù…Ø­ØªÙˆÙ‰ (Ø¹Ø±Ø¨ÙŠ)</label>
+        <div class="fg"><label class="fl">المحتوى (عربي)</label>
           <div class="rte-bar" id="rte-ar-bar">
             <button class="rte-btn" data-cmd="bold" data-ed="rte-ar"><b>B</b></button>
             <button class="rte-btn" data-cmd="italic" data-ed="rte-ar"><i>I</i></button>
@@ -143,24 +143,24 @@
             <span class="rte-sep"></span>
             <button class="rte-btn" data-cmd="formatBlock" data-val="h2" data-ed="rte-ar">H2</button>
             <button class="rte-btn" data-cmd="formatBlock" data-val="h3" data-ed="rte-ar">H3</button>
-            <button class="rte-btn" data-cmd="formatBlock" data-val="p" data-ed="rte-ar">Â¶</button>
+            <button class="rte-btn" data-cmd="formatBlock" data-val="p" data-ed="rte-ar">¶</button>
             <span class="rte-sep"></span>
-            <button class="rte-btn" data-cmd="justifyRight" data-ed="rte-ar">â‡’</button>
-            <button class="rte-btn" data-cmd="justifyCenter" data-ed="rte-ar">â‰¡</button>
-            <button class="rte-btn" data-cmd="justifyLeft" data-ed="rte-ar">â‡</button>
+            <button class="rte-btn" data-cmd="justifyRight" data-ed="rte-ar">⇒</button>
+            <button class="rte-btn" data-cmd="justifyCenter" data-ed="rte-ar">≡</button>
+            <button class="rte-btn" data-cmd="justifyLeft" data-ed="rte-ar">⇐</button>
             <span class="rte-sep"></span>
-            <button class="rte-btn" data-cmd="insertUnorderedList" data-ed="rte-ar">â€¢ Ù‚Ø§Ø¦Ù…Ø©</button>
-            <button class="rte-btn" data-cmd="insertOrderedList" data-ed="rte-ar">1. Ù…Ø±Ù‚Ù…</button>
+            <button class="rte-btn" data-cmd="insertUnorderedList" data-ed="rte-ar">• قائمة</button>
+            <button class="rte-btn" data-cmd="insertOrderedList" data-ed="rte-ar">1. مرقم</button>
             <span class="rte-sep"></span>
-            <button class="rte-btn" data-action="link" data-ed="rte-ar">ðŸ”— Ø±Ø§Ø¨Ø·</button>
-            <button class="rte-btn" data-action="image" data-ed="rte-ar">ðŸ–¼ ØµÙˆØ±Ø©</button>
-            <button class="rte-btn" data-action="video" data-ed="rte-ar">â–¶ ÙÙŠØ¯ÙŠÙˆ</button>
+            <button class="rte-btn" data-action="link" data-ed="rte-ar">🔗 رابط</button>
+            <button class="rte-btn" data-action="image" data-ed="rte-ar">🖼 صورة</button>
+            <button class="rte-btn" data-action="video" data-ed="rte-ar">▶ فيديو</button>
             <button class="rte-btn rte-callout-btn" data-action="callout" data-ed="rte-ar">Callout</button>
             <span class="rte-sep"></span>
             <select class="fi" data-ed="rte-ar" data-action="fontSize" style="padding:3px 8px;height:auto;font-size:.75rem;width:auto;">
-              <option value="">Ø­Ø¬Ù… Ø§Ù„Ø®Ø·</option>
-              <option value="1">ØµØºÙŠØ± Ø¬Ø¯Ø§Ù‹</option><option value="3">Ø¹Ø§Ø¯ÙŠ</option>
-              <option value="5">ÙƒØ¨ÙŠØ±</option><option value="7">ÙƒØ¨ÙŠØ± Ø¬Ø¯Ø§Ù‹</option>
+              <option value="">حجم الخط</option>
+              <option value="1">صغير جداً</option><option value="3">عادي</option>
+              <option value="5">كبير</option><option value="7">كبير جداً</option>
             </select>
           </div>
           <div class="rte-body" id="rte-ar" contenteditable="true" dir="rtl" spellcheck="false"></div>
@@ -182,18 +182,18 @@
             <span class="rte-sep"></span>
             <button class="rte-btn" data-cmd="formatBlock" data-val="h2" data-ed="rte-en">H2</button>
             <button class="rte-btn" data-cmd="formatBlock" data-val="h3" data-ed="rte-en">H3</button>
-            <button class="rte-btn" data-cmd="formatBlock" data-val="p" data-ed="rte-en">Â¶</button>
+            <button class="rte-btn" data-cmd="formatBlock" data-val="p" data-ed="rte-en">¶</button>
             <span class="rte-sep"></span>
-            <button class="rte-btn" data-cmd="justifyLeft" data-ed="rte-en">â‡</button>
-            <button class="rte-btn" data-cmd="justifyCenter" data-ed="rte-en">â‰¡</button>
-            <button class="rte-btn" data-cmd="justifyRight" data-ed="rte-en">â‡’</button>
+            <button class="rte-btn" data-cmd="justifyLeft" data-ed="rte-en">⇐</button>
+            <button class="rte-btn" data-cmd="justifyCenter" data-ed="rte-en">≡</button>
+            <button class="rte-btn" data-cmd="justifyRight" data-ed="rte-en">⇒</button>
             <span class="rte-sep"></span>
-            <button class="rte-btn" data-cmd="insertUnorderedList" data-ed="rte-en">â€¢ List</button>
+            <button class="rte-btn" data-cmd="insertUnorderedList" data-ed="rte-en">• List</button>
             <button class="rte-btn" data-cmd="insertOrderedList" data-ed="rte-en">1. List</button>
             <span class="rte-sep"></span>
-            <button class="rte-btn" data-action="link" data-ed="rte-en">ðŸ”— Link</button>
-            <button class="rte-btn" data-action="image" data-ed="rte-en">ðŸ–¼ Image</button>
-            <button class="rte-btn" data-action="video" data-ed="rte-en">â–¶ Video</button>
+            <button class="rte-btn" data-action="link" data-ed="rte-en">🔗 Link</button>
+            <button class="rte-btn" data-action="image" data-ed="rte-en">🖼 Image</button>
+            <button class="rte-btn" data-action="video" data-ed="rte-en">▶ Video</button>
             <button class="rte-btn rte-callout-btn" data-action="callout" data-ed="rte-en">Callout</button>
           </div>
           <div class="rte-body" id="rte-en" contenteditable="true" dir="ltr" spellcheck="false"></div>
@@ -202,88 +202,88 @@
 
       <div class="tc" id="art-meta">
         <div class="fr">
-          <div class="fg"><label class="fl">ØªØ§Ø±ÙŠØ® Ø§Ù„Ù†Ø´Ø±</label>
+          <div class="fg"><label class="fl">تاريخ النشر</label>
             <input type="date" id="f-art-date" class="fi">
           </div>
-          <div class="fg"><label class="fl">ÙˆÙ‚Øª Ø§Ù„Ù‚Ø±Ø§Ø¡Ø© (Ø¯Ù‚Ø§Ø¦Ù‚)</label>
+          <div class="fg"><label class="fl">وقت القراءة (دقائق)</label>
             <input type="number" id="f-art-readtime" class="fi" min="1" placeholder="5">
           </div>
         </div>
         <div class="fr">
-          <div class="fg"><label class="fl">Ø§Ù„Ø­Ø§Ù„Ø©</label>
+          <div class="fg"><label class="fl">الحالة</label>
             <select id="f-art-published" class="fi">
-              <option value="true">Ù…Ù†Ø´ÙˆØ± â€” ÙŠØ¸Ù‡Ø± Ù„Ù„Ø²ÙˆØ§Ø±</option>
-              <option value="false">Ù…Ø³ÙˆØ¯Ø© â€” Ù…Ø®ÙÙŠ</option>
+              <option value="true">منشور — يظهر للزوار</option>
+              <option value="false">مسودة — مخفي</option>
             </select>
           </div>
-          <div class="fg"><label class="fl">Ù†ÙˆØ¹ Ø§Ù„Ø¹Ø±Ø¶</label>
+          <div class="fg"><label class="fl">نوع العرض</label>
             <select id="f-art-featured" class="fi">
-              <option value="true">Ù…Ù…ÙŠØ² â€” ÙŠØ¸Ù‡Ø± ÙÙŠ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©</option>
-              <option value="false">Ø¹Ø§Ø¯ÙŠ</option>
+              <option value="true">مميز — يظهر في الرئيسية</option>
+              <option value="false">عادي</option>
             </select>
           </div>
         </div>
-        <div class="fg"><label class="fl">Ø§Ù„Ø¨Ø±Ù†Ø§Ù…Ø¬</label>
+        <div class="fg"><label class="fl">البرنامج</label>
           <select id="f-art-program" class="fi">
-            <option value="">-- Ø¨Ø¯ÙˆÙ† Ø¨Ø±Ù†Ø§Ù…Ø¬ --</option>
+            <option value="">-- بدون برنامج --</option>
           </select>
         </div>
-        <div class="fg"><label class="fl">Ø§Ù„ØªØ§Ù‚Ø§Øª</label>
+        <div class="fg"><label class="fl">التاقات</label>
           <div class="tag-box" id="tag-box" onclick="ge('tag-input')?.focus()">
             <div class="tag-chips-wrap" id="f-art-tags-display"></div>
-            <input type="text" id="tag-input" class="tag-field" placeholder="Ø§ÙƒØªØ¨ ØªØ§Ù‚ ÙˆØ§Ø¶ØºØ· Enter..." autocomplete="off" dir="rtl">
+            <input type="text" id="tag-input" class="tag-field" placeholder="اكتب تاق واضغط Enter..." autocomplete="off" dir="rtl">
             <ul class="tag-suggestions" id="tag-suggestions" style="display:none;"></ul>
           </div>
           <input type="hidden" id="f-art-tags-val" value="[]">
         </div>
-        <div class="fg"><label class="fl">Ø±Ø§Ø¨Ø· ÙŠÙˆØªÙŠÙˆØ¨ (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)</label>
+        <div class="fg"><label class="fl">رابط يوتيوب (اختياري)</label>
           <input id="f-art-youtube" class="fi" dir="ltr" placeholder="https://youtube.com/watch?v=...">
         </div>
-        <div class="fg"><label class="fl">Ø±Ø§Ø¨Ø· ÙÙŠØ¯ÙŠÙˆ Ù…Ø±ÙÙˆØ¹ (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)</label>
+        <div class="fg"><label class="fl">رابط فيديو مرفوع (اختياري)</label>
           <input id="f-art-videourl" class="fi" dir="ltr" placeholder="assets/videos/...">
         </div>
-        <div class="fg"><label class="fl">ØµÙˆØ±Ø© Ø§Ù„Ù…ÙˆØ¶ÙˆØ¹</label>
+        <div class="fg"><label class="fl">صورة الموضوع</label>
           <div class="upzone" id="art-upzone">
             <input type="file" id="art-file" accept="image/*">
-            <div class="upzone-txt">ðŸ“ Ø§Ù†Ù‚Ø± Ø£Ùˆ Ø§Ø³Ø­Ø¨ Ù„Ø±ÙØ¹ ØµÙˆØ±Ø©</div>
+            <div class="upzone-txt">📁 انقر أو اسحب لرفع صورة</div>
           </div>
           <input type="hidden" id="f-art-image">
           <img id="art-img-prev" class="up-prev">
         </div>
         <div class="fg">
           <label class="fl" style="display:flex;align-items:center;justify-content:space-between;">
-            <span>Ø§Ù„Ù…ØµØ§Ø¯Ø±</span>
-            <button type="button" class="ibtn" onclick="adminAddSource()">+ Ø¥Ø¶Ø§ÙØ© Ù…ØµØ¯Ø±</button>
+            <span>المصادر</span>
+            <button type="button" class="ibtn" onclick="adminAddSource()">+ إضافة مصدر</button>
           </label>
           <div id="f-art-sources-list" style="display:flex;flex-direction:column;gap:8px;margin-top:8px;"></div>
         </div>
       </div>
     </div>
     <div class="modal-ft">
-      <button class="btn btn-ghost" id="modal-article-cancel" style="padding:9px 22px;">Ø¥Ù„ØºØ§Ø¡</button>
-      <button class="btn btn-fill" id="modal-article-save" style="padding:9px 30px;">Ø­ÙØ¸ Ø§Ù„Ù…ÙˆØ¶ÙˆØ¹ âœ“</button>
+      <button class="btn btn-ghost" id="modal-article-cancel" style="padding:9px 22px;">إلغاء</button>
+      <button class="btn btn-fill" id="modal-article-save" style="padding:9px 30px;">حفظ الموضوع ✓</button>
     </div>
   </div>
 </div>
 
-<!-- â•â•â•â•â•â•â• PROGRAM MODAL â•â•â•â•â•â•â• -->
+<!-- ═══════ PROGRAM MODAL ═══════ -->
 <div class="overlay" id="modal-program">
   <div class="modal">
     <div class="modal-hd">
-      <span class="modal-hd-title" id="modal-program-title">Ø¨Ø±Ù†Ø§Ù…Ø¬ Ø¬Ø¯ÙŠØ¯</span>
-      <button class="modal-x" id="modal-program-close">Ã—</button>
+      <span class="modal-hd-title" id="modal-program-title">برنامج جديد</span>
+      <button class="modal-x" id="modal-program-close">×</button>
     </div>
     <div class="modal-bd">
       <input type="hidden" id="f-prog-id">
       <div class="tabs" id="prog-tabs">
-        <button class="tab-btn on" data-tab="prog-ar">Ø¹Ø±Ø¨ÙŠ ðŸ‡¸ðŸ‡¦</button>
-        <button class="tab-btn" data-tab="prog-en">English ðŸ‡¬ðŸ‡§</button>
-        <button class="tab-btn" data-tab="prog-meta">Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª</button>
+        <button class="tab-btn on" data-tab="prog-ar">عربي 🇸🇦</button>
+        <button class="tab-btn" data-tab="prog-en">English 🇬🇧</button>
+        <button class="tab-btn" data-tab="prog-meta">إعدادات</button>
       </div>
       <div class="tc on" id="prog-ar">
-        <div class="fg"><label class="fl">Ø§Ø³Ù… Ø§Ù„Ø¨Ø±Ù†Ø§Ù…Ø¬ (Ø¹Ø±Ø¨ÙŠ)</label><input id="f-prog-na" class="fi" dir="rtl" placeholder="Ù…ÙØ§Ù‡ÙŠÙ… Ø±ÙŠØ§Ø¶ÙŠØ©"></div>
-        <div class="fg"><label class="fl">ÙˆØµÙ Ù‚ØµÙŠØ± (Ø¹Ø±Ø¨ÙŠ)</label><textarea id="f-prog-sda" class="fi" rows="2" dir="rtl" placeholder="Ø¬Ù…Ù„Ø© Ø£Ùˆ Ø¬Ù…Ù„ØªØ§Ù†..."></textarea></div>
-        <div class="fg"><label class="fl">Ø§Ù„ÙˆØµÙ Ø§Ù„ÙƒØ§Ù…Ù„ (Ø¹Ø±Ø¨ÙŠ)</label><textarea id="f-prog-da" class="fi" rows="4" dir="rtl"></textarea></div>
+        <div class="fg"><label class="fl">اسم البرنامج (عربي)</label><input id="f-prog-na" class="fi" dir="rtl" placeholder="مفاهيم رياضية"></div>
+        <div class="fg"><label class="fl">وصف قصير (عربي)</label><textarea id="f-prog-sda" class="fi" rows="2" dir="rtl" placeholder="جملة أو جملتان..."></textarea></div>
+        <div class="fg"><label class="fl">الوصف الكامل (عربي)</label><textarea id="f-prog-da" class="fi" rows="4" dir="rtl"></textarea></div>
       </div>
       <div class="tc" id="prog-en">
         <div class="fg"><label class="fl">Program Name (English)</label><input id="f-prog-ne" class="fi" dir="ltr" placeholder="Sports Concepts"></div>
@@ -293,87 +293,87 @@
       <div class="tc" id="prog-meta">
         <div class="fr">
           <div class="fg"><label class="fl">Slug (URL)</label><input id="f-prog-slug" class="fi" dir="ltr" placeholder="sports-concepts"></div>
-          <div class="fg"><label class="fl">Ù„ÙˆÙ† Ù…Ù…ÙŠØ² (Accent Color)</label><input id="f-prog-color" class="fi" type="color" value="#c8a86e" style="height:42px;padding:4px;"></div>
+          <div class="fg"><label class="fl">لون مميز (Accent Color)</label><input id="f-prog-color" class="fi" type="color" value="#c8a86e" style="height:42px;padding:4px;"></div>
         </div>
         <div class="fr">
-          <div class="fg"><label class="fl">ØªØ±ØªÙŠØ¨ Ø§Ù„Ø¸Ù‡ÙˆØ±</label><input id="f-prog-order" class="fi" type="number" min="1" placeholder="1"></div>
-          <div class="fg"><label class="fl">Ø§Ù„Ø­Ø§Ù„Ø©</label>
+          <div class="fg"><label class="fl">ترتيب الظهور</label><input id="f-prog-order" class="fi" type="number" min="1" placeholder="1"></div>
+          <div class="fg"><label class="fl">الحالة</label>
             <select id="f-prog-active" class="fi">
-              <option value="true">Ø¸Ø§Ù‡Ø±</option>
-              <option value="false">Ù…Ø®ÙÙŠ</option>
+              <option value="true">ظاهر</option>
+              <option value="false">مخفي</option>
             </select>
           </div>
         </div>
-        <div class="fg"><label class="fl">Ø´Ø¹Ø§Ø± Ø§Ù„Ø¨Ø±Ù†Ø§Ù…Ø¬ (Logo)</label>
+        <div class="fg"><label class="fl">شعار البرنامج (Logo)</label>
           <input id="f-prog-logo" class="fi" dir="ltr" placeholder="assets/images/prog-logo.png">
-          <div class="upzone" style="margin-top:8px;"><input type="file" id="prog-logo-file" accept="image/*"><div class="upzone-txt">ðŸ“ Ø§Ø±ÙØ¹ Ø§Ù„Ø´Ø¹Ø§Ø± Ù…Ø¨Ø§Ø´Ø±Ø©</div></div>
+          <div class="upzone" style="margin-top:8px;"><input type="file" id="prog-logo-file" accept="image/*"><div class="upzone-txt">📁 ارفع الشعار مباشرة</div></div>
           <img id="prog-logo-prev" class="up-prev">
         </div>
-        <div class="fg"><label class="fl">ØµÙˆØ±Ø© ØºÙ„Ø§Ù Ø§Ù„Ø¨Ø±Ù†Ø§Ù…Ø¬ (Cover)</label>
-          <div class="upzone"><input type="file" id="prog-cover-file" accept="image/*"><div class="upzone-txt">ðŸ“ Ø§Ø±ÙØ¹ ØµÙˆØ±Ø© Ø§Ù„ØºÙ„Ø§Ù</div></div>
+        <div class="fg"><label class="fl">صورة غلاف البرنامج (Cover)</label>
+          <div class="upzone"><input type="file" id="prog-cover-file" accept="image/*"><div class="upzone-txt">📁 ارفع صورة الغلاف</div></div>
           <input type="hidden" id="f-prog-cover">
           <img id="prog-cover-prev" class="up-prev">
         </div>
         <div class="fr" style="gap:24px;margin-top:4px;">
           <div class="fg" style="flex:none;">
-            <label class="fl">Ø¨Ø±Ù†Ø§Ù…Ø¬ Ù…Ù…ÙŠØ²</label>
+            <label class="fl">برنامج مميز</label>
             <div class="tog-wrap"><label class="tog"><input type="checkbox" id="f-prog-featured"><span class="tog-sl"></span></label></div>
           </div>
         </div>
       </div>
     </div>
     <div class="modal-ft">
-      <button class="btn btn-ghost" id="modal-program-cancel" style="padding:9px 22px;">Ø¥Ù„ØºØ§Ø¡</button>
-      <button class="btn btn-fill" id="modal-program-save" style="padding:9px 30px;">Ø­ÙØ¸ Ø§Ù„Ø¨Ø±Ù†Ø§Ù…Ø¬ âœ“</button>
+      <button class="btn btn-ghost" id="modal-program-cancel" style="padding:9px 22px;">إلغاء</button>
+      <button class="btn btn-fill" id="modal-program-save" style="padding:9px 30px;">حفظ البرنامج ✓</button>
     </div>
   </div>
 </div>
 
-<!-- â•â•â•â•â•â•â• TAG MODAL â•â•â•â•â•â•â• -->
+<!-- ═══════ TAG MODAL ═══════ -->
 <div class="overlay" id="modal-tag">
   <div class="modal sm">
     <div class="modal-hd">
-      <span class="modal-hd-title">ØªØ§Ù‚</span>
-      <button class="modal-x" id="modal-tag-close">Ã—</button>
+      <span class="modal-hd-title">تاق</span>
+      <button class="modal-x" id="modal-tag-close">×</button>
     </div>
     <div class="modal-bd">
       <input type="hidden" id="f-tag-id">
-      <div class="fg"><label class="fl">Ø§Ø³Ù… Ø§Ù„ØªØ§Ù‚</label><input id="f-tag-name" class="fi" dir="rtl" placeholder="Ø§ÙƒØªØ´Ø§Ù Ø§Ù„Ù…ÙˆØ§Ù‡Ø¨"></div>
+      <div class="fg"><label class="fl">اسم التاق</label><input id="f-tag-name" class="fi" dir="rtl" placeholder="اكتشاف المواهب"></div>
       <div class="fg"><label class="fl">Slug (URL)</label><input id="f-tag-slug" class="fi" dir="ltr" placeholder="talent-identification"></div>
     </div>
     <div class="modal-ft">
-      <button class="btn btn-ghost" id="modal-tag-cancel" style="padding:9px 22px;">Ø¥Ù„ØºØ§Ø¡</button>
-      <button class="btn btn-fill" id="modal-tag-save" style="padding:9px 30px;">Ø­ÙØ¸ âœ“</button>
+      <button class="btn btn-ghost" id="modal-tag-cancel" style="padding:9px 22px;">إلغاء</button>
+      <button class="btn btn-fill" id="modal-tag-save" style="padding:9px 30px;">حفظ ✓</button>
     </div>
   </div>
 </div>
 
-<!-- â•â•â•â•â•â•â• RESOURCE MODAL â•â•â•â•â•â•â• -->
+<!-- ═══════ RESOURCE MODAL ═══════ -->
 <div class="overlay" id="modal-resource">
   <div class="modal">
     <div class="modal-hd">
-      <span class="modal-hd-title" id="modal-resource-title">Ù…ÙˆØ±Ø¯ Ø¬Ø¯ÙŠØ¯</span>
-      <button class="modal-x" id="modal-resource-close">Ã—</button>
+      <span class="modal-hd-title" id="modal-resource-title">مورد جديد</span>
+      <button class="modal-x" id="modal-resource-close">×</button>
     </div>
     <div class="modal-bd">
       <input type="hidden" id="f-res-id">
       <div class="tabs" id="res-tabs">
-        <button class="tab-btn on" data-tab="res-ar">Ø¹Ø±Ø¨ÙŠ ðŸ‡¸ðŸ‡¦</button>
-        <button class="tab-btn" data-tab="res-en">English ðŸ‡¬ðŸ‡§</button>
-        <button class="tab-btn" data-tab="res-details">ØªÙØ§ØµÙŠÙ„</button>
-        <button class="tab-btn" data-tab="res-meta">Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª</button>
+        <button class="tab-btn on" data-tab="res-ar">عربي 🇸🇦</button>
+        <button class="tab-btn" data-tab="res-en">English 🇬🇧</button>
+        <button class="tab-btn" data-tab="res-details">تفاصيل</button>
+        <button class="tab-btn" data-tab="res-meta">إعدادات</button>
       </div>
 
       <!-- TAB: Arabic -->
       <div class="tc on" id="res-ar">
-        <div class="fg"><label class="fl">Ø§Ù„Ø¹Ù†ÙˆØ§Ù† (Ø¹Ø±Ø¨ÙŠ)</label><input id="f-res-ta" class="fi" dir="rtl" placeholder="Ø¹Ù†ÙˆØ§Ù† Ø§Ù„Ù…ÙˆØ±Ø¯ Ø¨Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©"></div>
-        <div class="fg"><label class="fl">ÙˆØµÙ Ù…Ø®ØªØµØ± (Ø¹Ø±Ø¨ÙŠ)</label><textarea id="f-res-sda" class="fi" rows="2" dir="rtl" placeholder="Ø¬Ù…Ù„Ø© Ø£Ùˆ Ø¬Ù…Ù„ØªØ§Ù†..."></textarea></div>
-        <div class="fg"><label class="fl">Ø§Ù„ÙˆØµÙ Ø§Ù„ÙƒØ§Ù…Ù„ (Ø¹Ø±Ø¨ÙŠ)</label><textarea id="f-res-da" class="fi" rows="4" dir="rtl"></textarea></div>
-        <div class="fg"><label class="fl">Ù…Ù„Ø®Øµ Ø¨Ø§Ø¬Ùˆ Ø²ÙˆÙ† (Ø³Ø·Ø± Ù„ÙƒÙ„ Ù†Ù‚Ø·Ø©)</label>
-          <textarea id="f-res-summary" class="fi" rows="4" dir="rtl" placeholder="ÙŠØ´Ø±Ø­ Ø¸Ø§Ù‡Ø±Ø©...&#10;ÙŠÙ‚Ø¯Ù… Ø­Ù„Ø§Ù‹ Ø¹Ù…Ù„ÙŠØ§Ù‹...&#10;Ù…Ø¨Ù†ÙŠ Ø¹Ù„Ù‰ Ø¨ÙŠØ§Ù†Ø§Øª..."></textarea>
+        <div class="fg"><label class="fl">العنوان (عربي)</label><input id="f-res-ta" class="fi" dir="rtl" placeholder="عنوان المورد بالعربية"></div>
+        <div class="fg"><label class="fl">وصف مختصر (عربي)</label><textarea id="f-res-sda" class="fi" rows="2" dir="rtl" placeholder="جملة أو جملتان..."></textarea></div>
+        <div class="fg"><label class="fl">الوصف الكامل (عربي)</label><textarea id="f-res-da" class="fi" rows="4" dir="rtl"></textarea></div>
+        <div class="fg"><label class="fl">ملخص باجو زون (سطر لكل نقطة)</label>
+          <textarea id="f-res-summary" class="fi" rows="4" dir="rtl" placeholder="يشرح ظاهرة...&#10;يقدم حلاً عملياً...&#10;مبني على بيانات..."></textarea>
         </div>
-        <div class="fg"><label class="fl">Ù„Ù…Ø§Ø°Ø§ ÙŠÙ‡Ù… Ù‡Ø°Ø§ Ø§Ù„Ù…ÙˆØ±Ø¯ØŸ (Ø³Ø·Ø± Ù„ÙƒÙ„ Ù†Ù‚Ø·Ø©)</label>
-          <textarea id="f-res-why" class="fi" rows="3" dir="rtl" placeholder="Ù…ØµØ¯Ø± Ù…ÙˆØ«ÙˆÙ‚ Ù…Ù†...&#10;ÙŠØ³Ø§Ø¹Ø¯ Ø¹Ù„Ù‰ ØªÙˆØ­ÙŠØ¯..."></textarea>
+        <div class="fg"><label class="fl">لماذا يهم هذا المورد؟ (سطر لكل نقطة)</label>
+          <textarea id="f-res-why" class="fi" rows="3" dir="rtl" placeholder="مصدر موثوق من...&#10;يساعد على توحيد..."></textarea>
         </div>
       </div>
 
@@ -386,23 +386,23 @@
 
       <!-- TAB: Details -->
       <div class="tc" id="res-details">
-        <div class="fg"><label class="fl">Ø§Ù„Ø¬Ù…Ù‡ÙˆØ± Ø§Ù„Ù…Ø³ØªÙ‡Ø¯Ù</label>
+        <div class="fg"><label class="fl">الجمهور المستهدف</label>
           <div style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 0;">
-            ${[['coach','Ù…Ø¯Ø±Ø¨'],['scout','ÙƒØ´Ø§Ù'],['player','Ù„Ø§Ø¹Ø¨'],['parent','ÙˆÙ„ÙŠ Ø£Ù…Ø±'],['club','Ù†Ø§Ø¯Ù'],['researcher','Ø¨Ø§Ø­Ø«'],['fan','Ù…Ù‡ØªÙ…']].map(([v,l])=>`
+            ${[['coach','مدرب'],['scout','كشاف'],['player','لاعب'],['parent','ولي أمر'],['club','نادٍ'],['researcher','باحث'],['fan','مهتم']].map(([v,l])=>`
             <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:.82rem;color:var(--warm-mid);">
               <input type="checkbox" class="res-audience" value="${v}"> ${l}
             </label>`).join('')}
           </div>
         </div>
-        <div class="fg"><label class="fl">Ø§Ù„Ù…Ø¬Ø§Ù„</label>
+        <div class="fg"><label class="fl">المجال</label>
           <div style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 0;">
-            ${[['talent_identification','Ø§ÙƒØªØ´Ø§Ù Ø§Ù„Ù…ÙˆØ§Ù‡Ø¨'],['player_development','ØªØ·ÙˆÙŠØ± Ø§Ù„Ù„Ø§Ø¹Ø¨ÙŠÙ†'],['coaching','Ø§Ù„ØªØ¯Ø±ÙŠØ¨'],['analysis','Ø§Ù„ØªØ­Ù„ÙŠÙ„'],['physical','Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯ Ø§Ù„Ø¨Ø¯Ù†ÙŠ'],['nutrition','Ø§Ù„ØªØºØ°ÙŠØ©'],['sports_psychology','Ø¹Ù„Ù… Ø§Ù„Ù†ÙØ³ Ø§Ù„Ø±ÙŠØ§Ø¶ÙŠ'],['management','Ø§Ù„Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø±ÙŠØ§Ø¶ÙŠØ©'],['parent','ÙˆÙ„ÙŠ Ø§Ù„Ø£Ù…Ø±'],['other','Ø£Ø®Ø±Ù‰']].map(([v,l])=>`
+            ${[['talent_identification','اكتشاف المواهب'],['player_development','تطوير اللاعبين'],['coaching','التدريب'],['analysis','التحليل'],['physical','الإعداد البدني'],['nutrition','التغذية'],['sports_psychology','علم النفس الرياضي'],['management','الإدارة الرياضية'],['parent','ولي الأمر'],['other','أخرى']].map(([v,l])=>`
             <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:.82rem;color:var(--warm-mid);">
               <input type="checkbox" class="res-field" value="${v}"> ${l}
             </label>`).join('')}
           </div>
         </div>
-        <div class="fg"><label class="fl">Ø§Ù„ÙƒÙ„Ù…Ø§Øª Ø§Ù„Ù…ÙØªØ§Ø­ÙŠØ© (tags) â€” Ø§ÙØµÙ„ Ø¨ÙØ§ØµÙ„Ø©</label>
+        <div class="fg"><label class="fl">الكلمات المفتاحية (tags) — افصل بفاصلة</label>
           <input id="f-res-tags" class="fi" dir="ltr" placeholder="FIFA, talent, LTAD, youth">
         </div>
       </div>
@@ -410,53 +410,53 @@
       <!-- TAB: Settings -->
       <div class="tc" id="res-meta">
         <div class="fr">
-          <div class="fg"><label class="fl">Ù†ÙˆØ¹ Ø§Ù„Ù…ÙˆØ±Ø¯</label>
+          <div class="fg"><label class="fl">نوع المورد</label>
             <select id="f-res-type" class="fi" onchange="toggleResDocSubtype()">
-              <option value="scientific_study">Ø¯Ø±Ø§Ø³Ø© Ø¹Ù„Ù…ÙŠØ©</option>
-              <option value="official_document">ÙˆØ«ÙŠÙ‚Ø© Ø±Ø³Ù…ÙŠØ©</option>
-              <option value="practical_guide">Ø¯Ù„ÙŠÙ„ Ø¹Ù…Ù„ÙŠ</option>
-              <option value="template">Ù†Ù…ÙˆØ°Ø¬</option>
+              <option value="scientific_study">دراسة علمية</option>
+              <option value="official_document">وثيقة رسمية</option>
+              <option value="practical_guide">دليل عملي</option>
+              <option value="template">نموذج</option>
             </select>
           </div>
-          <div class="fg"><label class="fl">Ø§Ù„Ù„ØºØ©</label>
+          <div class="fg"><label class="fl">اللغة</label>
             <select id="f-res-lang" class="fi">
-              <option value="ar">Ø¹Ø±Ø¨ÙŠ</option>
+              <option value="ar">عربي</option>
               <option value="en">English</option>
               <option value="de">Deutsch</option>
-              <option value="es">EspaÃ±ol</option>
-              <option value="other">Ø£Ø®Ø±Ù‰</option>
+              <option value="es">Español</option>
+              <option value="other">أخرى</option>
             </select>
           </div>
         </div>
         <div class="fg" id="res-subtype-wrap" style="display:none;">
-          <label class="fl">Ù†ÙˆØ¹ Ø§Ù„ÙˆØ«ÙŠÙ‚Ø© Ø§Ù„Ø±Ø³Ù…ÙŠØ©</label>
+          <label class="fl">نوع الوثيقة الرسمية</label>
           <select id="f-res-subtype" class="fi">
-            <option value="">-- Ø§Ø®ØªØ± --</option>
-            <option value="official_report">ØªÙ‚Ø±ÙŠØ± Ø±Ø³Ù…ÙŠ</option>
-            <option value="strategic_plan">Ø®Ø·Ø© Ø§Ø³ØªØ±Ø§ØªÙŠØ¬ÙŠØ©</option>
-            <option value="development_program">Ø¨Ø±Ù†Ø§Ù…Ø¬ ØªØ·ÙˆÙŠØ±</option>
-            <option value="regulation">Ù„Ø§Ø¦Ø­Ø©</option>
-            <option value="guideline">Ø¯Ù„ÙŠÙ„ Ø¥Ø±Ø´Ø§Ø¯ÙŠ</option>
-            <option value="presentation">Ø¹Ø±Ø¶ ØªØ¹Ø±ÙŠÙÙŠ</option>
-            <option value="official_stats">Ø¥Ø­ØµØ§Ø¦ÙŠØ© Ø±Ø³Ù…ÙŠØ©</option>
-            <option value="business_model">Ù†Ù…ÙˆØ°Ø¬ Ø¹Ù…Ù„</option>
+            <option value="">-- اختر --</option>
+            <option value="official_report">تقرير رسمي</option>
+            <option value="strategic_plan">خطة استراتيجية</option>
+            <option value="development_program">برنامج تطوير</option>
+            <option value="regulation">لائحة</option>
+            <option value="guideline">دليل إرشادي</option>
+            <option value="presentation">عرض تعريفي</option>
+            <option value="official_stats">إحصائية رسمية</option>
+            <option value="business_model">نموذج عمل</option>
           </select>
         </div>
         <div class="fr">
-          <div class="fg"><label class="fl">Ù†ÙˆØ¹ Ø§Ù„ÙˆØµÙˆÙ„</label>
+          <div class="fg"><label class="fl">نوع الوصول</label>
             <select id="f-res-access" class="fi">
-              <option value="direct_download">ØªØ­Ù…ÙŠÙ„ Ù…Ø¨Ø§Ø´Ø±</option>
-              <option value="external_link">Ø±Ø§Ø¨Ø· Ø®Ø§Ø±Ø¬ÙŠ</option>
-              <option value="source_only">Ø§Ù„Ù…ØµØ¯Ø± ÙÙ‚Ø·</option>
+              <option value="direct_download">تحميل مباشر</option>
+              <option value="external_link">رابط خارجي</option>
+              <option value="source_only">المصدر فقط</option>
             </select>
           </div>
-          <div class="fg"><label class="fl">Ø­Ù‚ÙˆÙ‚ Ø§Ù„Ø§Ø³ØªØ®Ø¯Ø§Ù…</label>
+          <div class="fg"><label class="fl">حقوق الاستخدام</label>
             <select id="f-res-rights" class="fi">
-              <option value="free">Ù…Ø¬Ø§Ù†ÙŠ</option>
+              <option value="free">مجاني</option>
               <option value="creative_commons">Creative Commons</option>
-              <option value="official_publication">Ù†Ø´Ø± Ø±Ø³Ù…ÙŠ</option>
-              <option value="permission_required">ÙŠØªØ·Ù„Ø¨ Ø¥Ø°Ù†Ø§Ù‹</option>
-              <option value="source_link_only">Ø°ÙƒØ± Ø§Ù„Ù…ØµØ¯Ø± ÙÙ‚Ø·</option>
+              <option value="official_publication">نشر رسمي</option>
+              <option value="permission_required">يتطلب إذناً</option>
+              <option value="source_link_only">ذكر المصدر فقط</option>
             </select>
           </div>
         </div>
@@ -464,65 +464,65 @@
           <div class="fg"><label class="fl">Slug (URL)</label><input id="f-res-slug" class="fi" dir="ltr" placeholder="resource-slug"></div>
         </div>
         <div class="fr">
-          <div class="fg"><label class="fl">Ø§Ù„Ù…Ø¤Ù„Ù / Ø§Ù„Ø¬Ù‡Ø©</label><input id="f-res-author" class="fi" dir="rtl" placeholder="FIFA / Ø§Ø³Ù… Ø§Ù„Ù…Ø¤Ù„Ù"></div>
-          <div class="fg"><label class="fl">Ø§Ù„Ù†Ø§Ø´Ø±</label><input id="f-res-pub" class="fi" dir="rtl"></div>
+          <div class="fg"><label class="fl">المؤلف / الجهة</label><input id="f-res-author" class="fi" dir="rtl" placeholder="FIFA / اسم المؤلف"></div>
+          <div class="fg"><label class="fl">الناشر</label><input id="f-res-pub" class="fi" dir="rtl"></div>
         </div>
         <div class="fr">
-          <div class="fg"><label class="fl">Ø³Ù†Ø© Ø§Ù„Ù†Ø´Ø±</label><input id="f-res-year" class="fi" type="number" placeholder="2024" min="1900" max="2099"></div>
-          <div class="fg"><label class="fl">Ø§Ù„ØµÙØ­Ø§Øª</label><input id="f-res-pages" class="fi" type="number" placeholder="80" min="0"></div>
-          <div class="fg"><label class="fl">Ø­Ø¬Ù… Ø§Ù„Ù…Ù„Ù</label><input id="f-res-size" class="fi" dir="ltr" placeholder="3.2 MB"></div>
+          <div class="fg"><label class="fl">سنة النشر</label><input id="f-res-year" class="fi" type="number" placeholder="2024" min="1900" max="2099"></div>
+          <div class="fg"><label class="fl">الصفحات</label><input id="f-res-pages" class="fi" type="number" placeholder="80" min="0"></div>
+          <div class="fg"><label class="fl">حجم الملف</label><input id="f-res-size" class="fi" dir="ltr" placeholder="3.2 MB"></div>
         </div>
-        <div class="fg"><label class="fl">Ø±Ø§Ø¨Ø· Ø§Ù„Ù…ØµØ¯Ø± Ø§Ù„Ø£ØµÙ„ÙŠ</label><input id="f-res-src" class="fi" dir="ltr" placeholder="https://..."></div>
-        <div class="fg"><label class="fl">Ø±Ø§Ø¨Ø· Ø§Ù„ØªØ­Ù…ÙŠÙ„</label><input id="f-res-dl" class="fi" dir="ltr" placeholder="https://... Ø£Ùˆ Ø§ØªØ±ÙƒÙ‡ ÙØ§Ø±ØºØ§Ù‹"></div>
-        <div class="fg"><label class="fl">ØµÙˆØ±Ø© Ø§Ù„ØºÙ„Ø§Ù</label>
-          <div class="upzone"><input type="file" id="res-cover-file" accept="image/*"><div class="upzone-txt">ðŸ“ Ø§Ù†Ù‚Ø± Ù„Ø±ÙØ¹ ØµÙˆØ±Ø© Ø§Ù„ØºÙ„Ø§Ù</div></div>
+        <div class="fg"><label class="fl">رابط المصدر الأصلي</label><input id="f-res-src" class="fi" dir="ltr" placeholder="https://..."></div>
+        <div class="fg"><label class="fl">رابط التحميل</label><input id="f-res-dl" class="fi" dir="ltr" placeholder="https://... أو اتركه فارغاً"></div>
+        <div class="fg"><label class="fl">صورة الغلاف</label>
+          <div class="upzone"><input type="file" id="res-cover-file" accept="image/*"><div class="upzone-txt">📁 انقر لرفع صورة الغلاف</div></div>
           <input type="hidden" id="f-res-cover">
           <img id="res-cover-prev" class="up-prev">
         </div>
         <div class="fr" style="gap:24px;margin-top:8px;">
           <div class="fg" style="flex:none;">
-            <label class="fl">Ù…ÙˆØ±Ø¯ Ù…Ù…ÙŠØ²</label>
+            <label class="fl">مورد مميز</label>
             <div class="tog-wrap"><label class="tog"><input type="checkbox" id="f-res-featured"><span class="tog-sl"></span></label></div>
           </div>
           <div class="fg" style="flex:none;">
-            <label class="fl">Ù…Ù†Ø´ÙˆØ±</label>
+            <label class="fl">منشور</label>
             <div class="tog-wrap"><label class="tog"><input type="checkbox" id="f-res-published" checked><span class="tog-sl"></span></label></div>
           </div>
         </div>
       </div>
     </div>
     <div class="modal-ft">
-      <button class="btn btn-ghost" id="modal-resource-cancel" style="padding:9px 22px;">Ø¥Ù„ØºØ§Ø¡</button>
-      <button class="btn btn-fill" id="modal-resource-save" style="padding:9px 30px;">Ø­ÙØ¸ Ø§Ù„Ù…ÙˆØ±Ø¯ âœ“</button>
+      <button class="btn btn-ghost" id="modal-resource-cancel" style="padding:9px 22px;">إلغاء</button>
+      <button class="btn btn-fill" id="modal-resource-save" style="padding:9px 30px;">حفظ المورد ✓</button>
     </div>
   </div>
 </div>
 
-<!-- â•â•â•â•â•â•â• CONFIRM DELETE MODAL â•â•â•â•â•â•â• -->
+<!-- ═══════ CONFIRM DELETE MODAL ═══════ -->
 <div class="overlay" id="modal-del">
   <div class="modal sm">
     <div class="modal-hd">
-      <span class="modal-hd-title">ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø­Ø°Ù</span>
-      <button class="modal-x" id="modal-del-close">Ã—</button>
+      <span class="modal-hd-title">تأكيد الحذف</span>
+      <button class="modal-x" id="modal-del-close">×</button>
     </div>
     <div class="modal-bd">
-      <p style="color:var(--off-white);margin-bottom:8px;">Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† Ø­Ø°Ù Ù‡Ø°Ø§ Ø§Ù„Ø¹Ù†ØµØ±ØŸ</p>
-      <p style="color:#ff6b6b;font-size:.84rem;">Ù„Ø§ ÙŠÙ…ÙƒÙ† Ø§Ù„ØªØ±Ø§Ø¬Ø¹ Ø¹Ù† Ù‡Ø°Ø§ Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡.</p>
+      <p style="color:var(--off-white);margin-bottom:8px;">هل أنت متأكد من حذف هذا العنصر؟</p>
+      <p style="color:#ff6b6b;font-size:.84rem;">لا يمكن التراجع عن هذا الإجراء.</p>
     </div>
     <div class="modal-ft">
-      <button class="btn btn-ghost" id="modal-del-cancel" style="padding:9px 22px;">Ø¥Ù„ØºØ§Ø¡</button>
-      <button class="btn btn-fill" id="modal-del-confirm" style="padding:9px 30px;background:#ff6b6b;color:#fff;">Ø­Ø°Ù Ù†Ù‡Ø§Ø¦ÙŠØ§Ù‹</button>
+      <button class="btn btn-ghost" id="modal-del-cancel" style="padding:9px 22px;">إلغاء</button>
+      <button class="btn btn-fill" id="modal-del-confirm" style="padding:9px 30px;background:#ff6b6b;color:#fff;">حذف نهائياً</button>
     </div>
   </div>
 </div>
 
 <script>
 /* ============================================================
-   BajoZone Admin Panel â€” Clean rewrite, no name conflicts
+   BajoZone Admin Panel — Clean rewrite, no name conflicts
    ============================================================ */
 'use strict';
 
-// â”€â”€ DB â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── DB ────────────────────────────────────────
 let DB = null;
 const LS_KEY = 'bz_db_v8';
 let currentSection = 'overview';
@@ -554,7 +554,7 @@ async function dbLoad() {
   } catch (_) {
     if (!DB) {
       DB = {
-        settings: { site_name_ar:'Ø¨Ø§Ø¬Ùˆ Ø²ÙˆÙ†', site_name_en:'BajoZone', social:{} },
+        settings: { site_name_ar:'باجو زون', site_name_en:'BajoZone', social:{} },
         programs: [], articles: [], books: [], categories: [], tags: [], resources: [],
         admin: { username:'bajo', password:'BajoZone2025!' }
       };
@@ -585,15 +585,15 @@ function dbSave(sync = true) {
     localStorage.setItem(LS_KEY, JSON.stringify(DB));
   } catch(e) {
     if (e.name === 'QuotaExceededError' || e.code === 22) {
-      showAdminToast('âŒ Ø§Ù„ØªØ®Ø²ÙŠÙ† Ù…Ù…ØªÙ„Ø¦! Ø­Ø§ÙˆÙ„ Ø­Ø°Ù ØµÙˆØ± Ù‚Ø¯ÙŠÙ…Ø© Ø£Ùˆ ØªÙ‚Ù„ÙŠÙ„ Ø­Ø¬Ù… Ø§Ù„ØµÙˆØ±Ø©.', true);
+      showAdminToast('❌ التخزين ممتلئ! حاول حذف صور قديمة أو تقليل حجم الصورة.', true);
     } else {
-      showAdminToast('âŒ ÙØ´Ù„ Ø§Ù„Ø­ÙØ¸: ' + e.message, true);
+      showAdminToast('❌ فشل الحفظ: ' + e.message, true);
     }
     return;
   }
   if (sync) saveMySqlNow();
   return;
-  showToast('ØªÙ… Ø§Ù„Ø­ÙØ¸ Ø¨Ù†Ø¬Ø§Ø­ âœ“', 'ok');
+  showToast('تم الحفظ بنجاح ✓', 'ok');
 }
 
 async function saveMySqlNow() {
@@ -614,7 +614,7 @@ async function saveMySqlNow() {
   }
 }
 
-// â”€â”€ Auth â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Auth ──────────────────────────────────────
 function doLogin() {
   const u = gv('li-u');
   const p = gv('li-p');
@@ -643,12 +643,12 @@ function showLoginError(message) {
   setTimeout(() => err.style.display = 'none', 6000);
 }
 
-// â”€â”€ Section Navigation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Section Navigation ────────────────────────
 const SECTION_TITLES = {
-  overview:'Ù†Ø¸Ø±Ø© Ø¹Ø§Ù…Ø©', programs:'Ø§Ù„Ø¨Ø±Ø§Ù…Ø¬', articles:'Ø§Ù„Ù…ÙˆØ§Ø¶ÙŠØ¹',
-  tags:'Ø§Ù„ØªØ§Ù‚Ø§Øª', resources:'Ø§Ù„Ù…ÙƒØªØ¨Ø© Ø§Ù„Ø±Ù‚Ù…ÙŠØ©', sabout:'Ø¥Ø¹Ø±Ù Ø¹Ù†ÙŠ',
-  sgeneral:'Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ø¹Ø§Ù…Ø©', sticker:'Ø§Ù„Ø´Ø±ÙŠØ· Ø§Ù„Ù…ØªØ­Ø±Ùƒ', spopup:'Ø§Ù„Ø¨ÙˆØ¨ Ø£Ø¨',
-  ssocial:'ÙˆØ³Ø§Ø¦Ù„ Ø§Ù„ØªÙˆØ§ØµÙ„', ssec:'Ø§Ù„Ø£Ù…Ø§Ù†'
+  overview:'نظرة عامة', programs:'البرامج', articles:'المواضيع',
+  tags:'التاقات', resources:'المكتبة الرقمية', sabout:'إعرف عني',
+  sgeneral:'الإعدادات العامة', sticker:'الشريط المتحرك', spopup:'البوب أب',
+  ssocial:'وسائل التواصل', ssec:'الأمان'
 };
 
 const SECTION_RENDERERS = {
@@ -673,7 +673,7 @@ function goSection(name) {
   SECTION_RENDERERS[name]?.();
 }
 
-// â”€â”€ Modals â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Modals ────────────────────────────────────
 function modalOpen(id) {
   const el = ge('modal-' + id);
   if (el) el.classList.add('open');
@@ -691,7 +691,7 @@ document.querySelectorAll('.overlay').forEach(el => {
   });
 });
 
-// â”€â”€ Tabs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Tabs ──────────────────────────────────────
 function initTabs(containerId) {
   const container = ge(containerId);
   if (!container) return;
@@ -724,7 +724,7 @@ function switchTab(containerId, tabId) {
   if (pane) pane.classList.add('on');
 }
 
-// â”€â”€ Rich Text Editor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Rich Text Editor ──────────────────────────
 function initRTE(barId, editorId) {
   const bar = ge(barId);
   const editor = ge(editorId);
@@ -739,13 +739,13 @@ function initRTE(barId, editorId) {
       const action = this.dataset.action;
 
       if (action === 'link') {
-        const url = prompt('Ø£Ø¯Ø®Ù„ Ø§Ù„Ø±Ø§Ø¨Ø·:', 'https://');
+        const url = prompt('أدخل الرابط:', 'https://');
         if (url) { ed.focus(); document.execCommand('createLink', false, url); }
       } else if (action === 'image') {
-        const url = prompt('Ø±Ø§Ø¨Ø· Ø§Ù„ØµÙˆØ±Ø© (URL):');
+        const url = prompt('رابط الصورة (URL):');
         if (url) { ed.focus(); document.execCommand('insertImage', false, url); }
       } else if (action === 'video') {
-        const url = prompt('Ø±Ø§Ø¨Ø· ÙŠÙˆØªÙŠÙˆØ¨:');
+        const url = prompt('رابط يوتيوب:');
         if (url) {
           const m = url.match(/(?:youtu\.be\/|v=)([^&\s]+)/);
           if (m) {
@@ -755,7 +755,7 @@ function initRTE(barId, editorId) {
         }
       } else if (action === 'callout') {
         const sample = ed.dir === 'rtl'
-          ? 'Ø§ÙƒØªØ¨ Ù‡Ù†Ø§ Ø§Ù„Ø§Ù‚ØªØ¨Ø§Ø³ Ø£Ùˆ Ø§Ù„Ø¥Ø­ØµØ§Ø¦ÙŠØ© Ø§Ù„Ù…Ù‡Ù…Ø©...'
+          ? 'اكتب هنا الاقتباس أو الإحصائية المهمة...'
           : 'Write the highlighted quote or statistic here...';
         const html = `<p>:::callout<br>${sample}<br>:::</p>`;
         ed.focus();
@@ -779,7 +779,7 @@ function initRTE(barId, editorId) {
   }
 }
 
-// â”€â”€ Image Upload â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Image Upload ──────────────────────────────
 function compressImage(file, maxW, maxH, quality, cb) {
   const reader = new FileReader();
   reader.onload = ev => {
@@ -793,10 +793,10 @@ function compressImage(file, maxW, maxH, quality, cb) {
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
       cb(null, canvas.toDataURL('image/jpeg', quality));
     };
-    img.onerror = () => cb('ÙØ´Ù„ Ù‚Ø±Ø§Ø¡Ø© Ø§Ù„ØµÙˆØ±Ø©');
+    img.onerror = () => cb('فشل قراءة الصورة');
     img.src = ev.target.result;
   };
-  reader.onerror = () => cb('ÙØ´Ù„ Ù‚Ø±Ø§Ø¡Ø© Ø§Ù„Ù…Ù„Ù');
+  reader.onerror = () => cb('فشل قراءة الملف');
   reader.readAsDataURL(file);
 }
 
@@ -884,7 +884,7 @@ function showAdminToast(msg, isError = false) {
   setTimeout(() => el.remove(), 3500);
 }
 
-// â”€â”€ Sections â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Sections ──────────────────────────────────
 function getAnalytics() {
   const raw = localStorage.getItem('bz_analytics_v1');
   try { return raw ? JSON.parse(raw) : {}; } catch (_) { return {}; }
@@ -944,7 +944,7 @@ function eventBookDownloads(analytics, events) {
 }
 function monthKey(dateValue) {
   const d = dateValue ? new Date(dateValue) : null;
-  if (!d || Number.isNaN(d.getTime())) return 'ØºÙŠØ± Ù…Ø­Ø¯Ø¯';
+  if (!d || Number.isNaN(d.getTime())) return 'غير محدد';
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 function renderOverview() {
@@ -982,12 +982,12 @@ function renderOverview() {
   const progCounts = {};
   articles.forEach(a => {
     const prog = (DB.programs||[]).find(p => p.id === a.program_id);
-    const name = prog ? (prog.name_ar || prog.name_en) : 'Ø¨Ø¯ÙˆÙ† Ø¨Ø±Ù†Ø§Ù…Ø¬';
+    const name = prog ? (prog.name_ar || prog.name_en) : 'بدون برنامج';
     progCounts[name] = (progCounts[name] || 0) + 1;
   });
   const catRows = Object.entries(progCounts).sort(([,a],[,b]) => b - a);
 
-  // â”€â”€ Donut chart SVG â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Donut chart SVG ──────────────────────────
   const DONUT_COLORS = ['#c8a86e','#5a9e7a','#6e8ec8','#c86e9e','#9ec86e','#c8905a','#8e6ec8'];
   const donutTotal = catRows.reduce((s,[,v]) => s + v, 0) || 1;
   const R = 70, CIRC = +(2 * Math.PI * R).toFixed(2);
@@ -1005,45 +1005,45 @@ function renderOverview() {
   const shareBreakdown = ['instagram','x','whatsapp','facebook','linkedin','copy','pdf']
     .map(k => `<span class="mini-pill">${k.toUpperCase()} <b>${num(channels?.[k] || 0)}</b></span>`).join('');
   const bestArticle = topRows[0]?.article;
-  const bestCategory = catRows[0]?.[0] || 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø¨Ø¹Ø¯';
-  const strongestChannel = Object.entries(channels).sort(([,a],[,b]) => b - a)[0]?.[0] || 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø¨Ø¹Ø¯';
-  const rangeLabel = range === 'all' ? 'ÙƒÙ„ Ø§Ù„ÙˆÙ‚Øª' : `Ø¢Ø®Ø± ${range} ÙŠÙˆÙ…`;
+  const bestCategory = catRows[0]?.[0] || 'لا يوجد بعد';
+  const strongestChannel = Object.entries(channels).sort(([,a],[,b]) => b - a)[0]?.[0] || 'لا يوجد بعد';
+  const rangeLabel = range === 'all' ? 'كل الوقت' : `آخر ${range} يوم`;
   ge('main-content').innerHTML = `
     <div class="dash-hero">
       <div>
-        <div class="dash-kicker">Ù„ÙˆØ­Ø© Ø§Ù„Ù‚Ø±Ø§Ø±</div>
-        <h2>Ø§ØªØ¬Ø§Ù‡Ø§Øª Ø§Ù„Ù…Ø­ØªÙˆÙ‰ ÙˆØ§Ù„ØªÙØ§Ø¹Ù„</h2>
-        <p>Ù‚Ø±Ø§Ø¡Ø© Ø³Ø±ÙŠØ¹Ø© Ù„Ù…Ø§ ÙŠÙ†Ø´Ø±ØŒ ÙˆÙ…Ø§ ÙŠÙÙ‚Ø±Ø£ØŒ ÙˆØ£ÙŠÙ† ÙŠØªÙØ§Ø¹Ù„ Ø§Ù„Ø²ÙˆØ§Ø± Ù…Ø¹ Ù…Ù‚Ø§Ù„Ø§Øª BajoZone.</p>
+        <div class="dash-kicker">لوحة القرار</div>
+        <h2>اتجاهات المحتوى والتفاعل</h2>
+        <p>قراءة سريعة لما ينشر، وما يُقرأ، وأين يتفاعل الزوار مع مقالات BajoZone.</p>
       </div>
       <div class="dash-range" role="group" aria-label="Dashboard range">
-        ${[['all','ÙƒÙ„ Ø§Ù„ÙˆÙ‚Øª'],['7','7 Ø£ÙŠØ§Ù…'],['30','30 ÙŠÙˆÙ…'],['90','90 ÙŠÙˆÙ…']].map(([value,label]) => `
+        ${[['all','كل الوقت'],['7','7 أيام'],['30','30 يوم'],['90','90 يوم']].map(([value,label]) => `
           <button class="${range === value ? 'on' : ''}" type="button" onclick="setDashRange('${value}')">${label}</button>
         `).join('')}
       </div>
     </div>
     <div class="stats-row-admin">
-      <div class="stat-box-admin"><div class="stat-box-num">${num(articles.length)}</div><div class="stat-box-lbl">Ø§Ù„Ù…Ù‚Ø§Ù„Ø§Øª</div></div>
-      <div class="stat-box-admin"><div class="stat-box-num">${num(books.length)}</div><div class="stat-box-lbl">Ø§Ù„ÙƒØªØ¨</div></div>
+      <div class="stat-box-admin"><div class="stat-box-num">${num(articles.length)}</div><div class="stat-box-lbl">المقالات</div></div>
+      <div class="stat-box-admin"><div class="stat-box-num">${num(books.length)}</div><div class="stat-box-lbl">الكتب</div></div>
       <div class="stat-box-admin"><div class="stat-box-num">${num(periodSessions)}</div><div class="stat-box-lbl">Sessions / Visits - ${rangeLabel}</div></div>
       <div class="stat-box-admin"><div class="stat-box-num">${num(periodViews)}</div><div class="stat-box-lbl">Pageviews - ${rangeLabel}</div></div>
-      <div class="stat-box-admin"><div class="stat-box-num">${num(totalShares)}</div><div class="stat-box-lbl">Ù…Ø±Ø§Øª Ø§Ù„Ù…Ø´Ø§Ø±ÙƒØ©</div></div>
+      <div class="stat-box-admin"><div class="stat-box-num">${num(totalShares)}</div><div class="stat-box-lbl">مرات المشاركة</div></div>
     </div>
     <div class="dash-insights">
-      <div><span>Ø£Ù‚ÙˆÙ‰ Ù…Ù‚Ø§Ù„</span><strong>${bestArticle ? esc(bestArticle.title_ar || bestArticle.title_en) : 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¨ÙŠØ§Ù†Ø§Øª Ø¨Ø¹Ø¯'}</strong></div>
-      <div><span>Ø£ÙƒØ«Ø± Ø¨Ø±Ù†Ø§Ù…Ø¬ Ù†Ø´Ø±Ø§Ù‹</span><strong>${esc(catRows[0]?.[0] || 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø¨Ø¹Ø¯')}</strong></div>
-      <div><span>Ø£Ù‚ÙˆÙ‰ Ù‚Ù†Ø§Ø© Ù…Ø´Ø§Ø±ÙƒØ©</span><strong>${strongestChannel.toUpperCase()}</strong></div>
+      <div><span>أقوى مقال</span><strong>${bestArticle ? esc(bestArticle.title_ar || bestArticle.title_en) : 'لا توجد بيانات بعد'}</strong></div>
+      <div><span>أكثر برنامج نشراً</span><strong>${esc(catRows[0]?.[0] || 'لا يوجد بعد')}</strong></div>
+      <div><span>أقوى قناة مشاركة</span><strong>${strongestChannel.toUpperCase()}</strong></div>
     </div>
     <div class="dash-grid">
       <div class="a-card">
-        <div class="a-card-title">Ø§Ù„Ù…Ù‚Ø§Ù„Ø§Øª Ø§Ù„Ù…Ù†Ø´ÙˆØ±Ø© Ø­Ø³Ø¨ Ø§Ù„Ø´Ù‡Ø±</div>
+        <div class="a-card-title">المقالات المنشورة حسب الشهر</div>
         <div class="bar-chart">
           ${monthBars.length ? monthBars.map(([m,v]) => `
             <div class="bar-row"><span>${m}</span><div><i style="width:${Math.max(8, (v / maxMonth) * 100)}%"></i></div><b>${num(v)}</b></div>
-          `).join('') : `<div class="dash-empty">Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¨ÙŠØ§Ù†Ø§Øª Ù†Ø´Ø± Ø­ØªÙ‰ Ø§Ù„Ø¢Ù†</div>`}
+          `).join('') : `<div class="dash-empty">لا توجد بيانات نشر حتى الآن</div>`}
         </div>
       </div>
       <div class="a-card">
-        <div class="a-card-title">ØªÙˆØ²ÙŠØ¹ Ø§Ù„Ù…ÙˆØ§Ø¶ÙŠØ¹ Ø¹Ù„Ù‰ Ø§Ù„Ø¨Ø±Ø§Ù…Ø¬</div>
+        <div class="a-card-title">توزيع المواضيع على البرامج</div>
         ${catRows.length ? `
         <div class="donut-wrap">
           <div class="donut-svg-wrap">
@@ -1051,69 +1051,69 @@ function renderOverview() {
               <circle cx="100" cy="100" r="70" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="30"/>
               ${donutSegs}
               <text x="100" y="96" class="donut-center-num">${num(donutTotal)}</text>
-              <text x="100" y="115" class="donut-center-lbl">Ù…ÙˆØ¶ÙˆØ¹</text>
+              <text x="100" y="115" class="donut-center-lbl">موضوع</text>
             </svg>
           </div>
           <div class="donut-legend">${donutLegend}</div>
-        </div>` : `<div class="dash-empty">Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…ÙˆØ§Ø¶ÙŠØ¹ Ø­ØªÙ‰ Ø§Ù„Ø¢Ù†</div>`}
+        </div>` : `<div class="dash-empty">لا توجد مواضيع حتى الآن</div>`}
       </div>
     </div>
     <div class="a-card">
-      <div class="a-card-title">ØªÙØµÙŠÙ„ Ø§Ù„Ù…Ø´Ø§Ø±ÙƒØ§Øª Ø­Ø³Ø¨ Ø§Ù„Ù…Ù†ØµØ©</div>
+      <div class="a-card-title">تفصيل المشاركات حسب المنصة</div>
       <div class="share-pills">${shareBreakdown}</div>
     </div>
     <div class="a-card">
-      <div class="a-card-title">Ø£ÙƒØ«Ø± Ø®Ù…Ø³ Ù…Ù‚Ø§Ù„Ø§Øª Ù…Ø´Ø§Ù‡Ø¯Ø©</div>
+      <div class="a-card-title">أكثر خمس مقالات مشاهدة</div>
       <div class="rank-list">
         ${topFiveViews.length ? topFiveViews.map((row, idx) => `
           <div class="rank-item">
             <span class="rank-num">${idx + 1}</span>
-            <div><strong>${esc(row.article.title_ar || row.article.title_en || 'â€”')}</strong><small>${esc(row.article.category_ar || 'ØºÙŠØ± Ù…ØµÙ†Ù')}</small></div>
+            <div><strong>${esc(row.article.title_ar || row.article.title_en || '—')}</strong><small>${esc(row.article.category_ar || 'غير مصنف')}</small></div>
             <b>${num(row.views)}</b>
           </div>
-        `).join('') : `<div class="dash-empty">Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ø´Ø§Ù‡Ø¯Ø§Øª Ù…Ù‚Ø§Ù„Ø§Øª Ø­ØªÙ‰ Ø§Ù„Ø¢Ù†</div>`}
+        `).join('') : `<div class="dash-empty">لا توجد مشاهدات مقالات حتى الآن</div>`}
       </div>
     </div>
     <div class="a-card">
-      <div class="a-card-title">Ø£ÙƒØ«Ø± ÙƒØªØ¨ ØªØ­Ù…ÙŠÙ„Ø§Ù‹</div>
+      <div class="a-card-title">أكثر كتب تحميلاً</div>
       <div class="rank-list">
         ${topBookDownloads.length ? topBookDownloads.map((row, idx) => `
           <div class="rank-item">
             <span class="rank-num">${idx + 1}</span>
-            <div><strong>${esc(row.book.title_ar || row.book.title_en || 'â€”')}</strong><small>${row.book.available ? 'Ù…ØªØ§Ø­' : 'Ù‚Ø±ÙŠØ¨Ø§Ù‹'}</small></div>
+            <div><strong>${esc(row.book.title_ar || row.book.title_en || '—')}</strong><small>${row.book.available ? 'متاح' : 'قريباً'}</small></div>
             <b>${num(row.downloads)}</b>
           </div>
-        `).join('') : `<div class="dash-empty">Ù„Ø§ ØªÙˆØ¬Ø¯ ØªØ­Ù…ÙŠÙ„Ø§Øª ÙƒØªØ¨ Ø­ØªÙ‰ Ø§Ù„Ø¢Ù†</div>`}
+        `).join('') : `<div class="dash-empty">لا توجد تحميلات كتب حتى الآن</div>`}
       </div>
     </div>
     <div class="a-card">
-      <div class="a-card-title">Ø¢Ø®Ø± Ø§Ù„Ù…Ù‚Ø§Ù„Ø§Øª Ø§Ù„Ù…Ù†Ø´ÙˆØ±Ø©
-        <button class="ibtn" style="font-size:.72rem;" onclick="goSection('articles')">Ø¹Ø±Ø¶ Ø§Ù„ÙƒÙ„</button>
+      <div class="a-card-title">آخر المقالات المنشورة
+        <button class="ibtn" style="font-size:.72rem;" onclick="goSection('articles')">عرض الكل</button>
       </div>
       <table class="a-table">
-        <thead><tr><th>Ø§Ù„Ø¹Ù†ÙˆØ§Ù†</th><th>Ø§Ù„Ù‚Ø³Ù…</th><th>ØªØ§Ø±ÙŠØ® Ø§Ù„Ù†Ø´Ø±</th><th>Ù…Ø´Ø§Ù‡Ø¯Ø§Øª</th><th>Ù…Ø´Ø§Ø±ÙƒØ§Øª</th><th></th></tr></thead>
+        <thead><tr><th>العنوان</th><th>القسم</th><th>تاريخ النشر</th><th>مشاهدات</th><th>مشاركات</th><th></th></tr></thead>
         <tbody>
           ${latestArticles.map(a=>`<tr>
-            <td><strong>${esc(a.title_ar||'â€”')}</strong></td>
-            <td>${esc(a.category_ar||'â€”')}</td>
-            <td style="font-family:var(--ff-mono);font-size:.75rem;">${a.date||'â€”'}</td>
+            <td><strong>${esc(a.title_ar||'—')}</strong></td>
+            <td>${esc(a.category_ar||'—')}</td>
+            <td style="font-family:var(--ff-mono);font-size:.75rem;">${a.date||'—'}</td>
             <td>${num(viewsMap?.[a.id] || 0)}</td>
             <td>${num(shareTotalFromMap(sharesMap, a.id))}</td>
-            <td><button class="ibtn" data-edit-art="${a.id}">âœ</button></td>
-          </tr>`).join('')||`<tr><td colspan="6" style="text-align:center;color:var(--warm-dark);padding:28px;">Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ù‚Ø§Ù„Ø§Øª Ø¨Ø¹Ø¯</td></tr>`}
+            <td><button class="ibtn" data-edit-art="${a.id}">✏</button></td>
+          </tr>`).join('')||`<tr><td colspan="6" style="text-align:center;color:var(--warm-dark);padding:28px;">لا توجد مقالات بعد</td></tr>`}
         </tbody>
       </table>
     </div>
     <div class="a-card">
-      <div class="a-card-title">Ø£ÙƒØ«Ø± Ø§Ù„Ù…Ù‚Ø§Ù„Ø§Øª Ù…Ø´Ø§Ù‡Ø¯Ø© ÙˆØªÙØ§Ø¹Ù„Ø§Ù‹</div>
+      <div class="a-card-title">أكثر المقالات مشاهدة وتفاعلاً</div>
       <table class="a-table">
-        <thead><tr><th>Ø§Ù„Ù…Ù‚Ø§Ù„</th><th>Ø§Ù„Ù…Ø´Ø§Ù‡Ø¯Ø§Øª</th><th>IG</th><th>X</th><th>WA</th><th>FB</th><th>IN</th><th>Ù†Ø³Ø®</th><th>PDF</th><th>Ø§Ù„Ø¥Ø¬Ù…Ø§Ù„ÙŠ</th></tr></thead>
+        <thead><tr><th>المقال</th><th>المشاهدات</th><th>IG</th><th>X</th><th>WA</th><th>FB</th><th>IN</th><th>نسخ</th><th>PDF</th><th>الإجمالي</th></tr></thead>
         <tbody>
           ${topRows.length ? topRows.map(row => {
             const s = row.shares || {};
             const total = shareTotalFromMap(sharesMap, row.article.id);
             return `<tr>
-              <td><strong>${esc(row.article.title_ar || 'â€”')}</strong><br><small style="color:var(--warm-dark);">${esc(row.article.category_ar || '')}</small></td>
+              <td><strong>${esc(row.article.title_ar || '—')}</strong><br><small style="color:var(--warm-dark);">${esc(row.article.category_ar || '')}</small></td>
               <td>${num(row.views)}</td>
               <td>${num(s.instagram)}</td>
               <td>${num(s.x)}</td>
@@ -1124,7 +1124,7 @@ function renderOverview() {
               <td>${num(s.pdf)}</td>
               <td><strong>${num(total)}</strong></td>
             </tr>`;
-          }).join('') : `<tr><td colspan="10" style="text-align:center;color:var(--warm-dark);padding:28px;">Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¨ÙŠØ§Ù†Ø§Øª ØªÙØ§Ø¹Ù„ Ø­ØªÙ‰ Ø§Ù„Ø¢Ù†</td></tr>`}
+          }).join('') : `<tr><td colspan="10" style="text-align:center;color:var(--warm-dark);padding:28px;">لا توجد بيانات تفاعل حتى الآن</td></tr>`}
         </tbody>
       </table>
     </div>
@@ -1153,40 +1153,40 @@ function renderArticles(opts = {}) {
 
   ge('main-content').innerHTML = `
     <div class="a-card">
-      <div class="a-card-title">Ø§Ù„Ù…ÙˆØ§Ø¶ÙŠØ¹ (${arts.length} / ${DB.articles?.length||0})</div>
+      <div class="a-card-title">المواضيع (${arts.length} / ${DB.articles?.length||0})</div>
       <div class="fr" style="gap:10px;margin-bottom:14px;flex-wrap:wrap;">
-        <input id="art-search" class="fi" style="flex:1;min-width:160px;" placeholder="ðŸ” Ø¨Ø­Ø« ÙÙŠ Ø§Ù„Ø¹Ù†ÙˆØ§Ù†..." value="${esc(opts.q||'')}">
+        <input id="art-search" class="fi" style="flex:1;min-width:160px;" placeholder="🔍 بحث في العنوان..." value="${esc(opts.q||'')}">
         <select id="art-prog-filter" class="fi" style="min-width:140px;width:auto;">
-          <option value="">ÙƒÙ„ Ø§Ù„Ø¨Ø±Ø§Ù…Ø¬</option>${progOpts}
+          <option value="">كل البرامج</option>${progOpts}
         </select>
         <select id="art-status-filter" class="fi" style="width:auto;">
-          <option value="" ${!statusFilter?'selected':''}>ÙƒÙ„ Ø§Ù„Ø­Ø§Ù„Ø§Øª</option>
-          <option value="published" ${statusFilter==='published'?'selected':''}>Ù…Ù†Ø´ÙˆØ± ÙÙ‚Ø·</option>
-          <option value="draft" ${statusFilter==='draft'?'selected':''}>Ù…Ø³ÙˆØ¯Ø© ÙÙ‚Ø·</option>
+          <option value="" ${!statusFilter?'selected':''}>كل الحالات</option>
+          <option value="published" ${statusFilter==='published'?'selected':''}>منشور فقط</option>
+          <option value="draft" ${statusFilter==='draft'?'selected':''}>مسودة فقط</option>
         </select>
       </div>
       <table class="a-table">
-        <thead><tr><th>Ø§Ù„Ø¹Ù†ÙˆØ§Ù†</th><th>Ø§Ù„Ø¨Ø±Ù†Ø§Ù…Ø¬</th><th>Ø§Ù„ØªØ§Ø±ÙŠØ®</th><th>Ø§Ù„Ø­Ø§Ù„Ø©</th><th>Ù…Ù…ÙŠØ²</th><th>Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª</th></tr></thead>
+        <thead><tr><th>العنوان</th><th>البرنامج</th><th>التاريخ</th><th>الحالة</th><th>مميز</th><th>إجراءات</th></tr></thead>
         <tbody>
           ${arts.map(a=>{
             const prog = (DB.programs||[]).find(p=>p.id===a.program_id);
             return `<tr>
               <td>
-                <strong>${esc(a.title_ar||'â€”')}</strong>
+                <strong>${esc(a.title_ar||'—')}</strong>
                 <br><small style="color:var(--warm-dark);font-size:.75rem;">${esc(a.title_en||'')}</small>
               </td>
-              <td>${prog ? esc(prog.name_ar) : '<span style="color:var(--warm-dark)">â€”</span>'}</td>
-              <td style="font-family:var(--ff-mono);font-size:.75rem;">${a.date||'â€”'}</td>
-              <td><span class="badge ${a.is_published!==false?'g':'d'}">${a.is_published!==false?'Ù…Ù†Ø´ÙˆØ±':'Ù…Ø³ÙˆØ¯Ø©'}</span></td>
-              <td><span class="badge ${a.featured?'g':'d'}">${a.featured?'â˜… Ù…Ù…ÙŠØ²':'â€”'}</span></td>
+              <td>${prog ? esc(prog.name_ar) : '<span style="color:var(--warm-dark)">—</span>'}</td>
+              <td style="font-family:var(--ff-mono);font-size:.75rem;">${a.date||'—'}</td>
+              <td><span class="badge ${a.is_published!==false?'g':'d'}">${a.is_published!==false?'منشور':'مسودة'}</span></td>
+              <td><span class="badge ${a.featured?'g':'d'}">${a.featured?'★ مميز':'—'}</span></td>
               <td>
                 <div class="actions">
-                  <button class="ibtn" data-edit-art="${a.id}">âœ ØªØ¹Ø¯ÙŠÙ„</button>
-                  <button class="ibtn red" data-del-art="${a.id}">ðŸ—‘</button>
+                  <button class="ibtn" data-edit-art="${a.id}">✏ تعديل</button>
+                  <button class="ibtn red" data-del-art="${a.id}">🗑</button>
                 </div>
               </td>
             </tr>`;
-          }).join('')||`<tr><td colspan="6" style="text-align:center;color:var(--warm-dark);padding:32px;">Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…ÙˆØ§Ø¶ÙŠØ¹ Ù…Ø·Ø§Ø¨Ù‚Ø©</td></tr>`}
+          }).join('')||`<tr><td colspan="6" style="text-align:center;color:var(--warm-dark);padding:32px;">لا توجد مواضيع مطابقة</td></tr>`}
         </tbody>
       </table>
     </div>`;
@@ -1202,18 +1202,18 @@ function renderArticles(opts = {}) {
   bindEditBtns();
 }
 
-// â”€â”€ Resources Admin â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Resources Admin ───────────────────────────
 const RES_TYPE_LABELS = {
-  scientific_study: 'Ø¯Ø±Ø§Ø³Ø© Ø¹Ù„Ù…ÙŠØ©',
-  official_document: 'ÙˆØ«ÙŠÙ‚Ø© Ø±Ø³Ù…ÙŠØ©',
-  practical_guide: 'Ø¯Ù„ÙŠÙ„ Ø¹Ù…Ù„ÙŠ',
-  template: 'Ù†Ù…ÙˆØ°Ø¬'
+  scientific_study: 'دراسة علمية',
+  official_document: 'وثيقة رسمية',
+  practical_guide: 'دليل عملي',
+  template: 'نموذج'
 };
 const RES_ACCESS_LABELS = {
-  direct_download: 'ØªØ­Ù…ÙŠÙ„ Ù…Ø¨Ø§Ø´Ø±',
-  external_link: 'Ø±Ø§Ø¨Ø· Ø®Ø§Ø±Ø¬ÙŠ',
-  source_only: 'Ù…ØµØ¯Ø± ÙÙ‚Ø·',
-  free: 'Ù…Ø¬Ø§Ù†ÙŠ'
+  direct_download: 'تحميل مباشر',
+  external_link: 'رابط خارجي',
+  source_only: 'مصدر فقط',
+  free: 'مجاني'
 };
 
 window.toggleResDocSubtype = function() {
@@ -1235,35 +1235,35 @@ function renderAdminResources(opts = {}) {
 
   ge('main-content').innerHTML = `
     <div class="a-card">
-      <div class="a-card-title">Ø§Ù„Ù…ÙƒØªØ¨Ø© Ø§Ù„Ø±Ù‚Ù…ÙŠØ© (${resources.length} / ${DB.resources?.length||0})</div>
+      <div class="a-card-title">المكتبة الرقمية (${resources.length} / ${DB.resources?.length||0})</div>
       <div class="fr" style="gap:10px;margin-bottom:14px;flex-wrap:wrap;">
-        <input id="res-search" class="fi" style="flex:1;min-width:160px;" placeholder="ðŸ” Ø¨Ø­Ø« ÙÙŠ Ø§Ù„Ø¹Ù†ÙˆØ§Ù†..." value="${esc(opts.q||'')}">
+        <input id="res-search" class="fi" style="flex:1;min-width:160px;" placeholder="🔍 بحث في العنوان..." value="${esc(opts.q||'')}">
         <select id="res-type-filter" class="fi" style="width:auto;">
-          <option value="">ÙƒÙ„ Ø§Ù„Ø£Ù†ÙˆØ§Ø¹</option>${typeOpts}
+          <option value="">كل الأنواع</option>${typeOpts}
         </select>
       </div>
       <table class="a-table">
-        <thead><tr><th>Ø§Ù„Ø¹Ù†ÙˆØ§Ù†</th><th>Ø§Ù„Ù†ÙˆØ¹</th><th>Ø§Ù„Ø¬Ù‡Ø©</th><th>Ø§Ù„Ø³Ù†Ø©</th><th>Ø§Ù„Ù„ØºØ©</th><th>Ø§Ù„ÙˆØµÙˆÙ„</th><th>Ù…Ù…ÙŠØ²</th><th>Ø§Ù„Ø­Ø§Ù„Ø©</th><th>Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª</th></tr></thead>
+        <thead><tr><th>العنوان</th><th>النوع</th><th>الجهة</th><th>السنة</th><th>اللغة</th><th>الوصول</th><th>مميز</th><th>الحالة</th><th>إجراءات</th></tr></thead>
         <tbody>
           ${resources.map(r => `<tr>
             <td>
-              <strong>${esc(r.title_ar || 'â€”')}</strong>
+              <strong>${esc(r.title_ar || '—')}</strong>
               <br><small style="color:var(--warm-dark);font-size:.75rem;">${esc(r.title_en || '')}</small>
             </td>
-            <td><span class="badge g" style="font-size:.7rem;">${esc(RES_TYPE_LABELS[r.type] || r.type || 'â€”')}</span></td>
-            <td style="font-size:.78rem;">${esc(r.author_or_org || 'â€”')}</td>
-            <td style="font-family:var(--ff-mono);font-size:.75rem;">${r.publication_year || 'â€”'}</td>
-            <td style="font-size:.75rem;">${esc(r.language || 'â€”')}</td>
-            <td style="font-size:.72rem;">${esc(RES_ACCESS_LABELS[r.access_type] || r.access_type || 'â€”')}</td>
-            <td style="text-align:center;">${r.is_featured ? '<span style="color:var(--gold)">â˜…</span>' : 'â€”'}</td>
-            <td><span class="badge ${r.is_published !== false ? 'g' : 'd'}">${r.is_published !== false ? 'Ù…Ù†Ø´ÙˆØ±' : 'Ù…Ø³ÙˆØ¯Ø©'}</span></td>
+            <td><span class="badge g" style="font-size:.7rem;">${esc(RES_TYPE_LABELS[r.type] || r.type || '—')}</span></td>
+            <td style="font-size:.78rem;">${esc(r.author_or_org || '—')}</td>
+            <td style="font-family:var(--ff-mono);font-size:.75rem;">${r.publication_year || '—'}</td>
+            <td style="font-size:.75rem;">${esc(r.language || '—')}</td>
+            <td style="font-size:.72rem;">${esc(RES_ACCESS_LABELS[r.access_type] || r.access_type || '—')}</td>
+            <td style="text-align:center;">${r.is_featured ? '<span style="color:var(--gold)">★</span>' : '—'}</td>
+            <td><span class="badge ${r.is_published !== false ? 'g' : 'd'}">${r.is_published !== false ? 'منشور' : 'مسودة'}</span></td>
             <td>
               <div class="actions">
-                <button class="ibtn" data-edit-res="${r.id}">âœ ØªØ¹Ø¯ÙŠÙ„</button>
-                <button class="ibtn red" data-del-res="${r.id}">ðŸ—‘</button>
+                <button class="ibtn" data-edit-res="${r.id}">✏ تعديل</button>
+                <button class="ibtn red" data-del-res="${r.id}">🗑</button>
               </div>
             </td>
-          </tr>`).join('') || `<tr><td colspan="9" style="text-align:center;color:var(--warm-dark);padding:32px;">Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…ÙˆØ§Ø±Ø¯ Ù…Ø·Ø§Ø¨Ù‚Ø©</td></tr>`}
+          </tr>`).join('') || `<tr><td colspan="9" style="text-align:center;color:var(--warm-dark);padding:32px;">لا توجد موارد مطابقة</td></tr>`}
         </tbody>
       </table>
     </div>`;
@@ -1285,7 +1285,7 @@ function _getCheckboxGroup(selector) {
 }
 
 function openResourceModal(res) {
-  ge('modal-resource-title').textContent = res ? 'ØªØ¹Ø¯ÙŠÙ„ Ù…ÙˆØ±Ø¯' : 'Ø¥Ø¶Ø§ÙØ© Ù…ÙˆØ±Ø¯ Ø¬Ø¯ÙŠØ¯';
+  ge('modal-resource-title').textContent = res ? 'تعديل مورد' : 'إضافة مورد جديد';
   ge('f-res-id').value            = res?.id || '';
   ge('f-res-ta').value            = res?.title_ar || '';
   ge('f-res-te').value            = res?.title_en || '';
@@ -1375,57 +1375,57 @@ function renderSGeneral() {
   const s = DB.settings || {};
   ge('main-content').innerHTML = `
     <div class="a-card">
-      <div class="a-card-title">Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ù…ÙˆÙ‚Ø¹</div>
+      <div class="a-card-title">معلومات الموقع</div>
       <div class="fr">
-        <div class="fg"><label class="fl">Ø§Ø³Ù… Ø§Ù„Ù…ÙˆÙ‚Ø¹ (Ø¹Ø±Ø¨ÙŠ)</label><input id="sg-na" class="fi" value="${esc(s.site_name_ar||'')}" dir="rtl"></div>
+        <div class="fg"><label class="fl">اسم الموقع (عربي)</label><input id="sg-na" class="fi" value="${esc(s.site_name_ar||'')}" dir="rtl"></div>
         <div class="fg"><label class="fl">Site Name (English)</label><input id="sg-ne" class="fi" value="${esc(s.site_name_en||'')}" dir="ltr"></div>
       </div>
       <div class="fr">
-        <div class="fg"><label class="fl">Ø§Ù„Ø´Ø¹Ø§Ø± Ø§Ù„ØªØ¹Ø±ÙŠÙÙŠ (Ø¹Ø±Ø¨ÙŠ)</label><input id="sg-ta" class="fi" value="${esc(s.tagline_ar||'')}" dir="rtl"></div>
+        <div class="fg"><label class="fl">الشعار التعريفي (عربي)</label><input id="sg-ta" class="fi" value="${esc(s.tagline_ar||'')}" dir="rtl"></div>
         <div class="fg"><label class="fl">Tagline (English)</label><input id="sg-te" class="fi" value="${esc(s.tagline_en||'')}" dir="ltr"></div>
       </div>
       <div class="fr">
-        <div class="fg"><label class="fl">Ù†Ø¨Ø°Ø© Ø¥Ø¹Ø±Ù Ø¹Ù†ÙŠ (Ø¹Ø±Ø¨ÙŠ)</label><textarea id="sg-aa" class="fi" rows="4" dir="rtl">${esc(s.about_ar||'')}</textarea></div>
+        <div class="fg"><label class="fl">نبذة إعرف عني (عربي)</label><textarea id="sg-aa" class="fi" rows="4" dir="rtl">${esc(s.about_ar||'')}</textarea></div>
         <div class="fg"><label class="fl">About Bajo (English)</label><textarea id="sg-ae" class="fi" rows="4" dir="ltr">${esc(s.about_en||'')}</textarea></div>
       </div>
     </div>
     <div class="a-card">
-      <div class="a-card-title">Ø§Ù„ØµÙˆØ± ÙˆØ§Ù„Ù‡ÙˆÙŠØ© Ø§Ù„Ø¨ØµØ±ÙŠØ©</div>
+      <div class="a-card-title">الصور والهوية البصرية</div>
       <div class="fr">
         <div class="fg">
-          <label class="fl">Ø´Ø¹Ø§Ø± Ø§Ù„Ù…ÙˆÙ‚Ø¹ (Logo)</label>
-          <div class="upzone"><input type="file" id="sg-logo-file" accept="image/*"><div class="upzone-txt">ðŸ“ Ø§Ù†Ù‚Ø± Ù„Ø±ÙØ¹ Ø§Ù„Ø´Ø¹Ø§Ø±</div></div>
+          <label class="fl">شعار الموقع (Logo)</label>
+          <div class="upzone"><input type="file" id="sg-logo-file" accept="image/*"><div class="upzone-txt">📁 انقر لرفع الشعار</div></div>
           <input type="hidden" id="sg-logo-val" value="${esc(s.logo||'')}">
           <img id="sg-logo-prev" class="up-prev" ${s.logo?`src="../${s.logo}" style="display:block;"`:''}>
         </div>
         <div class="fg">
-          <label class="fl">ØµÙˆØ±Ø© Ø¥Ø¹Ø±Ù Ø¹Ù†ÙŠ</label>
-          <div class="upzone"><input type="file" id="sg-abt-file" accept="image/*"><div class="upzone-txt">ðŸ“ Ø§Ù†Ù‚Ø± Ù„Ø±ÙØ¹ Ø§Ù„ØµÙˆØ±Ø©</div></div>
+          <label class="fl">صورة إعرف عني</label>
+          <div class="upzone"><input type="file" id="sg-abt-file" accept="image/*"><div class="upzone-txt">📁 انقر لرفع الصورة</div></div>
           <input type="hidden" id="sg-abt-val" value="${esc(s.about_image||'')}">
           <img id="sg-abt-prev" class="up-prev" ${s.about_image?`src="../${s.about_image}" style="display:block;"`:''}>
         </div>
       </div>
     </div>
     <div class="a-card">
-      <div class="a-card-title">Ø§Ù„Ù„ØºØ© Ø§Ù„Ø¥Ù†Ø¬Ù„ÙŠØ²ÙŠØ©</div>
+      <div class="a-card-title">اللغة الإنجليزية</div>
       <p style="color:var(--warm-mid);font-size:.83rem;margin-bottom:20px;">
-        Ø¹Ù†Ø¯ Ø§Ù„ØªØ¹Ø·ÙŠÙ„ ÙŠØ®ØªÙÙŠ Ø²Ø± ØªØ¨Ø¯ÙŠÙ„ Ø§Ù„Ù„ØºØ© Ù…Ù† Ø§Ù„Ù…ÙˆÙ‚Ø¹ ÙˆÙŠÙØ¬Ø¨Ø± Ø§Ù„Ù…ÙˆÙ‚Ø¹ Ø¹Ù„Ù‰ Ø§Ù„Ø¹Ø±Ø¶ Ø¨Ø§Ù„Ø¹Ø±Ø¨ÙŠØ© ÙÙ‚Ø·.
+        عند التعطيل يختفي زر تبديل اللغة من الموقع ويُجبر الموقع على العرض بالعربية فقط.
       </p>
       <div class="fg">
-        <label class="fl">ØªÙØ¹ÙŠÙ„ Ø§Ù„Ù„ØºØ© Ø§Ù„Ø¥Ù†Ø¬Ù„ÙŠØ²ÙŠØ©</label>
+        <label class="fl">تفعيل اللغة الإنجليزية</label>
         <div class="tog-wrap">
           <label class="tog"><input type="checkbox" id="sg-en-enabled" ${s.english_enabled !== false ? 'checked' : ''}><span class="tog-sl"></span></label>
-          <span id="sg-en-enabled-lbl" style="font-size:.84rem;color:var(--warm-mid);">${s.english_enabled !== false ? 'Ù…ÙØ¹Ù‘Ù„' : 'Ù…Ø¹Ø·Ù‘Ù„'}</span>
+          <span id="sg-en-enabled-lbl" style="font-size:.84rem;color:var(--warm-mid);">${s.english_enabled !== false ? 'مفعّل' : 'معطّل'}</span>
         </div>
       </div>
     </div>
-    <button class="btn btn-fill" id="btn-save-sgeneral" style="padding:11px 36px;">Ø­ÙØ¸ Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª âœ“</button>`;
+    <button class="btn btn-fill" id="btn-save-sgeneral" style="padding:11px 36px;">حفظ الإعدادات ✓</button>`;
 
   initUpload('sg-logo-file', 'sg-logo-prev', 'sg-logo-val');
   initUpload('sg-abt-file', 'sg-abt-prev', 'sg-abt-val');
 
   ge('sg-en-enabled').addEventListener('change', e => {
-    ge('sg-en-enabled-lbl').textContent = e.target.checked ? 'Ù…ÙØ¹Ù‘Ù„' : 'Ù…Ø¹Ø·Ù‘Ù„';
+    ge('sg-en-enabled-lbl').textContent = e.target.checked ? 'مفعّل' : 'معطّل';
   });
 
   ge('btn-save-sgeneral').addEventListener('click', () => {
@@ -1445,22 +1445,22 @@ function renderSGeneral() {
 }
 
 const SOCIALS = [
-  {key:'whatsapp', icon:'ðŸ’¬', lbl:'ÙˆØ§ØªØ³Ø§Ø¨',            ph:'+966 5XX XXX XXXX'},
-  {key:'email',    icon:'âœ‰ï¸', lbl:'Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ', ph:'your@email.com'},
-  {key:'phone',    icon:'ðŸ“ž', lbl:'Ù‡Ø§ØªÙ',              ph:'+966 5XX XXX XXXX'},
-  {key:'snapchat', icon:'ðŸ‘»', lbl:'Ø³Ù†Ø§Ø¨ Ø´Ø§Øª',          ph:'username'},
-  {key:'tiktok',   icon:'ðŸŽµ', lbl:'ØªÙŠÙƒ ØªÙˆÙƒ',           ph:'@username'},
-  {key:'facebook', icon:'ðŸ“˜', lbl:'ÙÙŠØ³Ø¨ÙˆÙƒ',            ph:'page url or username'},
-  {key:'instagram',icon:'ðŸ“·', lbl:'Ø¥Ù†Ø³ØªÙ‚Ø±Ø§Ù…',          ph:'@username'},
-  {key:'twitter',  icon:'ðŸ¦', lbl:'ØªÙˆÙŠØªØ± / X',         ph:'@username'},
+  {key:'whatsapp', icon:'💬', lbl:'واتساب',            ph:'+966 5XX XXX XXXX'},
+  {key:'email',    icon:'✉️', lbl:'البريد الإلكتروني', ph:'your@email.com'},
+  {key:'phone',    icon:'📞', lbl:'هاتف',              ph:'+966 5XX XXX XXXX'},
+  {key:'snapchat', icon:'👻', lbl:'سناب شات',          ph:'username'},
+  {key:'tiktok',   icon:'🎵', lbl:'تيك توك',           ph:'@username'},
+  {key:'facebook', icon:'📘', lbl:'فيسبوك',            ph:'page url or username'},
+  {key:'instagram',icon:'📷', lbl:'إنستقرام',          ph:'@username'},
+  {key:'twitter',  icon:'🐦', lbl:'تويتر / X',         ph:'@username'},
 ];
 
 function renderSSocial() {
   const s = DB.settings?.social || {};
   ge('main-content').innerHTML = `
     <div class="a-card">
-      <div class="a-card-title">Ù‚Ù†ÙˆØ§Øª Ø§Ù„ØªÙˆØ§ØµÙ„ Ø§Ù„Ø§Ø¬ØªÙ…Ø§Ø¹ÙŠ</div>
-      <p style="color:var(--warm-mid);font-size:.84rem;margin-bottom:20px;">ÙØ¹Ù‘Ù„ Ø§Ù„Ù‚Ù†ÙˆØ§Øª Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø© ÙˆØ£Ø¯Ø®Ù„ Ø¨ÙŠØ§Ù†Ø§ØªÙ‡Ø§. Ø§Ù„Ù…ÙÙØ¹ÙŽÙ‘Ù„Ø© ÙÙ‚Ø· Ø³ØªØ¸Ù‡Ø± ÙÙŠ Ø§Ù„Ù…ÙˆÙ‚Ø¹.</p>
+      <div class="a-card-title">قنوات التواصل الاجتماعي</div>
+      <p style="color:var(--warm-mid);font-size:.84rem;margin-bottom:20px;">فعّل القنوات المطلوبة وأدخل بياناتها. المُفعَّلة فقط ستظهر في الموقع.</p>
       ${SOCIALS.map(sc=>`
         <div class="social-row">
           <div class="social-icon-box">${sc.icon}</div>
@@ -1470,10 +1470,10 @@ function renderSSocial() {
             <input type="checkbox" id="sc-vis-${sc.key}" ${s[sc.key]?.visible?'checked':''}>
             <span class="tog-sl"></span>
           </label>
-          <span class="tog-lbl" id="sc-lbl-${sc.key}" style="font-size:.75rem;color:var(--warm-dark);width:36px;">${s[sc.key]?.visible?'Ø¸Ø§Ù‡Ø±':'Ù…Ø®ÙÙŠ'}</span>
+          <span class="tog-lbl" id="sc-lbl-${sc.key}" style="font-size:.75rem;color:var(--warm-dark);width:36px;">${s[sc.key]?.visible?'ظاهر':'مخفي'}</span>
         </div>`).join('')}
       <div style="margin-top:20px;">
-        <button class="btn btn-fill" id="btn-save-ssocial" style="padding:11px 36px;">Ø­ÙØ¸ âœ“</button>
+        <button class="btn btn-fill" id="btn-save-ssocial" style="padding:11px 36px;">حفظ ✓</button>
       </div>
     </div>`;
 
@@ -1481,7 +1481,7 @@ function renderSSocial() {
     const vis = ge(`sc-vis-${sc.key}`);
     const lbl = ge(`sc-lbl-${sc.key}`);
     if (vis && lbl) {
-      vis.addEventListener('change', () => { lbl.textContent = vis.checked ? 'Ø¸Ø§Ù‡Ø±' : 'Ù…Ø®ÙÙŠ'; });
+      vis.addEventListener('change', () => { lbl.textContent = vis.checked ? 'ظاهر' : 'مخفي'; });
     }
   });
 
@@ -1501,20 +1501,20 @@ function renderSSocial() {
 function renderSSec() {
   ge('main-content').innerHTML = `
     <div class="a-card" style="max-width:480px;">
-      <div class="a-card-title">ØªØºÙŠÙŠØ± Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø¯Ø®ÙˆÙ„</div>
-      <div class="fg"><label class="fl">Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ</label><input id="sec-u" class="fi" value="${esc(sessionStorage.getItem('bz_admin_email') || '')}"></div>
-      <div class="fg"><label class="fl">ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ø§Ù„Ø­Ø§Ù„ÙŠØ©</label><input type="password" id="sec-op" class="fi"></div>
-      <div class="fg"><label class="fl">ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©</label><input type="password" id="sec-np" class="fi"></div>
-      <div class="fg"><label class="fl">ØªØ£ÙƒÙŠØ¯ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±</label><input type="password" id="sec-cp" class="fi"></div>
+      <div class="a-card-title">تغيير بيانات الدخول</div>
+      <div class="fg"><label class="fl">البريد الإلكتروني</label><input id="sec-u" class="fi" value="${esc(sessionStorage.getItem('bz_admin_email') || '')}"></div>
+      <div class="fg"><label class="fl">كلمة المرور الحالية</label><input type="password" id="sec-op" class="fi"></div>
+      <div class="fg"><label class="fl">كلمة المرور الجديدة</label><input type="password" id="sec-np" class="fi"></div>
+      <div class="fg"><label class="fl">تأكيد كلمة المرور</label><input type="password" id="sec-cp" class="fi"></div>
       <p id="sec-err" style="display:none;color:#ff6b6b;font-size:.82rem;margin-bottom:12px;"></p>
-      <button class="btn btn-fill" id="btn-save-sec" style="padding:11px 32px;">Ø­ÙØ¸ Ø§Ù„ØªØºÙŠÙŠØ±Ø§Øª âœ“</button>
+      <button class="btn btn-fill" id="btn-save-sec" style="padding:11px 32px;">حفظ التغييرات ✓</button>
     </div>`;
 
   ge('btn-save-sec').addEventListener('click', async () => {
     const op = gv('sec-op'), np = gv('sec-np'), cp = gv('sec-cp');
     const errEl = ge('sec-err');
     if (np && np !== cp) {
-      errEl.textContent = 'ÙƒÙ„Ù…Ø§Øª Ø§Ù„Ù…Ø±ÙˆØ± Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø© ØºÙŠØ± Ù…ØªØ·Ø§Ø¨Ù‚Ø©'; errEl.style.display = 'block'; return;
+      errEl.textContent = 'كلمات المرور الجديدة غير متطابقة'; errEl.style.display = 'block'; return;
     }
     errEl.style.display = 'none';
     try {
@@ -1536,10 +1536,10 @@ function renderSSec() {
   });
 }
 
-// â”€â”€ Article Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Article Modal ─────────────────────────────
 function openArticleModal(article) {
   const isNew = !article;
-  ge('modal-article-title').textContent = isNew ? 'Ø¥Ø¶Ø§ÙØ© Ù…ÙˆØ¶ÙˆØ¹ Ø¬Ø¯ÙŠØ¯' : 'ØªØ¹Ø¯ÙŠÙ„ Ù…ÙˆØ¶ÙˆØ¹';
+  ge('modal-article-title').textContent = isNew ? 'إضافة موضوع جديد' : 'تعديل موضوع';
   ge('f-art-id').value        = article?.id || '';
   ge('f-art-title-ar').value  = article?.title_ar || '';
   ge('f-art-title-en').value  = article?.title_en || '';
@@ -1557,7 +1557,7 @@ function openArticleModal(article) {
 
   // Populate program select
   const progSel = ge('f-art-program');
-  progSel.innerHTML = '<option value="">-- Ø¨Ø¯ÙˆÙ† Ø¨Ø±Ù†Ø§Ù…Ø¬ --</option>' +
+  progSel.innerHTML = '<option value="">-- بدون برنامج --</option>' +
     (DB.programs||[]).filter(p=>p.is_active!==false).sort((a,b)=>(a.sort_order||99)-(b.sort_order||99))
       .map(p=>`<option value="${p.id}" ${article?.program_id===p.id?'selected':''}>${esc(p.name_ar)}</option>`).join('');
 
@@ -1583,8 +1583,8 @@ function openArticleModal(article) {
 
 async function saveArticle() {
   const saveBtn = ge('modal-article-save');
-  const origLabel = saveBtn?.textContent || 'Ø­ÙØ¸ Ø§Ù„Ù…ÙˆØ¶ÙˆØ¹ âœ“';
-  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'â³ Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø­ÙØ¸...'; }
+  const origLabel = saveBtn?.textContent || 'حفظ الموضوع ✓';
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '⏳ جاري الحفظ...'; }
 
   const id = ge('f-art-id').value;
   let tags = [];
@@ -1624,7 +1624,7 @@ async function saveArticle() {
   // Check approximate size before saving
   const dbSize = JSON.stringify(DB).length;
   if (dbSize > 4.5 * 1024 * 1024) {
-    showAdminToast('âš ï¸ ØªØ­Ø°ÙŠØ±: Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª ÙƒØ¨ÙŠØ±Ø© Ø¬Ø¯Ø§Ù‹ (' + (dbSize / 1024 / 1024).toFixed(1) + 'MB). Ø¬Ø±Ù‘Ø¨ Ø­Ø°Ù ØµÙˆØ± Ù‚Ø¯ÙŠÙ…Ø©.', true);
+    showAdminToast('⚠️ تحذير: البيانات كبيرة جداً (' + (dbSize / 1024 / 1024).toFixed(1) + 'MB). جرّب حذف صور قديمة.', true);
     if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = origLabel; }
     return;
   }
@@ -1640,35 +1640,35 @@ async function saveArticle() {
   else if (currentSection === 'overview') renderOverview();
 }
 
-// â”€â”€ Programs Admin â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Programs Admin ────────────────────────────
 function renderAdminPrograms() {
   const progs = DB.programs || [];
   ge('main-content').innerHTML = `
     <div class="a-card">
-      <div class="a-card-title">Ø§Ù„Ø¨Ø±Ø§Ù…Ø¬ (${progs.length})</div>
+      <div class="a-card-title">البرامج (${progs.length})</div>
       <table class="a-table">
-        <thead><tr><th>Ø§Ù„Ø¨Ø±Ù†Ø§Ù…Ø¬</th><th>Slug</th><th>Ø§Ù„Ù…ÙˆØ§Ø¶ÙŠØ¹</th><th>Ø§Ù„ØªØ±ØªÙŠØ¨</th><th>Ø§Ù„Ø­Ø§Ù„Ø©</th><th>Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª</th></tr></thead>
+        <thead><tr><th>البرنامج</th><th>Slug</th><th>المواضيع</th><th>الترتيب</th><th>الحالة</th><th>إجراءات</th></tr></thead>
         <tbody>
           ${progs.sort((a,b)=>(a.sort_order||99)-(b.sort_order||99)).map(p => {
             const count = (DB.articles||[]).filter(a=>a.program_id===p.id).length;
             return `<tr>
               <td>
                 ${p.logo_url ? `<img src="${mediaSrc(p.logo_url)}" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;margin-inline-end:8px;border-radius:3px;" onerror="this.style.display='none'">` : ''}
-                <strong>${esc(p.name_ar||'â€”')}</strong>
+                <strong>${esc(p.name_ar||'—')}</strong>
                 <br><small style="color:var(--warm-dark);">${esc(p.name_en||'')}</small>
               </td>
               <td style="font-family:var(--ff-mono);font-size:.75rem;">${esc(p.slug||'')}</td>
               <td style="font-family:var(--ff-mono);">${count}</td>
-              <td style="font-family:var(--ff-mono);">${p.sort_order||'â€”'}</td>
-              <td><span class="badge ${p.is_active!==false?'g':'d'}">${p.is_active!==false?'Ø¸Ø§Ù‡Ø±':'Ù…Ø®ÙÙŠ'}</span></td>
+              <td style="font-family:var(--ff-mono);">${p.sort_order||'—'}</td>
+              <td><span class="badge ${p.is_active!==false?'g':'d'}">${p.is_active!==false?'ظاهر':'مخفي'}</span></td>
               <td>
                 <div class="actions">
-                  <button class="ibtn" data-edit-prog="${p.id}">âœ ØªØ¹Ø¯ÙŠÙ„</button>
-                  <button class="ibtn red" data-del-prog="${p.id}">ðŸ—‘</button>
+                  <button class="ibtn" data-edit-prog="${p.id}">✏ تعديل</button>
+                  <button class="ibtn red" data-del-prog="${p.id}">🗑</button>
                 </div>
               </td>
             </tr>`;
-          }).join('')||`<tr><td colspan="6" style="text-align:center;color:var(--warm-dark);padding:32px;">Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¨Ø±Ø§Ù…Ø¬ â€” Ø§Ø¶ØºØ· "+ Ø¥Ø¶Ø§ÙØ©"</td></tr>`}
+          }).join('')||`<tr><td colspan="6" style="text-align:center;color:var(--warm-dark);padding:32px;">لا توجد برامج — اضغط "+ إضافة"</td></tr>`}
         </tbody>
       </table>
     </div>`;
@@ -1677,7 +1677,7 @@ function renderAdminPrograms() {
 
 function openProgramModal(prog) {
   const isNew = !prog;
-  ge('modal-program-title').textContent = isNew ? 'Ø¥Ø¶Ø§ÙØ© Ø¨Ø±Ù†Ø§Ù…Ø¬ Ø¬Ø¯ÙŠØ¯' : 'ØªØ¹Ø¯ÙŠÙ„ Ø¨Ø±Ù†Ø§Ù…Ø¬';
+  ge('modal-program-title').textContent = isNew ? 'إضافة برنامج جديد' : 'تعديل برنامج';
   ge('f-prog-id').value    = prog?.id || '';
   ge('f-prog-na').value    = prog?.name_ar || '';
   ge('f-prog-ne').value    = prog?.name_en || '';
@@ -1733,29 +1733,29 @@ async function saveProgramAdmin() {
   if (currentSection === 'programs') renderAdminPrograms();
 }
 
-// â”€â”€ Tags Admin â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Tags Admin ────────────────────────────────
 function renderAdminTags() {
   const tags = DB.tags || [];
   ge('main-content').innerHTML = `
     <div class="a-card">
-      <div class="a-card-title">Ø§Ù„ØªØ§Ù‚Ø§Øª (${tags.length})</div>
+      <div class="a-card-title">التاقات (${tags.length})</div>
       <table class="a-table">
-        <thead><tr><th>Ø§Ø³Ù… Ø§Ù„ØªØ§Ù‚</th><th>Slug</th><th>Ø¹Ø¯Ø¯ Ø§Ù„Ù…ÙˆØ§Ø¶ÙŠØ¹</th><th>Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª</th></tr></thead>
+        <thead><tr><th>اسم التاق</th><th>Slug</th><th>عدد المواضيع</th><th>إجراءات</th></tr></thead>
         <tbody>
           ${tags.map(t => {
             const count = (DB.articles||[]).filter(a=>Array.isArray(a.tags)&&a.tags.includes(t.id)).length;
             return `<tr>
-              <td><strong>${esc(t.name||'â€”')}</strong></td>
+              <td><strong>${esc(t.name||'—')}</strong></td>
               <td style="font-family:var(--ff-mono);font-size:.75rem;">${esc(t.slug||'')}</td>
               <td style="font-family:var(--ff-mono);">${count}</td>
               <td>
                 <div class="actions">
-                  <button class="ibtn" data-edit-tag="${t.id}">âœ</button>
-                  <button class="ibtn red" data-del-tag="${t.id}">ðŸ—‘</button>
+                  <button class="ibtn" data-edit-tag="${t.id}">✏</button>
+                  <button class="ibtn red" data-del-tag="${t.id}">🗑</button>
                 </div>
               </td>
             </tr>`;
-          }).join('')||`<tr><td colspan="4" style="text-align:center;color:var(--warm-dark);padding:28px;">Ù„Ø§ ØªÙˆØ¬Ø¯ ØªØ§Ù‚Ø§Øª â€” Ø§Ø¶ØºØ· "+ Ø¥Ø¶Ø§ÙØ©"</td></tr>`}
+          }).join('')||`<tr><td colspan="4" style="text-align:center;color:var(--warm-dark);padding:28px;">لا توجد تاقات — اضغط "+ إضافة"</td></tr>`}
         </tbody>
       </table>
     </div>`;
@@ -1787,7 +1787,7 @@ function saveTagAdmin() {
   if (currentSection === 'tags') renderAdminTags();
 }
 
-// â”€â”€ Tag display helpers (article modal) â”€â”€â”€â”€â”€â”€
+// ── Tag display helpers (article modal) ──────
 function refreshTagChips() {
   let tags = [];
   try { tags = JSON.parse(ge('f-art-tags-val')?.value || '[]'); } catch(_) {}
@@ -1796,7 +1796,7 @@ function refreshTagChips() {
   el.innerHTML = tags.map(tid => {
     const tag = (DB.tags||[]).find(t => t.id === tid);
     const name = tag ? esc(tag.name) : esc(tid);
-    return `<span class="tag-chip-admin">${name}<button type="button" onclick="tagRemoveAdmin('${tid}')">Ã—</button></span>`;
+    return `<span class="tag-chip-admin">${name}<button type="button" onclick="tagRemoveAdmin('${tid}')">×</button></span>`;
   }).join('');
 }
 
@@ -1830,7 +1830,7 @@ function initTagInput() {
       `<li data-id="${t.id}" class="${i === activeIdx ? 'active' : ''}">${esc(t.name)}</li>`
     ).join('');
     if (q && !exactMatch) {
-      html += `<li data-new="${esc(q)}" class="new-tag">+ Ø¥Ø¶Ø§ÙØ© "<strong>${esc(q)}</strong>"</li>`;
+      html += `<li data-new="${esc(q)}" class="new-tag">+ إضافة "<strong>${esc(q)}</strong>"</li>`;
     }
     if (html) {
       dropdown.innerHTML = html;
@@ -1886,27 +1886,27 @@ function initTagInput() {
   });
 }
 
-// â”€â”€ Source rows (article modal) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Source rows (article modal) ───────────────
 function appendSourceRow(s = {}) {
   const div = document.createElement('div');
   div.className = 'source-admin-row';
   div.style.cssText = 'background:rgba(255,255,255,.03);border:1px solid var(--line);padding:10px 12px;display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;';
   div.innerHTML = `
-    <div class="fg" style="margin:0;"><label class="fl" style="font-size:.7rem;">Ø¹Ù†ÙˆØ§Ù† Ø§Ù„Ù…ØµØ¯Ø±</label>
-      <input class="fi src-title" dir="rtl" value="${esc(s.title||'')}" placeholder="Ø§Ø³Ù… Ø§Ù„Ù…ØµØ¯Ø± Ø£Ùˆ Ø§Ù„ÙƒØªØ§Ø¨..."></div>
-    <div class="fg" style="margin:0;"><label class="fl" style="font-size:.7rem;">Ø§Ù„Ø±Ø§Ø¨Ø· (URL)</label>
+    <div class="fg" style="margin:0;"><label class="fl" style="font-size:.7rem;">عنوان المصدر</label>
+      <input class="fi src-title" dir="rtl" value="${esc(s.title||'')}" placeholder="اسم المصدر أو الكتاب..."></div>
+    <div class="fg" style="margin:0;"><label class="fl" style="font-size:.7rem;">الرابط (URL)</label>
       <input class="fi src-url" dir="ltr" value="${esc(s.url||'')}" placeholder="https://..."></div>
     <div style="display:flex;flex-direction:column;gap:4px;">
       <select class="fi src-type" style="padding:5px 8px;height:auto;font-size:.75rem;">
-        <option value="" ${!s.type?'selected':''}>Ø§Ù„Ù†ÙˆØ¹</option>
-        <option value="study" ${s.type==='study'?'selected':''}>Ø¯Ø±Ø§Ø³Ø©</option>
-        <option value="official" ${s.type==='official'?'selected':''}>Ù…ÙˆÙ‚Ø¹ Ø±Ø³Ù…ÙŠ</option>
-        <option value="report" ${s.type==='report'?'selected':''}>ØªÙ‚Ø±ÙŠØ±</option>
-        <option value="book" ${s.type==='book'?'selected':''}>ÙƒØªØ§Ø¨</option>
-        <option value="video" ${s.type==='video'?'selected':''}>ÙÙŠØ¯ÙŠÙˆ</option>
-        <option value="article" ${s.type==='article'?'selected':''}>Ù…Ù‚Ø§Ù„</option>
+        <option value="" ${!s.type?'selected':''}>النوع</option>
+        <option value="study" ${s.type==='study'?'selected':''}>دراسة</option>
+        <option value="official" ${s.type==='official'?'selected':''}>موقع رسمي</option>
+        <option value="report" ${s.type==='report'?'selected':''}>تقرير</option>
+        <option value="book" ${s.type==='book'?'selected':''}>كتاب</option>
+        <option value="video" ${s.type==='video'?'selected':''}>فيديو</option>
+        <option value="article" ${s.type==='article'?'selected':''}>مقال</option>
       </select>
-      <button type="button" class="ibtn red" onclick="this.closest('.source-admin-row').remove()" style="font-size:.8rem;">Ø­Ø°Ù</button>
+      <button type="button" class="ibtn red" onclick="this.closest('.source-admin-row').remove()" style="font-size:.8rem;">حذف</button>
     </div>`;
   ge('f-art-sources-list').appendChild(div);
 }
@@ -1921,7 +1921,7 @@ function collectSources() {
   })).filter(s => s.title || s.url);
 }
 
-// â”€â”€ Delete â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Delete ────────────────────────────────────
 function confirmDelete(type, id) {
   pendingDeleteFn = () => {
     if (type === 'article')  DB.articles   = (DB.articles||[]).filter(a => a.id !== id);
@@ -1941,7 +1941,7 @@ function confirmDelete(type, id) {
   modalOpen('del');
 }
 
-// â”€â”€ Event delegation for dynamic content â”€â”€â”€â”€â”€â”€
+// ── Event delegation for dynamic content ──────
 function bindEditBtns() {
   const mc = ge('main-content');
   mc.querySelectorAll('[data-edit-art]').forEach(btn => {
@@ -1982,7 +1982,7 @@ function bindEditBtns() {
   });
 }
 
-// â”€â”€ Utilities â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Utilities ─────────────────────────────────
 function ge(id) { return document.getElementById(id); }
 function gv(id) { const el = ge(id); return el ? (el.value || '').trim() : ''; }
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -2036,7 +2036,7 @@ function showToast(msg, type='ok') {
 }
 
 
-// â”€â”€ About Rich Editor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── About Rich Editor ─────────────────────────
 function aboutProfileDefaults(lang = 'ar') {
   if (lang === 'en') return {
     name: 'Abdulaziz Bajkhaif',
@@ -2061,26 +2061,26 @@ function aboutProfileDefaults(lang = 'ar') {
     services: [['Sports knowledge content','Writing and developing articles and guides that connect science with the field.'],['Scouting frameworks','Building practical templates that help scouts and coaches read players deeply.'],['Workshops and lectures','Knowledge sessions on talent identification and youth football.'],['Research or media collaboration','Turning sport ideas into publishable and practical projects.']]
   };
   return {
-    name: 'Ø¹Ø¨Ø¯Ø§Ù„Ø¹Ø²ÙŠØ² Ø¨Ø§Ø¬Ø®ÙŠÙ',
-    title: 'Ø£Ù‚Ø±Ø£ ÙƒØ±Ø© Ø§Ù„Ù‚Ø¯Ù… Ø¨Ø¹ÙŠÙ† Ø§Ù„Ø¹Ù„Ù… ÙˆØ§Ù„Ù…ÙŠØ¯Ø§Ù†',
-    lead: 'Ø¨Ø§Ø­Ø« ÙˆÙ…Ù…Ø§Ø±Ø³ ÙÙŠ Ø¹Ù„ÙˆÙ… Ø§Ù„Ø±ÙŠØ§Ø¶Ø© ÙˆÙƒØ±Ø© Ø§Ù„Ù‚Ø¯Ù…ØŒ Ù…Ù‡ØªÙ… Ø¨Ø§ÙƒØªØ´Ø§Ù Ø§Ù„Ù…ÙˆØ§Ù‡Ø¨ ÙˆØªØ·ÙˆÙŠØ± Ø§Ù„Ù„Ø§Ø¹Ø¨ÙŠÙ† ÙÙŠ Ø§Ù„ÙØ¦Ø§Øª Ø§Ù„Ø³Ù†ÙŠØ©. BajoZone Ù„ÙŠØ³Øª ØµÙØ­Ø© ØªØ¹Ø±ÙŠÙ ØªÙ‚Ù„ÙŠØ¯ÙŠØ©ØŒ Ø¨Ù„ Ø¯ÙØªØ± Ù…ÙŠØ¯Ø§Ù† Ø£ØªØ±Ø¬Ù… ÙÙŠÙ‡ Ø§Ù„ØªØ¬Ø§Ø±Ø¨ Ø¥Ù„Ù‰ Ù…Ø¹Ø±ÙØ© Ù‚Ø§Ø¨Ù„Ø© Ù„Ù„ØªØ·Ø¨ÙŠÙ‚.',
-    quote: 'Ø§Ù„Ù…ÙˆÙ‡Ø¨Ø© Ù„Ø§ ØªÙƒÙÙŠ Ø£Ù† ØªØ±Ù‰. ÙŠØ¬Ø¨ Ø£Ù† ØªÙÙ‡Ù…ØŒ ØªÙ‚Ø§Ø³ØŒ ØªØ±Ø¹Ù‰ØŒ Ø«Ù… ØªÙ…Ù†Ø­ Ø§Ù„Ø¨ÙŠØ¦Ø© Ø§Ù„ØªÙŠ ØªØ¬Ø¹Ù„Ù‡Ø§ ØªÙƒØ¨Ø±.',
-    emailLabel: 'ØªÙˆØ§ØµÙ„ Ù…Ø¹ÙŠ',
+    name: 'عبدالعزيز باجخيف',
+    title: 'أقرأ كرة القدم بعين العلم والميدان',
+    lead: 'باحث وممارس في علوم الرياضة وكرة القدم، مهتم باكتشاف المواهب وتطوير اللاعبين في الفئات السنية. BajoZone ليست صفحة تعريف تقليدية، بل دفتر ميدان أترجم فيه التجارب إلى معرفة قابلة للتطبيق.',
+    quote: 'الموهبة لا تكفي أن ترى. يجب أن تفهم، تقاس، ترعى، ثم تمنح البيئة التي تجعلها تكبر.',
+    emailLabel: 'تواصل معي',
     email: 'Abdulaziz.bajkhaif@hotmail.com',
-    lensesTitle: 'Ø§Ù„Ø¹Ø¯Ø³Ø§Øª Ø§Ù„ØªÙŠ Ø£ÙƒØªØ¨ Ù…Ù† Ø®Ù„Ø§Ù„Ù‡Ø§',
-    journeyTitle: 'Ù…Ø­Ø·Ø§Øª ØµÙ†Ø¹Øª Ø§Ù„Ù†Ø¸Ø±Ø©',
-    journeySub: 'Ù„ÙŠØ³Øª Ø³ÙŠØ±Ø© Ø°Ø§ØªÙŠØ© Ù…Ø±ØªØ¨Ø© Ø¹Ù„Ù‰ Ø§Ù„ÙˆØ±Ù‚. Ù‡Ø°Ù‡ Ù…Ø­Ø·Ø§Øª ØµÙ†Ø¹Øª Ø·Ø±ÙŠÙ‚Ø© ØªÙÙƒÙŠØ± Ù…Ø®ØªÙ„ÙØ© ÙÙŠ Ø§Ù„Ù„Ø§Ø¹Ø¨ ÙˆØ§Ù„Ù…ÙˆÙ‡Ø¨Ø©.',
-    albumTitle: 'Ø£Ù„Ø¨ÙˆÙ… Ø§Ù„Ù…Ø­Ø·Ø§Øª',
-    albumSub: 'Ù‡Ù†Ø§ Ù…Ø³Ø§Ø­Ø© Ø§Ù„ØµÙˆØ± ÙˆØ§Ù„Ù‚ØµØµ: Ø²ÙŠØ§Ø±Ø©ØŒ Ù…Ø¹Ø§ÙŠØ´Ø©ØŒ Ø¯ÙˆØ±Ø©ØŒ Ù…Ø­Ø§Ø¶Ø±Ø©ØŒ ÙØ¹Ø§Ù„ÙŠØ©ØŒ Ø£Ùˆ Ù„Ø­Ø¸Ø© Ù…ÙŠØ¯Ø§Ù†ÙŠØ© ØªØ³ØªØ­Ù‚ Ø£Ù† ØªØ±ÙˆÙ‰.',
-    whyTitle: 'Ù„Ù…Ø§Ø°Ø§ ØªØ³ØªØ­Ù‚ BajoZone Ø£Ù† ØªÙ‚Ø±Ø£ØŸ',
-    whyText: 'Ù„Ø£Ù†Ù‡Ø§ Ù„Ø§ ØªÙƒØªÙÙŠ Ø¨Ø§Ù„ÙƒÙ„Ø§Ù… Ø§Ù„Ø¹Ø§Ù… Ø¹Ù† ÙƒØ±Ø© Ø§Ù„Ù‚Ø¯Ù…. Ù‡Ù†Ø§ Ø£Ø­Ø§ÙˆÙ„ Ø£Ù† Ø£Ø¬Ù…Ø¹ Ø¨ÙŠÙ† Ø§Ù„Ø¹Ù„Ù…ØŒ Ø§Ù„Ù…Ù„Ø§Ø­Ø¸Ø©ØŒ ÙˆØ§Ù„ØªØ¬Ø±Ø¨Ø© Ø§Ù„Ø´Ø®ØµÙŠØ©.',
-    ctaTitle: 'Ù‡Ù„ Ù„Ø¯ÙŠÙƒ ØªØ¬Ø±Ø¨Ø©ØŒ Ø£ÙƒØ§Ø¯ÙŠÙ…ÙŠØ©ØŒ Ø£Ùˆ ÙÙƒØ±Ø© ØªØ³ØªØ­Ù‚ Ø§Ù„Ù†Ù‚Ø§Ø´ØŸ',
-    ctaText: 'ÙŠØ³Ø¹Ø¯Ù†ÙŠ Ø§Ù„ØªÙˆØ§ØµÙ„ Ø­ÙˆÙ„ Ø§Ù„Ù…ÙˆØ§Ù‡Ø¨ØŒ Ø§Ù„ÙØ¦Ø§Øª Ø§Ù„Ø³Ù†ÙŠØ©ØŒ ØªØ·ÙˆÙŠØ± Ø§Ù„Ù„Ø§Ø¹Ø¨ÙŠÙ†ØŒ Ø§Ù„Ù…Ø­Ø§Ø¶Ø±Ø§ØªØŒ Ø£Ùˆ Ø§Ù„ØªØ¹Ø§ÙˆÙ† ÙÙŠ Ù…Ø­ØªÙˆÙ‰ ÙŠØ®Ø¯Ù… ÙƒØ±Ø© Ø§Ù„Ù‚Ø¯Ù… Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©.',
-    stats: [['Ø¹Ù„ÙˆÙ… Ø§Ù„Ø±ÙŠØ§Ø¶Ø©','Ø®Ù„ÙÙŠØ© Ø£ÙƒØ§Ø¯ÙŠÙ…ÙŠØ© ÙÙŠ Ø§Ù„Ø­Ø±ÙƒØ© ÙˆØ§Ù„Ø£Ø¯Ø§Ø¡ ÙˆÙÙ‡Ù… Ø§Ù„Ù„Ø§Ø¹Ø¨'],['Ø§Ù„ÙØ¦Ø§Øª Ø§Ù„Ø³Ù†ÙŠØ©','ØªØ±ÙƒÙŠØ² Ø¹Ù„Ù‰ Ø§Ù„Ù‚Ø±Ø§Ø±Ø§Øª Ø§Ù„ØªÙŠ ØªØµÙ†Ø¹ Ù…Ø³Ø§Ø± Ø§Ù„Ù„Ø§Ø¹Ø¨ Ù…Ø¨ÙƒØ±Ø§'],['ÙƒØªØ§Ø¨ Ù…Ø¤Ù„Ù','ØªØ­ÙˆÙŠÙ„ Ø§Ù„ØªØ¬Ø±Ø¨Ø© ÙˆØ§Ù„Ù…Ø¹Ø±ÙØ© Ø¥Ù„Ù‰ Ù…Ø±Ø¬Ø¹ ÙŠÙ…ÙƒÙ† Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„Ù‡'],['Ù…Ø­Ø§Ø¶Ø±Ø§Øª ÙˆÙØ¹Ø§Ù„ÙŠØ§Øª','Ù…Ø´Ø§Ø±ÙƒØ© ÙˆØªÙ†Ø¸ÙŠÙ… ÙˆÙ…Ø³Ø§Ù‡Ù…Ø© Ø¯Ø§Ø®Ù„ Ø¨ÙŠØ¦Ø§Øª Ø±ÙŠØ§Ø¶ÙŠØ© Ù…ØªÙ†ÙˆØ¹Ø©']],
-    lenses: [['Talent ID','ÙƒÙŠÙ Ù†Ù…ÙŠØ² Ø§Ù„Ù…ÙˆÙ‡Ø¨Ø© Ø¨Ø¹ÙŠØ¯Ø§ Ø¹Ù† Ø§Ù„Ø§Ù†Ø·Ø¨Ø§Ø¹ Ø§Ù„Ø³Ø±ÙŠØ¹ØŸ'],['Player Development','ÙƒÙŠÙ ÙŠØªØ­ÙˆÙ„ Ø§Ù„Ù„Ø§Ø¹Ø¨ Ø§Ù„ÙˆØ§Ø¹Ø¯ Ø¥Ù„Ù‰ Ù…Ø´Ø±ÙˆØ¹ Ù‚Ø§Ø¨Ù„ Ù„Ù„Ù†Ù…ÙˆØŸ'],['Recruitment Analysis','ÙƒÙŠÙ ØªÙ‚Ø±Ø£ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª ÙˆØ§Ù„Ø³Ù„ÙˆÙƒ Ù‚Ø¨Ù„ Ù‚Ø±Ø§Ø± Ø§Ù„Ø§Ø®ØªÙŠØ§Ø±ØŸ'],['Player Care','ÙƒÙŠÙ Ù†Ø­Ù…ÙŠ Ø§Ù„Ù„Ø§Ø¹Ø¨ Ù†ÙØ³ÙŠØ§ ÙˆØªØ¹Ù„ÙŠÙ…ÙŠØ§ ÙˆØ¨ÙŠØ¦ÙŠØ§ØŸ']],
-    journey: [['Ø§Ù„Ø¨Ø¯Ø§ÙŠØ© Ù…Ù† Ø§Ù„Ø´ØºÙ','ÙƒØ±Ø© Ø§Ù„Ù‚Ø¯Ù… ÙƒØ§Ù†Øª Ø§Ù„Ù…Ø¯Ø®Ù„ Ø§Ù„Ø£ÙˆÙ„ Ù„ÙÙ‡Ù… Ø§Ù„Ø¥Ù†Ø³Ø§Ù† Ø¯Ø§Ø®Ù„ Ø§Ù„Ù…Ù„Ø¹Ø¨.'],['Ø¹Ù„ÙˆÙ… Ø§Ù„Ø­Ø±ÙƒØ© ÙˆØ§Ù„Ø±ÙŠØ§Ø¶Ø©','Ø¯Ø±Ø§Ø³Ø© Ø£ÙƒØ§Ø¯ÙŠÙ…ÙŠØ© Ù…Ù†Ø­ØªÙ†ÙŠ Ù„ØºØ© Ø£Ø¯Ù‚ Ù„Ù‚Ø±Ø§Ø¡Ø© Ø§Ù„Ø£Ø¯Ø§Ø¡ ÙˆØ§Ù„ØªØ·ÙˆØ±.'],['Ø²ÙŠØ§Ø±Ø§Øª ÙˆÙ…Ø¹Ø§ÙŠØ´Ø§Øª Ù…ÙŠØ¯Ø§Ù†ÙŠØ©','Ø§Ù„Ø§Ø­ØªÙƒØ§Ùƒ Ø¨Ø§Ù„Ø¨ÙŠØ¦Ø§Øª Ø§Ù„Ø±ÙŠØ§Ø¶ÙŠØ© ÙŠØ¹Ù„Ù… Ù…Ø§ Ù„Ø§ ØªÙ‚ÙˆÙ„Ù‡ Ø§Ù„Ø´Ø±Ø§Ø¦Ø­.'],['Ø¯ÙˆØ±Ø§Øª ÙˆØ¯Ø¨Ù„ÙˆÙ…Ø§Øª ÙˆÙ…Ø­Ø§Ø¶Ø±Ø§Øª','ÙƒÙ„ Ù…Ø­Ø·Ø© ØªØ¹Ù„Ù… Ø£Ø¶Ø§ÙØª Ø£Ø¯Ø§Ø© Ø£Ùˆ Ø²Ø§ÙˆÙŠØ© Ø¬Ø¯ÙŠØ¯Ø©.'],['ØªØ£Ù„ÙŠÙ ÙˆÙ…Ø´Ø§Ø±ÙƒØ©','Ø§Ù„ÙƒØªØ§Ø¨ ÙˆØ§Ù„ÙØ¹Ø§Ù„ÙŠØ§Øª Ø·Ø±ÙŠÙ‚Ø© Ù„ØªÙ†Ø¸ÙŠÙ… Ø§Ù„Ù…Ø¹Ø±ÙØ© ÙˆÙ…Ø´Ø§Ø±ÙƒØªÙ‡Ø§.']],
-    quotes: ['Ø£Ø­ÙŠØ§Ù†Ø§ Ù„Ø§ ØªØ¶ÙŠØ¹ Ø§Ù„Ù…ÙˆÙ‡Ø¨Ø© Ù„Ø£Ù†Ù‡Ø§ Ø¶Ø¹ÙŠÙØ©ØŒ Ø¨Ù„ Ù„Ø£Ù†Ù‡Ø§ Ù‚Ø±Ø¦Øª Ø¨Ø·Ø±ÙŠÙ‚Ø© Ø®Ø§Ø·Ø¦Ø©.','Ø§Ù„ÙƒØ´Ø§Ù Ù„Ø§ ÙŠØ±Ù‰ Ù…Ø§ Ø­Ø¯Ø« ÙÙ‚Ø·ØŒ Ø¨Ù„ ÙŠØ³Ø£Ù„: Ù…Ø§Ø°Ø§ ÙŠÙ…ÙƒÙ† Ø£Ù† ÙŠØ­Ø¯Ø« Ø¨Ø¹Ø¯ Ø¹Ø§Ù…ÙŠÙ†ØŸ','ÙÙŠ ÙƒØ±Ø© Ø§Ù„Ù‚Ø¯Ù…ØŒ Ø§Ù„Ø³ÙŠØ§Ù‚ Ù†ØµÙ Ø§Ù„Ø­Ù‚ÙŠÙ‚Ø©.'],
-    services: [['Ù…Ø­ØªÙˆÙ‰ Ù…Ø¹Ø±ÙÙŠ Ø±ÙŠØ§Ø¶ÙŠ','ÙƒØªØ§Ø¨Ø© ÙˆØªØ·ÙˆÙŠØ± Ù…Ù‚Ø§Ù„Ø§Øª ÙˆØ£Ø¯Ù„Ø© ØªØ±Ø¨Ø· Ø§Ù„Ø¹Ù„Ù… Ø¨Ø§Ù„Ù…ÙŠØ¯Ø§Ù† Ø¨Ù„ØºØ© ÙˆØ§Ø¶Ø­Ø©.'],['Ù†Ù…Ø§Ø°Ø¬ ØªÙ‚ÙŠÙŠÙ… ÙˆÙƒØ´Ù','Ø¨Ù†Ø§Ø¡ Ù‚ÙˆØ§Ù„Ø¨ Ø¹Ù…Ù„ÙŠØ© ØªØ³Ø§Ø¹Ø¯ Ø§Ù„ÙƒØ´Ø§Ù ÙˆØ§Ù„Ù…Ø¯Ø±Ø¨ Ø¹Ù„Ù‰ Ù‚Ø±Ø§Ø¡Ø© Ø§Ù„Ù„Ø§Ø¹Ø¨ Ø¨Ø¹Ù…Ù‚.'],['ÙˆØ±Ø´ ÙˆÙ…Ø­Ø§Ø¶Ø±Ø§Øª','Ø¬Ù„Ø³Ø§Øª Ù…Ø¹Ø±ÙÙŠØ© Ø­ÙˆÙ„ Ø§ÙƒØªØ´Ø§Ù Ø§Ù„Ù…ÙˆØ§Ù‡Ø¨ ÙˆØ§Ù„ÙØ¦Ø§Øª Ø§Ù„Ø³Ù†ÙŠØ© ÙˆØ¨ÙŠØ¦Ø§Øª Ø§Ù„ØªØ·ÙˆÙŠØ±.'],['ØªØ¹Ø§ÙˆÙ† Ø¨Ø­Ø«ÙŠ Ø£Ùˆ Ø¥Ø¹Ù„Ø§Ù…ÙŠ','ØªØ­ÙˆÙŠÙ„ Ø§Ù„Ø£ÙÙƒØ§Ø± Ø§Ù„Ø±ÙŠØ§Ø¶ÙŠØ© Ø¥Ù„Ù‰ Ù…Ø­ØªÙˆÙ‰ Ø£Ùˆ Ù…Ø´Ø§Ø±ÙŠØ¹ Ù‚Ø§Ø¨Ù„Ø© Ù„Ù„Ù†Ø´Ø± ÙˆØ§Ù„ØªØ·Ø¨ÙŠÙ‚.']]
+    lensesTitle: 'العدسات التي أكتب من خلالها',
+    journeyTitle: 'محطات صنعت النظرة',
+    journeySub: 'ليست سيرة ذاتية مرتبة على الورق. هذه محطات صنعت طريقة تفكير مختلفة في اللاعب والموهبة.',
+    albumTitle: 'ألبوم المحطات',
+    albumSub: 'هنا مساحة الصور والقصص: زيارة، معايشة، دورة، محاضرة، فعالية، أو لحظة ميدانية تستحق أن تروى.',
+    whyTitle: 'لماذا تستحق BajoZone أن تقرأ؟',
+    whyText: 'لأنها لا تكتفي بالكلام العام عن كرة القدم. هنا أحاول أن أجمع بين العلم، الملاحظة، والتجربة الشخصية.',
+    ctaTitle: 'هل لديك تجربة، أكاديمية، أو فكرة تستحق النقاش؟',
+    ctaText: 'يسعدني التواصل حول المواهب، الفئات السنية، تطوير اللاعبين، المحاضرات، أو التعاون في محتوى يخدم كرة القدم العربية.',
+    stats: [['علوم الرياضة','خلفية أكاديمية في الحركة والأداء وفهم اللاعب'],['الفئات السنية','تركيز على القرارات التي تصنع مسار اللاعب مبكرا'],['كتاب مؤلف','تحويل التجربة والمعرفة إلى مرجع يمكن العودة له'],['محاضرات وفعاليات','مشاركة وتنظيم ومساهمة داخل بيئات رياضية متنوعة']],
+    lenses: [['Talent ID','كيف نميز الموهبة بعيدا عن الانطباع السريع؟'],['Player Development','كيف يتحول اللاعب الواعد إلى مشروع قابل للنمو؟'],['Recruitment Analysis','كيف تقرأ البيانات والسلوك قبل قرار الاختيار؟'],['Player Care','كيف نحمي اللاعب نفسيا وتعليميا وبيئيا؟']],
+    journey: [['البداية من الشغف','كرة القدم كانت المدخل الأول لفهم الإنسان داخل الملعب.'],['علوم الحركة والرياضة','دراسة أكاديمية منحتني لغة أدق لقراءة الأداء والتطور.'],['زيارات ومعايشات ميدانية','الاحتكاك بالبيئات الرياضية يعلم ما لا تقوله الشرائح.'],['دورات ودبلومات ومحاضرات','كل محطة تعلم أضافت أداة أو زاوية جديدة.'],['تأليف ومشاركة','الكتاب والفعاليات طريقة لتنظيم المعرفة ومشاركتها.']],
+    quotes: ['أحيانا لا تضيع الموهبة لأنها ضعيفة، بل لأنها قرئت بطريقة خاطئة.','الكشاف لا يرى ما حدث فقط، بل يسأل: ماذا يمكن أن يحدث بعد عامين؟','في كرة القدم، السياق نصف الحقيقة.'],
+    services: [['محتوى معرفي رياضي','كتابة وتطوير مقالات وأدلة تربط العلم بالميدان بلغة واضحة.'],['نماذج تقييم وكشف','بناء قوالب عملية تساعد الكشاف والمدرب على قراءة اللاعب بعمق.'],['ورش ومحاضرات','جلسات معرفية حول اكتشاف المواهب والفئات السنية وبيئات التطوير.'],['تعاون بحثي أو إعلامي','تحويل الأفكار الرياضية إلى محتوى أو مشاريع قابلة للنشر والتطبيق.']]
   };
 }
 function aboutProfile(lang) {
@@ -2105,44 +2105,44 @@ function aboutProfileFields(lang, label, dir) {
   const p = aboutProfile(lang);
   const prefix = `abt-${lang}`;
   return `<div class="a-card">
-    <div class="a-card-title">Ø§Ù„Ù†ØµÙˆØµ Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ© - ${label}</div>
+    <div class="a-card-title">النصوص الأساسية - ${label}</div>
     <div class="fr">
-      <div class="fg"><label class="fl">Ø§Ù„Ø§Ø³Ù…</label><input id="${prefix}-name" class="fi" dir="${dir}" value="${esc(p.name)}"></div>
-      <div class="fg"><label class="fl">Ø§Ù„Ø¹Ù†ÙˆØ§Ù† Ø§Ù„Ù…Ù‡Ù†ÙŠ</label><input id="${prefix}-title" class="fi" dir="${dir}" value="${esc(p.title)}"></div>
+      <div class="fg"><label class="fl">الاسم</label><input id="${prefix}-name" class="fi" dir="${dir}" value="${esc(p.name)}"></div>
+      <div class="fg"><label class="fl">العنوان المهني</label><input id="${prefix}-title" class="fi" dir="${dir}" value="${esc(p.title)}"></div>
     </div>
-    <div class="fg"><label class="fl">Ø§Ù„Ù†Øµ Ø§Ù„Ø§ÙØªØªØ§Ø­ÙŠ</label><textarea id="${prefix}-lead" class="fi" rows="4" dir="${dir}">${esc(p.lead)}</textarea></div>
-    <div class="fg"><label class="fl">Ø§Ù„Ø§Ù‚ØªØ¨Ø§Ø³ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ</label><textarea id="${prefix}-quote" class="fi" rows="2" dir="${dir}">${esc(p.quote)}</textarea></div>
+    <div class="fg"><label class="fl">النص الافتتاحي</label><textarea id="${prefix}-lead" class="fi" rows="4" dir="${dir}">${esc(p.lead)}</textarea></div>
+    <div class="fg"><label class="fl">الاقتباس الرئيسي</label><textarea id="${prefix}-quote" class="fi" rows="2" dir="${dir}">${esc(p.quote)}</textarea></div>
     <div class="fr">
-      <div class="fg"><label class="fl">Ù†Øµ Ø²Ø± Ø§Ù„ØªÙˆØ§ØµÙ„</label><input id="${prefix}-emailLabel" class="fi" dir="${dir}" value="${esc(p.emailLabel)}"></div>
-      <div class="fg"><label class="fl">Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø£Ùˆ Ø±Ø§Ø¨Ø· Ø§Ù„ØªÙˆØ§ØµÙ„</label><input id="${prefix}-email" class="fi" dir="ltr" value="${esc(p.email)}"></div>
-    </div>
-    <div class="fr">
-      <div class="fg"><label class="fl">Ø¹Ù†ÙˆØ§Ù† Ø§Ù„Ø¹Ø¯Ø³Ø§Øª</label><input id="${prefix}-lensesTitle" class="fi" dir="${dir}" value="${esc(p.lensesTitle)}"></div>
-      <div class="fg"><label class="fl">Ø¹Ù†ÙˆØ§Ù† Ø§Ù„Ù…Ø­Ø·Ø§Øª Ø§Ù„Ù†ØµÙŠØ©</label><input id="${prefix}-journeyTitle" class="fi" dir="${dir}" value="${esc(p.journeyTitle)}"></div>
-    </div>
-    <div class="fg"><label class="fl">ÙˆØµÙ Ø§Ù„Ù…Ø­Ø·Ø§Øª Ø§Ù„Ù†ØµÙŠØ©</label><textarea id="${prefix}-journeySub" class="fi" rows="2" dir="${dir}">${esc(p.journeySub)}</textarea></div>
-    <div class="fr">
-      <div class="fg"><label class="fl">Ø¹Ù†ÙˆØ§Ù† Ø£Ù„Ø¨ÙˆÙ… Ø§Ù„ØµÙˆØ±</label><input id="${prefix}-albumTitle" class="fi" dir="${dir}" value="${esc(p.albumTitle)}"></div>
-      <div class="fg"><label class="fl">ÙˆØµÙ Ø£Ù„Ø¨ÙˆÙ… Ø§Ù„ØµÙˆØ±</label><textarea id="${prefix}-albumSub" class="fi" rows="2" dir="${dir}">${esc(p.albumSub)}</textarea></div>
+      <div class="fg"><label class="fl">نص زر التواصل</label><input id="${prefix}-emailLabel" class="fi" dir="${dir}" value="${esc(p.emailLabel)}"></div>
+      <div class="fg"><label class="fl">البريد أو رابط التواصل</label><input id="${prefix}-email" class="fi" dir="ltr" value="${esc(p.email)}"></div>
     </div>
     <div class="fr">
-      <div class="fg"><label class="fl">Ø¹Ù†ÙˆØ§Ù† Ø§Ù„ÙÙƒØ±Ø©</label><input id="${prefix}-whyTitle" class="fi" dir="${dir}" value="${esc(p.whyTitle)}"></div>
-      <div class="fg"><label class="fl">Ù†Øµ Ø§Ù„ÙÙƒØ±Ø©</label><textarea id="${prefix}-whyText" class="fi" rows="3" dir="${dir}">${esc(p.whyText)}</textarea></div>
+      <div class="fg"><label class="fl">عنوان العدسات</label><input id="${prefix}-lensesTitle" class="fi" dir="${dir}" value="${esc(p.lensesTitle)}"></div>
+      <div class="fg"><label class="fl">عنوان المحطات النصية</label><input id="${prefix}-journeyTitle" class="fi" dir="${dir}" value="${esc(p.journeyTitle)}"></div>
+    </div>
+    <div class="fg"><label class="fl">وصف المحطات النصية</label><textarea id="${prefix}-journeySub" class="fi" rows="2" dir="${dir}">${esc(p.journeySub)}</textarea></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">عنوان ألبوم الصور</label><input id="${prefix}-albumTitle" class="fi" dir="${dir}" value="${esc(p.albumTitle)}"></div>
+      <div class="fg"><label class="fl">وصف ألبوم الصور</label><textarea id="${prefix}-albumSub" class="fi" rows="2" dir="${dir}">${esc(p.albumSub)}</textarea></div>
     </div>
     <div class="fr">
-      <div class="fg"><label class="fl">Ø¹Ù†ÙˆØ§Ù† Ø§Ù„Ù†Ø¯Ø§Ø¡ Ø§Ù„Ø£Ø®ÙŠØ±</label><input id="${prefix}-ctaTitle" class="fi" dir="${dir}" value="${esc(p.ctaTitle)}"></div>
-      <div class="fg"><label class="fl">Ù†Øµ Ø§Ù„Ù†Ø¯Ø§Ø¡ Ø§Ù„Ø£Ø®ÙŠØ±</label><textarea id="${prefix}-ctaText" class="fi" rows="3" dir="${dir}">${esc(p.ctaText)}</textarea></div>
-    </div>
-    <p style="color:var(--warm-dark);font-size:.76rem;margin:8px 0 12px;">Ù„Ù„Ù‚ÙˆØ§Ø¦Ù… Ø§Ù„ØªØ§Ù„ÙŠØ©: Ø§ÙƒØªØ¨ ÙƒÙ„ Ø¹Ù†ØµØ± ÙÙŠ Ø³Ø·Ø± Ø¨ØµÙŠØºØ©: Ø§Ù„Ø¹Ù†ÙˆØ§Ù† | Ø§Ù„ÙˆØµÙ. Ø£Ù…Ø§ Ø§Ù„Ø§Ù‚ØªØ¨Ø§Ø³Ø§Øª ÙØ§ÙƒØªØ¨ ÙƒÙ„ Ø§Ù‚ØªØ¨Ø§Ø³ ÙÙŠ Ø³Ø·Ø± Ù…Ø³ØªÙ‚Ù„.</p>
-    <div class="fr">
-      <div class="fg"><label class="fl">Ø§Ù„Ø¥Ø­ØµØ§Ø¡Ø§Øª / Ø§Ù„Ø¨Ø·Ø§Ù‚Ø§Øª</label><textarea id="${prefix}-stats" class="fi" rows="6" dir="${dir}">${esc(pairsToText(p.stats))}</textarea></div>
-      <div class="fg"><label class="fl">Ø§Ù„Ø¹Ø¯Ø³Ø§Øª</label><textarea id="${prefix}-lenses" class="fi" rows="6" dir="${dir}">${esc(pairsToText(p.lenses))}</textarea></div>
+      <div class="fg"><label class="fl">عنوان الفكرة</label><input id="${prefix}-whyTitle" class="fi" dir="${dir}" value="${esc(p.whyTitle)}"></div>
+      <div class="fg"><label class="fl">نص الفكرة</label><textarea id="${prefix}-whyText" class="fi" rows="3" dir="${dir}">${esc(p.whyText)}</textarea></div>
     </div>
     <div class="fr">
-      <div class="fg"><label class="fl">Ø§Ù„Ù…Ø­Ø·Ø§Øª Ø§Ù„Ù†ØµÙŠØ©</label><textarea id="${prefix}-journey" class="fi" rows="7" dir="${dir}">${esc(pairsToText(p.journey))}</textarea></div>
-      <div class="fg"><label class="fl">Ø§Ù„Ø®Ø¯Ù…Ø§Øª</label><textarea id="${prefix}-services" class="fi" rows="7" dir="${dir}">${esc(pairsToText(p.services))}</textarea></div>
+      <div class="fg"><label class="fl">عنوان النداء الأخير</label><input id="${prefix}-ctaTitle" class="fi" dir="${dir}" value="${esc(p.ctaTitle)}"></div>
+      <div class="fg"><label class="fl">نص النداء الأخير</label><textarea id="${prefix}-ctaText" class="fi" rows="3" dir="${dir}">${esc(p.ctaText)}</textarea></div>
     </div>
-    <div class="fg"><label class="fl">Ø§Ù„Ø§Ù‚ØªØ¨Ø§Ø³Ø§Øª</label><textarea id="${prefix}-quotes" class="fi" rows="5" dir="${dir}">${esc(linesToText(p.quotes))}</textarea></div>
+    <p style="color:var(--warm-dark);font-size:.76rem;margin:8px 0 12px;">للقوائم التالية: اكتب كل عنصر في سطر بصيغة: العنوان | الوصف. أما الاقتباسات فاكتب كل اقتباس في سطر مستقل.</p>
+    <div class="fr">
+      <div class="fg"><label class="fl">الإحصاءات / البطاقات</label><textarea id="${prefix}-stats" class="fi" rows="6" dir="${dir}">${esc(pairsToText(p.stats))}</textarea></div>
+      <div class="fg"><label class="fl">العدسات</label><textarea id="${prefix}-lenses" class="fi" rows="6" dir="${dir}">${esc(pairsToText(p.lenses))}</textarea></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">المحطات النصية</label><textarea id="${prefix}-journey" class="fi" rows="7" dir="${dir}">${esc(pairsToText(p.journey))}</textarea></div>
+      <div class="fg"><label class="fl">الخدمات</label><textarea id="${prefix}-services" class="fi" rows="7" dir="${dir}">${esc(pairsToText(p.services))}</textarea></div>
+    </div>
+    <div class="fg"><label class="fl">الاقتباسات</label><textarea id="${prefix}-quotes" class="fi" rows="5" dir="${dir}">${esc(linesToText(p.quotes))}</textarea></div>
   </div>`;
 }
 function collectAboutProfileLang(lang) {
@@ -2159,20 +2159,20 @@ function collectAboutProfileLang(lang) {
 function galleryItemHtml(item = {}, idx = 0) {
   return `<div class="gallery-admin-item" data-gallery-item>
     <div class="gallery-admin-media">
-      ${item.image ? `<img src="../${item.image}" alt="">` : `<div class="gallery-admin-ph">ØµÙˆØ±Ø©</div>`}
+      ${item.image ? `<img src="../${item.image}" alt="">` : `<div class="gallery-admin-ph">صورة</div>`}
       <input type="hidden" data-g-image value="${esc(item.image || '')}">
       <input type="file" accept="image/*" data-g-file>
     </div>
     <div class="gallery-admin-fields">
       <div class="fr">
-        <div class="fg"><label class="fl">Ø¹Ù†ÙˆØ§Ù† Ø§Ù„ØªØ¬Ø±Ø¨Ø© (Ø¹Ø±Ø¨ÙŠ)</label><input class="fi" data-g-title-ar dir="rtl" value="${esc(item.title_ar || '')}"></div>
+        <div class="fg"><label class="fl">عنوان التجربة (عربي)</label><input class="fi" data-g-title-ar dir="rtl" value="${esc(item.title_ar || '')}"></div>
         <div class="fg"><label class="fl">Experience title (English)</label><input class="fi" data-g-title-en dir="ltr" value="${esc(item.title_en || '')}"></div>
       </div>
       <div class="fr">
-        <div class="fg"><label class="fl">Ø§Ù„Ù‚ØµØ© / Ø§Ù„Ù†Ø¨Ø°Ø© (Ø¹Ø±Ø¨ÙŠ)</label><textarea class="fi" data-g-story-ar rows="4" dir="rtl">${esc(item.story_ar || '')}</textarea></div>
+        <div class="fg"><label class="fl">القصة / النبذة (عربي)</label><textarea class="fi" data-g-story-ar rows="4" dir="rtl">${esc(item.story_ar || '')}</textarea></div>
         <div class="fg"><label class="fl">Story / note (English)</label><textarea class="fi" data-g-story-en rows="4" dir="ltr">${esc(item.story_en || '')}</textarea></div>
       </div>
-      <button class="ibtn red" type="button" data-g-remove>Ø­Ø°Ù Ù‡Ø°Ù‡ Ø§Ù„ØµÙˆØ±Ø©</button>
+      <button class="ibtn red" type="button" data-g-remove>حذف هذه الصورة</button>
     </div>
   </div>`;
 }
@@ -2219,20 +2219,20 @@ function collectGallery() {
 function galleryItemHtmlFixed(item = {}, idx = 0) {
   return `<div class="gallery-admin-item" data-gallery-item>
     <div class="gallery-admin-media">
-      ${item.image ? `<img src="${mediaSrc(item.image)}" alt="">` : `<div class="gallery-admin-ph">ØµÙˆØ±Ø©</div>`}
+      ${item.image ? `<img src="${mediaSrc(item.image)}" alt="">` : `<div class="gallery-admin-ph">صورة</div>`}
       <input type="hidden" data-g-image value="${esc(item.image || '')}">
       <input type="file" accept="image/*" data-g-file>
     </div>
     <div class="gallery-admin-fields">
       <div class="fr">
-        <div class="fg"><label class="fl">Ø¹Ù†ÙˆØ§Ù† Ø§Ù„ØªØ¬Ø±Ø¨Ø© (Ø¹Ø±Ø¨ÙŠ)</label><input class="fi" data-g-title-ar dir="rtl" value="${esc(item.title_ar || '')}"></div>
+        <div class="fg"><label class="fl">عنوان التجربة (عربي)</label><input class="fi" data-g-title-ar dir="rtl" value="${esc(item.title_ar || '')}"></div>
         <div class="fg"><label class="fl">Experience title (English)</label><input class="fi" data-g-title-en dir="ltr" value="${esc(item.title_en || '')}"></div>
       </div>
       <div class="fr">
-        <div class="fg"><label class="fl">Ø§Ù„Ù‚ØµØ© / Ø§Ù„Ù†Ø¨Ø°Ø© (Ø¹Ø±Ø¨ÙŠ)</label><textarea class="fi" data-g-story-ar rows="4" dir="rtl">${esc(item.story_ar || '')}</textarea></div>
+        <div class="fg"><label class="fl">القصة / النبذة (عربي)</label><textarea class="fi" data-g-story-ar rows="4" dir="rtl">${esc(item.story_ar || '')}</textarea></div>
         <div class="fg"><label class="fl">Story / note (English)</label><textarea class="fi" data-g-story-en rows="4" dir="ltr">${esc(item.story_en || '')}</textarea></div>
       </div>
-      <button class="ibtn red" type="button" data-g-remove>Ø­Ø°Ù Ù‡Ø°Ù‡ Ø§Ù„ØµÙˆØ±Ø©</button>
+      <button class="ibtn red" type="button" data-g-remove>حذف هذه الصورة</button>
     </div>
   </div>`;
 }
@@ -2259,25 +2259,25 @@ function bindGalleryEditorFixed() {
       const hidden = item.querySelector('[data-g-image]');
       const media = item.querySelector('.gallery-admin-media');
       const ph = item.querySelector('.gallery-admin-ph');
-      const oldPh = ph?.textContent || 'ØµÙˆØ±Ø©';
-      if (ph) ph.textContent = 'Ø¬Ø§Ø±ÙŠ Ù…Ø¹Ø§Ù„Ø¬Ø© Ø§Ù„ØµÙˆØ±Ø©...';
+      const oldPh = ph?.textContent || 'صورة';
+      if (ph) ph.textContent = 'جاري معالجة الصورة...';
       input.disabled = true;
       compressImage(file, 1200, 1200, 0.78, async (err, dataUrl) => {
         input.disabled = false;
         if (err) {
           if (ph) ph.textContent = oldPh;
-          showAdminToast('Ø®Ø·Ø£ ÙÙŠ Ø§Ù„ØµÙˆØ±Ø©: ' + err, true);
+          showAdminToast('خطأ في الصورة: ' + err, true);
           return;
         }
         let finalUrl = '';
         if (true) {
           try {
-            if (ph) ph.textContent = 'Ø¬Ø§Ø±ÙŠ Ø±ÙØ¹ Ø§Ù„ØµÙˆØ±Ø©...';
+            if (ph) ph.textContent = 'جاري رفع الصورة...';
             finalUrl = await uploadImageToServer(dataUrl, 'about-gallery', file);
           } catch (uploadErr) {
             console.error(uploadErr);
             const reason = uploadErr?.message ? `: ${uploadErr.message}` : '';
-            showAdminToast(`ØªØ¹Ø°Ø± Ø±ÙØ¹ ØµÙˆØ±Ø© Ø§Ù„Ù…Ø­Ø·Ø© Ø¥Ù„Ù‰ MySQL${reason}`, true);
+            showAdminToast(`تعذر رفع صورة المحطة إلى MySQL${reason}`, true);
           }
         }
         if (!finalUrl) {
@@ -2287,11 +2287,11 @@ function bindGalleryEditorFixed() {
         if (!finalUrl) {
           if (dataUrl.length > 900 * 1024) {
             if (ph) ph.textContent = oldPh;
-            showAdminToast('Ø§Ù„ØµÙˆØ±Ø© Ø¬Ø§Ù‡Ø²Ø© Ù„ÙƒÙ† Ù„Ø§ ÙŠÙ…ÙƒÙ† Ø­ÙØ¸Ù‡Ø§ Ù…Ø­Ù„ÙŠØ§ Ù„Ø£Ù†Ù‡Ø§ ÙƒØ¨ÙŠØ±Ø©. Ø³Ø¬Ù„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø¹Ø¨Ø± MySQL Ø£Ùˆ Ø§Ø³ØªØ®Ø¯Ù… ØµÙˆØ±Ø© Ø£ØµØºØ±.', true);
+            showAdminToast('الصورة جاهزة لكن لا يمكن حفظها محليا لأنها كبيرة. سجل الدخول عبر MySQL أو استخدم صورة أصغر.', true);
             return;
           }
           finalUrl = dataUrl;
-          showAdminToast('ØªÙ… Ø­ÙØ¸ Ø§Ù„ØµÙˆØ±Ø© Ù…Ø­Ù„ÙŠØ§ Ù…Ø¤Ù‚ØªØ§. Ø§Ù„Ø£ÙØ¶Ù„ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø¹Ø¨Ø± MySQL Ø­ØªÙ‰ ØªØ¸Ù‡Ø± Ø¹Ù„Ù‰ Ø§Ù„Ù…ÙˆÙ‚Ø¹ Ø§Ù„Ù…Ù†Ø´ÙˆØ±.', true);
+          showAdminToast('تم حفظ الصورة محليا مؤقتا. الأفضل تسجيل الدخول عبر MySQL حتى تظهر على الموقع المنشور.', true);
         }
         hidden.value = finalUrl;
         media.querySelector('img')?.remove();
@@ -2308,23 +2308,23 @@ function renderSAbout() {
   ge('main-content').innerHTML = `
     <div data-tab-scope>
     <div class="tabs" id="abt-profile-tabs" style="margin-bottom:16px;">
-      <button class="tab-btn on" data-tab="abt-profile-ar">Ø¹Ø±Ø¨ÙŠ</button>
+      <button class="tab-btn on" data-tab="abt-profile-ar">عربي</button>
       <button class="tab-btn" data-tab="abt-profile-en">English</button>
     </div>
-    <div class="tc on" id="abt-profile-ar">${aboutProfileFields('ar', 'Ø¹Ø±Ø¨ÙŠ', 'rtl')}</div>
+    <div class="tc on" id="abt-profile-ar">${aboutProfileFields('ar', 'عربي', 'rtl')}</div>
     <div class="tc" id="abt-profile-en">${aboutProfileFields('en', 'English', 'ltr')}</div>
     </div>
     <div class="a-card">
-      <div class="a-card-title">Ù…Ø­ØªÙˆÙ‰ ØµÙØ­Ø© "Ø¥Ø¹Ø±Ù Ø¹Ù†ÙŠ"</div>
+      <div class="a-card-title">محتوى صفحة "إعرف عني"</div>
       <p style="color:var(--warm-mid);font-size:.83rem;margin-bottom:20px;">
-        Ø§Ù„ØµÙØ­Ø© Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø© Ù…Ø¨Ù†ÙŠØ© ÙƒØªØ¬Ø±Ø¨Ø© ØªÙØ§Ø¹Ù„ÙŠØ© Ù„Ø¹Ø¨Ø¯Ø§Ù„Ø¹Ø²ÙŠØ². Ø§Ø³ØªØ®Ø¯Ù… Ù‡Ø°Ø§ Ø§Ù„Ù…Ø­Ø±Ø± Ù„Ù„Ù†ØµÙˆØµ Ø§Ù„Ø¥Ø¶Ø§ÙÙŠØ© Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø©ØŒ ÙˆØ§Ø³ØªØ®Ø¯Ù… Ø§Ù„Ù…Ø¹Ø±Ø¶ Ø£Ø¯Ù†Ø§Ù‡ Ù„Ø¥Ø¶Ø§ÙØ© Ø§Ù„ØµÙˆØ± ÙˆÙ‚ØµØµÙ‡Ø§.
+        الصفحة الجديدة مبنية كتجربة تفاعلية لعبدالعزيز. استخدم هذا المحرر للنصوص الإضافية عند الحاجة، واستخدم المعرض أدناه لإضافة الصور وقصصها.
       </p>
       <div class="tabs" id="abt-pg-tabs">
-        <button class="tab-btn on" data-tab="abt-pg-ar">Ø¹Ø±Ø¨ÙŠ ðŸ‡¸ðŸ‡¦</button>
-        <button class="tab-btn" data-tab="abt-pg-en">English ðŸ‡¬ðŸ‡§</button>
+        <button class="tab-btn on" data-tab="abt-pg-ar">عربي 🇸🇦</button>
+        <button class="tab-btn" data-tab="abt-pg-en">English 🇬🇧</button>
       </div>
       <div class="tc on" id="abt-pg-ar">
-        <div class="fg"><label class="fl">Ø§Ù„Ù…Ø­ØªÙˆÙ‰ (Ø¹Ø±Ø¨ÙŠ)</label>
+        <div class="fg"><label class="fl">المحتوى (عربي)</label>
           <div class="rte-bar" id="abt-rte-ar-bar">
             <button class="rte-btn" data-cmd="bold" data-ed="abt-rte-ar"><b>B</b></button>
             <button class="rte-btn" data-cmd="italic" data-ed="abt-rte-ar"><i>I</i></button>
@@ -2332,18 +2332,18 @@ function renderSAbout() {
             <span class="rte-sep"></span>
             <button class="rte-btn" data-cmd="formatBlock" data-val="h2" data-ed="abt-rte-ar">H2</button>
             <button class="rte-btn" data-cmd="formatBlock" data-val="h3" data-ed="abt-rte-ar">H3</button>
-            <button class="rte-btn" data-cmd="formatBlock" data-val="p" data-ed="abt-rte-ar">Â¶</button>
+            <button class="rte-btn" data-cmd="formatBlock" data-val="p" data-ed="abt-rte-ar">¶</button>
             <span class="rte-sep"></span>
-            <button class="rte-btn" data-cmd="justifyRight" data-ed="abt-rte-ar">â‡’</button>
-            <button class="rte-btn" data-cmd="justifyCenter" data-ed="abt-rte-ar">â‰¡</button>
-            <button class="rte-btn" data-cmd="justifyLeft" data-ed="abt-rte-ar">â‡</button>
+            <button class="rte-btn" data-cmd="justifyRight" data-ed="abt-rte-ar">⇒</button>
+            <button class="rte-btn" data-cmd="justifyCenter" data-ed="abt-rte-ar">≡</button>
+            <button class="rte-btn" data-cmd="justifyLeft" data-ed="abt-rte-ar">⇐</button>
             <span class="rte-sep"></span>
-            <button class="rte-btn" data-cmd="insertUnorderedList" data-ed="abt-rte-ar">â€¢ Ù‚Ø§Ø¦Ù…Ø©</button>
-            <button class="rte-btn" data-cmd="insertOrderedList" data-ed="abt-rte-ar">1. Ù…Ø±Ù‚Ù…</button>
+            <button class="rte-btn" data-cmd="insertUnorderedList" data-ed="abt-rte-ar">• قائمة</button>
+            <button class="rte-btn" data-cmd="insertOrderedList" data-ed="abt-rte-ar">1. مرقم</button>
             <span class="rte-sep"></span>
-            <button class="rte-btn" data-action="link" data-ed="abt-rte-ar">ðŸ”— Ø±Ø§Ø¨Ø·</button>
-            <button class="rte-btn" data-action="image" data-ed="abt-rte-ar">ðŸ–¼ ØµÙˆØ±Ø©</button>
-            <button class="rte-btn" data-action="video" data-ed="abt-rte-ar">â–¶ ÙÙŠØ¯ÙŠÙˆ</button>
+            <button class="rte-btn" data-action="link" data-ed="abt-rte-ar">🔗 رابط</button>
+            <button class="rte-btn" data-action="image" data-ed="abt-rte-ar">🖼 صورة</button>
+            <button class="rte-btn" data-action="video" data-ed="abt-rte-ar">▶ فيديو</button>
           </div>
           <div class="rte-body" id="abt-rte-ar" contenteditable="true" dir="rtl" spellcheck="false" style="min-height:380px;"></div>
         </div>
@@ -2357,34 +2357,34 @@ function renderSAbout() {
             <span class="rte-sep"></span>
             <button class="rte-btn" data-cmd="formatBlock" data-val="h2" data-ed="abt-rte-en">H2</button>
             <button class="rte-btn" data-cmd="formatBlock" data-val="h3" data-ed="abt-rte-en">H3</button>
-            <button class="rte-btn" data-cmd="formatBlock" data-val="p" data-ed="abt-rte-en">Â¶</button>
+            <button class="rte-btn" data-cmd="formatBlock" data-val="p" data-ed="abt-rte-en">¶</button>
             <span class="rte-sep"></span>
-            <button class="rte-btn" data-cmd="justifyLeft" data-ed="abt-rte-en">â‡</button>
-            <button class="rte-btn" data-cmd="justifyCenter" data-ed="abt-rte-en">â‰¡</button>
-            <button class="rte-btn" data-cmd="justifyRight" data-ed="abt-rte-en">â‡’</button>
+            <button class="rte-btn" data-cmd="justifyLeft" data-ed="abt-rte-en">⇐</button>
+            <button class="rte-btn" data-cmd="justifyCenter" data-ed="abt-rte-en">≡</button>
+            <button class="rte-btn" data-cmd="justifyRight" data-ed="abt-rte-en">⇒</button>
             <span class="rte-sep"></span>
-            <button class="rte-btn" data-cmd="insertUnorderedList" data-ed="abt-rte-en">â€¢ List</button>
+            <button class="rte-btn" data-cmd="insertUnorderedList" data-ed="abt-rte-en">• List</button>
             <button class="rte-btn" data-cmd="insertOrderedList" data-ed="abt-rte-en">1. List</button>
             <span class="rte-sep"></span>
-            <button class="rte-btn" data-action="link" data-ed="abt-rte-en">ðŸ”— Link</button>
-            <button class="rte-btn" data-action="image" data-ed="abt-rte-en">ðŸ–¼ Image</button>
-            <button class="rte-btn" data-action="video" data-ed="abt-rte-en">â–¶ Video</button>
+            <button class="rte-btn" data-action="link" data-ed="abt-rte-en">🔗 Link</button>
+            <button class="rte-btn" data-action="image" data-ed="abt-rte-en">🖼 Image</button>
+            <button class="rte-btn" data-action="video" data-ed="abt-rte-en">▶ Video</button>
           </div>
           <div class="rte-body" id="abt-rte-en" contenteditable="true" dir="ltr" spellcheck="false" style="min-height:380px;"></div>
         </div>
       </div>
     </div>
     <div class="a-card">
-      <div class="a-card-title">Ù…Ø¹Ø±Ø¶ Ø§Ù„ØªØ¬Ø§Ø±Ø¨ ÙˆØ§Ù„ØµÙˆØ±</div>
+      <div class="a-card-title">معرض التجارب والصور</div>
       <p style="color:var(--warm-mid);font-size:.83rem;margin-bottom:18px;">
-        Ø£Ø¶Ù ØµÙˆØ± Ø²ÙŠØ§Ø±Ø§ØªÙƒ ÙˆÙ…Ø¹Ø§ÙŠØ´Ø§ØªÙƒ ÙˆØ¯ÙˆØ±Ø§ØªÙƒ ÙˆÙ…Ø­Ø§Ø¶Ø±Ø§ØªÙƒØŒ ÙˆØ§ÙƒØªØ¨ ØªØ­Øª ÙƒÙ„ ØµÙˆØ±Ø© Ù†Ø¨Ø°Ø© Ø£Ùˆ Ù‚ØµØ© Ù‚ØµÙŠØ±Ø©.
+        أضف صور زياراتك ومعايشاتك ودوراتك ومحاضراتك، واكتب تحت كل صورة نبذة أو قصة قصيرة.
       </p>
       <div id="about-gallery-editor" class="gallery-admin-list">
-        ${(s.about_gallery || []).map((item, idx) => galleryItemHtml(item, idx)).join('') || `<div class="dash-empty">Ù„Ø§ ØªÙˆØ¬Ø¯ ØµÙˆØ± Ø¨Ø¹Ø¯. Ø§Ø¶ØºØ· Ø¥Ø¶Ø§ÙØ© ØµÙˆØ±Ø©.</div>`}
+        ${(s.about_gallery || []).map((item, idx) => galleryItemHtml(item, idx)).join('') || `<div class="dash-empty">لا توجد صور بعد. اضغط إضافة صورة.</div>`}
       </div>
-      <button class="ibtn" type="button" id="btn-add-gallery" style="margin-top:12px;">+ Ø¥Ø¶Ø§ÙØ© ØµÙˆØ±Ø© ØªØ¬Ø±Ø¨Ø©</button>
+      <button class="ibtn" type="button" id="btn-add-gallery" style="margin-top:12px;">+ إضافة صورة تجربة</button>
     </div>
-    <button class="btn btn-fill" id="btn-save-sabout" style="padding:11px 36px;">Ø­ÙØ¸ Ø§Ù„Ù…Ø­ØªÙˆÙ‰ âœ“</button>`;
+    <button class="btn btn-fill" id="btn-save-sabout" style="padding:11px 36px;">حفظ المحتوى ✓</button>`;
 
   // Load existing content
   ge('abt-rte-ar').innerHTML = s.about_content_ar || `<p>${esc(s.about_ar||'')}</p>`;
@@ -2414,16 +2414,16 @@ function logoItemHtml(item = {}) {
   const displaySrc = src ? mediaSrc(src) : '';
   return `<div class="gallery-admin-item" data-logo-item>
     <div class="gallery-admin-media">
-      ${displaySrc ? `<img src="${displaySrc}" alt="">` : `<div class="gallery-admin-ph">Ù„ÙˆÙ‚Ùˆ</div>`}
+      ${displaySrc ? `<img src="${displaySrc}" alt="">` : `<div class="gallery-admin-ph">لوقو</div>`}
       <input type="hidden" data-l-src value="${esc(src)}">
       <input type="file" accept="image/*" data-l-file>
     </div>
     <div class="gallery-admin-fields">
       <div class="fr">
-        <div class="fg"><label class="fl">Ø§Ø³Ù… Ø§Ù„Ø¬Ù‡Ø© (Ø¹Ø±Ø¨ÙŠ)</label><input class="fi" data-l-alt-ar dir="rtl" value="${esc(item.alt_ar || '')}"></div>
+        <div class="fg"><label class="fl">اسم الجهة (عربي)</label><input class="fi" data-l-alt-ar dir="rtl" value="${esc(item.alt_ar || '')}"></div>
         <div class="fg"><label class="fl">Institution name (English)</label><input class="fi" data-l-alt-en dir="ltr" value="${esc(item.alt_en || '')}"></div>
       </div>
-      <button class="ibtn red" type="button" data-l-remove>Ø­Ø°Ù Ù‡Ø°Ø§ Ø§Ù„Ø´Ø¹Ø§Ø±</button>
+      <button class="ibtn red" type="button" data-l-remove>حذف هذا الشعار</button>
     </div>
   </div>`;
 }
@@ -2448,24 +2448,24 @@ function bindLogoEditor() {
       const hidden = item.querySelector('[data-l-src]');
       const media = item.querySelector('.gallery-admin-media');
       const ph = item.querySelector('.gallery-admin-ph');
-      const oldPh = ph?.textContent || 'Ù„ÙˆÙ‚Ùˆ';
-      if (ph) ph.textContent = 'Ø¬Ø§Ø±ÙŠ Ø§Ù„Ù…Ø¹Ø§Ù„Ø¬Ø©...';
+      const oldPh = ph?.textContent || 'لوقو';
+      if (ph) ph.textContent = 'جاري المعالجة...';
       this.disabled = true;
       compressImage(file, 400, 400, 0.85, async (err, dataUrl) => {
         this.disabled = false;
         if (err) {
           if (ph) ph.textContent = oldPh;
-          showAdminToast('Ø®Ø·Ø£ ÙÙŠ Ø§Ù„ØµÙˆØ±Ø©: ' + err, true);
+          showAdminToast('خطأ في الصورة: ' + err, true);
           return;
         }
         let finalUrl = '';
         if (true) {
           try {
-            if (ph) ph.textContent = 'Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø±ÙØ¹...';
+            if (ph) ph.textContent = 'جاري الرفع...';
             finalUrl = await uploadImageToServer(dataUrl, 'about-logos', file);
           } catch (uploadErr) {
             const reason = uploadErr?.message ? `: ${uploadErr.message}` : '';
-            showAdminToast(`ØªØ¹Ø°Ø± Ø±ÙØ¹ Ø§Ù„Ø´Ø¹Ø§Ø±${reason}`, true);
+            showAdminToast(`تعذر رفع الشعار${reason}`, true);
           }
         }
         if (!finalUrl) {
@@ -2493,15 +2493,15 @@ function renderSAbout() {
   const varData = s.about_var_data || {};
   ge('main-content').innerHTML = `
     <div class="a-card">
-      <div class="a-card-title">Ø§Ù„ØµÙˆØ±Ø© Ø§Ù„Ø´Ø®ØµÙŠØ©</div>
+      <div class="a-card-title">الصورة الشخصية</div>
       <p style="color:var(--warm-mid);font-size:.86rem;line-height:1.8;margin-bottom:18px;">
-        ØªØ¸Ù‡Ø± ÙƒØ¨Ø·Ø§Ù‚Ø© Ù…Ø³ØªØ·ÙŠÙ„Ø© Ø·ÙˆÙ„ÙŠØ© ÙÙŠ Ø§Ù„Ù‚Ø³Ù… Ø§Ù„Ø£ÙˆÙ„ Ù…Ù† ØµÙØ­Ø© "ØªØ¹Ø±Ù Ø¹Ù„ÙŠ". Ø§Ù„Ø£ÙØ¶Ù„ ØµÙˆØ±Ø© Ø´Ø®ØµÙŠØ© Ø¨Ø¥Ø¶Ø§Ø¡Ø© Ø¬ÙŠØ¯Ø©ØŒ ÙˆÙŠÙÙ†ØµØ­ Ø¨ØµÙˆØ±Ø© Ø·ÙˆÙ„ÙŠØ© Portrait.
+        تظهر كبطاقة مستطيلة طولية في القسم الأول من صفحة "تعرف علي". الأفضل صورة شخصية بإضاءة جيدة، ويُنصح بصورة طولية Portrait.
       </p>
       <div class="fg">
-        <label class="fl">Ø§Ù„ØµÙˆØ±Ø© Ø§Ù„Ø´Ø®ØµÙŠØ©</label>
+        <label class="fl">الصورة الشخصية</label>
         <div class="upzone">
           <input type="file" id="about-profile-file" accept="image/*">
-          <div class="upzone-txt">Ø§Ø±ÙØ¹ ØµÙˆØ±Ø© Ø´Ø®ØµÙŠØ© Ù…Ø±Ø¨Ø¹Ø© Ø£Ùˆ Ù‚Ø±ÙŠØ¨Ø© Ù…Ù† Ø§Ù„Ù…Ø±Ø¨Ø¹</div>
+          <div class="upzone-txt">ارفع صورة شخصية مربعة أو قريبة من المربع</div>
         </div>
         <input type="hidden" id="about-profile-val" value="${esc(s.about_image || '')}">
         <img id="about-profile-prev" class="up-prev" ${s.about_image ? `src="${mediaSrc(s.about_image)}" style="display:block;"` : ''}>
@@ -2509,76 +2509,76 @@ function renderSAbout() {
     </div>
 
     <div class="a-card">
-      <div class="a-card-title">Ù„Ù‚Ø·Ø§Øª Ù…Ù† Ø§Ù„Ø±Ø­Ù„Ø©</div>
+      <div class="a-card-title">لقطات من الرحلة</div>
       <p style="color:var(--warm-mid);font-size:.86rem;line-height:1.8;margin-bottom:18px;">
-        ØªØ¸Ù‡Ø± Ù‡Ø°Ù‡ Ø§Ù„ØµÙˆØ± ÙÙŠ Ù‚Ø³Ù… "Ù„Ù‚Ø·Ø§Øª ÙˆÙ…Ø­Ø·Ø§Øª Ù…Ù† Ø§Ù„Ø±Ø­Ù„Ø©" Ù…Ø¹ Ø´Ø±ÙŠØ· Ø§Ù„Ø´Ø¹Ø§Ø±Ø§Øª Ø£Ø¯Ù†Ø§Ù‡. Ø£Ø¶Ù 3 Ø¥Ù„Ù‰ 6 ØµÙˆØ±.
+        تظهر هذه الصور في قسم "لقطات ومحطات من الرحلة" مع شريط الشعارات أدناه. أضف 3 إلى 6 صور.
       </p>
       <div id="about-gallery-editor" class="gallery-admin-list">
-        ${(s.about_gallery || []).map((item, idx) => galleryItemHtml(item, idx)).join('') || `<div class="dash-empty">Ù„Ø§ ØªÙˆØ¬Ø¯ ØµÙˆØ± Ø¨Ø¹Ø¯. Ø§Ø¶ØºØ· Ø¥Ø¶Ø§ÙØ© ØµÙˆØ±Ø©.</div>`}
+        ${(s.about_gallery || []).map((item, idx) => galleryItemHtml(item, idx)).join('') || `<div class="dash-empty">لا توجد صور بعد. اضغط إضافة صورة.</div>`}
       </div>
-      <button class="ibtn" type="button" id="btn-add-gallery" style="margin-top:12px;">+ Ø¥Ø¶Ø§ÙØ© Ù„Ù‚Ø·Ø©</button>
+      <button class="ibtn" type="button" id="btn-add-gallery" style="margin-top:12px;">+ إضافة لقطة</button>
     </div>
 
     <div class="a-card">
-      <div class="a-card-title">Ø´Ø¹Ø§Ø±Ø§Øª Ø§Ù„Ø¬Ù‡Ø§Øª (Ø§Ù„Ù„ÙˆÙ‚ÙˆÙ‡Ø§Øª)</div>
+      <div class="a-card-title">شعارات الجهات (اللوقوهات)</div>
       <p style="color:var(--warm-mid);font-size:.86rem;line-height:1.8;margin-bottom:18px;">
-        ØªØ¸Ù‡Ø± ÙƒØ´Ø±ÙŠØ· Ø£ÙÙ‚ÙŠ Ù…ØªØ­Ø±Ùƒ Ø£Ø³ÙÙ„ Ù‚Ø³Ù… "Ù„Ù‚Ø·Ø§Øª ÙˆÙ…Ø­Ø·Ø§Øª". Ø£Ø¶Ù Ø´Ø¹Ø§Ø±Ø§Øª Ø§Ù„Ø¬Ù‡Ø§Øª Ø§Ù„ØªÙŠ Ø¹Ù…Ù„Øª Ø¨Ù‡Ø§ Ø£Ùˆ ØªØ¹Ù„Ù…Øª Ù…Ù†Ù‡Ø§.
+        تظهر كشريط أفقي متحرك أسفل قسم "لقطات ومحطات". أضف شعارات الجهات التي عملت بها أو تعلمت منها.
       </p>
       <div id="about-logos-editor" class="gallery-admin-list">
-        ${(s.about_journey_logos || []).map((item) => logoItemHtml(item)).join('') || `<div class="dash-empty">Ù„Ø§ ØªÙˆØ¬Ø¯ Ø´Ø¹Ø§Ø±Ø§Øª Ø¨Ø¹Ø¯. Ø§Ø¶ØºØ· Ø¥Ø¶Ø§ÙØ© Ø´Ø¹Ø§Ø±.</div>`}
+        ${(s.about_journey_logos || []).map((item) => logoItemHtml(item)).join('') || `<div class="dash-empty">لا توجد شعارات بعد. اضغط إضافة شعار.</div>`}
       </div>
-      <button class="ibtn" type="button" id="btn-add-logo" style="margin-top:12px;">+ Ø¥Ø¶Ø§ÙØ© Ø´Ø¹Ø§Ø±</button>
+      <button class="ibtn" type="button" id="btn-add-logo" style="margin-top:12px;">+ إضافة شعار</button>
     </div>
 
     <div class="a-card">
-      <div class="a-card-title">Ø§Ù„ÙƒÙ„Ù…Ø§Øª Ø§Ù„Ù…ÙØªØ§Ø­ÙŠØ© (ØªØ§Ù‚Ø§Øª Ø§Ù„ØªØ®ØµØµ)</div>
+      <div class="a-card-title">الكلمات المفتاحية (تاقات التخصص)</div>
       <p style="color:var(--warm-mid);font-size:.86rem;line-height:1.8;margin-bottom:14px;">
-        ØªØ¸Ù‡Ø± ÙƒØªØ§Ù‚Ø§Øª Ø«Ø§Ø¨ØªØ© ÙÙˆÙ‚ Ø§Ù„ØµÙˆØ±Ø© Ø§Ù„Ø´Ø®ØµÙŠØ© Ù…Ù† Ø§Ù„Ø£Ø³ÙÙ„ ÙÙŠ Ø§Ù„Ù‚Ø³Ù… Ø§Ù„Ø£ÙˆÙ„. Ø§ÙƒØªØ¨ ÙƒÙ„Ù…Ø© Ø£Ùˆ Ø¹Ø¨Ø§Ø±Ø© ÙˆØ§Ø­Ø¯Ø© ÙÙŠ ÙƒÙ„ Ø³Ø·Ø±.
+        تظهر كتاقات ثابتة فوق الصورة الشخصية من الأسفل في القسم الأول. اكتب كلمة أو عبارة واحدة في كل سطر.
       </p>
       <div class="fg">
-        <label class="fl">Ø§Ù„ÙƒÙ„Ù…Ø§Øª Ø§Ù„Ù…ÙØªØ§Ø­ÙŠØ© (Ø¹Ø±Ø¨ÙŠ/English â€” ÙƒÙ„ ÙƒÙ„Ù…Ø© ÙÙŠ Ø³Ø·Ø±)</label>
-        <textarea id="about-keywords" class="fi" dir="rtl" rows="8" style="resize:vertical;" placeholder="Ø§ÙƒØªØ´Ø§Ù Ø§Ù„Ù…ÙˆØ§Ù‡Ø¨&#10;Ø¹Ù„ÙˆÙ… Ø§Ù„Ø±ÙŠØ§Ø¶Ø©&#10;ØªØ·ÙˆÙŠØ± Ø§Ù„Ù…ÙˆØ§Ù‡Ø¨&#10;Ø±Ø¹Ø§ÙŠØ© Ø§Ù„Ù…ÙˆØ§Ù‡Ø¨&#10;Ø£ÙƒØ§Ø¯ÙŠÙ…ÙŠØ§Øª ÙƒØ±Ø© Ø§Ù„Ù‚Ø¯Ù…&#10;Ø§Ù„ÙØ¦Ø§Øª Ø§Ù„Ø³Ù†ÙŠØ©&#10;Ø¨Ù†Ø§Ø¡ Ø§Ù„ÙØ±ÙŠÙ‚&#10;Ø§Ø³ØªÙ‚Ø·Ø§Ø¨ Ø§Ù„Ù„Ø§Ø¹Ø¨ÙŠÙ†">${esc((s.about_keywords || []).join('\n'))}</textarea>
+        <label class="fl">الكلمات المفتاحية (عربي/English — كل كلمة في سطر)</label>
+        <textarea id="about-keywords" class="fi" dir="rtl" rows="8" style="resize:vertical;" placeholder="اكتشاف المواهب&#10;علوم الرياضة&#10;تطوير المواهب&#10;رعاية المواهب&#10;أكاديميات كرة القدم&#10;الفئات السنية&#10;بناء الفريق&#10;استقطاب اللاعبين">${esc((s.about_keywords || []).join('\n'))}</textarea>
       </div>
     </div>
 
     <div class="a-card">
-      <div class="a-card-title">Ù†Øµ Ø§Ù„ØªÙˆØ§ØµÙ„ ÙÙŠ Ø§Ù„Ø®Ø§ØªÙ…Ø©</div>
+      <div class="a-card-title">نص التواصل في الخاتمة</div>
       <p style="color:var(--warm-mid);font-size:.86rem;line-height:1.8;margin-bottom:14px;">
-        ÙŠØ¸Ù‡Ø± Ù‡Ø°Ø§ Ø§Ù„Ù†Øµ Ù‚Ø¨Ù„ Ø£ÙŠÙ‚ÙˆÙ†Ø§Øª Ø§Ù„ØªÙˆØ§ØµÙ„ Ø§Ù„Ø§Ø¬ØªÙ…Ø§Ø¹ÙŠ ÙÙŠ Ø¢Ø®Ø± Ù‚Ø³Ù…. Ø§ØªØ±ÙƒÙ‡ ÙØ§Ø±ØºØ§Ù‹ Ù„Ø¥Ø®ÙØ§Ø¦Ù‡.
+        يظهر هذا النص قبل أيقونات التواصل الاجتماعي في آخر قسم. اتركه فارغاً لإخفائه.
       </p>
       <div class="fg">
-        <label class="fl">Ø§Ù„Ù†Øµ (Ø¹Ø±Ø¨ÙŠ)</label>
-        <input id="about-invite-ar" class="fi" dir="rtl" value="${esc(s.about_contact_invite_ar || '')}" placeholder="Ù„Ø¯ÙŠÙƒ Ø³Ø¤Ø§Ù„ Ø£Ùˆ ØªØ±ÙŠØ¯ Ø§Ù„ØªÙˆØ§ØµÙ„ØŸ">
+        <label class="fl">النص (عربي)</label>
+        <input id="about-invite-ar" class="fi" dir="rtl" value="${esc(s.about_contact_invite_ar || '')}" placeholder="لديك سؤال أو تريد التواصل؟">
       </div>
       <div class="fg">
-        <label class="fl">Ø§Ù„Ù†Øµ (English)</label>
+        <label class="fl">النص (English)</label>
         <input id="about-invite-en" class="fi" dir="ltr" value="${esc(s.about_contact_invite_en || '')}" placeholder="Have a question or want to get in touch?">
       </div>
     </div>
 
     <div class="a-card">
-      <div class="a-card-title">VAR Check â€” Ø§Ù„Ø¨ÙŠØ¶Ø© Ø§Ù„Ù…Ø®ÙÙŠØ©</div>
+      <div class="a-card-title">VAR Check — البيضة المخفية</div>
       <p style="color:var(--warm-mid);font-size:.86rem;line-height:1.8;margin-bottom:14px;">
-        Ù…Ø´Ù‡Ø¯ ØªÙØ§Ø¹Ù„ÙŠ Ø¸Ø±ÙŠÙ ÙŠØ¸Ù‡Ø± Ø¨ÙŠÙ† Ù‚Ø³Ù… Ø§Ù„Ù…Ø­Ø·Ø§Øª ÙˆØ§Ù„Ø®Ø§ØªÙ…Ø©. ÙŠÙ…ÙƒÙ† ØªØ¹Ø·ÙŠÙ„Ù‡ ØªÙ…Ø§Ù…Ø§Ù‹.
+        مشهد تفاعلي ظريف يظهر بين قسم المحطات والخاتمة. يمكن تعطيله تماماً.
       </p>
       <div class="fg">
-        <label class="fl">Ø§Ù„Ø­Ø§Ù„Ø©</label>
+        <label class="fl">الحالة</label>
         <div class="tog-wrap">
           <label class="tog"><input type="checkbox" id="about-var-enabled" ${s.about_var_enabled !== false ? 'checked' : ''}><span class="tog-sl"></span></label>
-          <span style="font-size:.84rem;color:var(--warm-mid);">${s.about_var_enabled !== false ? 'Ù…ÙØ¹Ù‘Ù„' : 'Ù…Ø¹Ø·Ù‘Ù„'}</span>
+          <span style="font-size:.84rem;color:var(--warm-mid);">${s.about_var_enabled !== false ? 'مفعّل' : 'معطّل'}</span>
         </div>
       </div>
       <div class="fg">
-        <label class="fl">Ù†Øµ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© (ÙŠØ¸Ù‡Ø± Ø¹Ù†Ø¯ Ø§Ù„Ø¶ØºØ·)</label>
-        <input id="about-var-reviewing" class="fi" dir="rtl" value="${esc(varData.reviewing || '')}" placeholder="... Ø¬Ø§Ø±Ù Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ù‚Ø±Ø§Ø±">
+        <label class="fl">نص المراجعة (يظهر عند الضغط)</label>
+        <input id="about-var-reviewing" class="fi" dir="rtl" value="${esc(varData.reviewing || '')}" placeholder="... جارٍ مراجعة القرار">
       </div>
       <div class="fg">
-        <label class="fl">Ù†ØªÙŠØ¬Ø© Ø§Ù„Ù‚Ø±Ø§Ø± Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠ</label>
-        <input id="about-var-result" class="fi" dir="rtl" value="${esc(varData.result || '')}" placeholder="Ø§Ù„Ù‚Ø±Ø§Ø± Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠ: Ø§Ù„Ù…ÙˆÙ‡Ø¨Ø© Ø§Ù„Ø­Ù‚ÙŠÙ‚ÙŠØ© Ù„Ø§ ØªÙÙˆÙ‚Ù.">
+        <label class="fl">نتيجة القرار النهائي</label>
+        <input id="about-var-result" class="fi" dir="rtl" value="${esc(varData.result || '')}" placeholder="القرار النهائي: الموهبة الحقيقية لا تُوقف.">
       </div>
     </div>
 
-    <button class="btn btn-fill" id="btn-save-sabout" style="padding:11px 36px;">Ø­ÙØ¸ ØµÙØ­Ø© ØªØ¹Ø±Ù Ø¹Ù„ÙŠ</button>`;
+    <button class="btn btn-fill" id="btn-save-sabout" style="padding:11px 36px;">حفظ صفحة تعرف علي</button>`;
 
   initUpload('about-profile-file', 'about-profile-prev', 'about-profile-val');
   bindGalleryEditor();
@@ -2602,25 +2602,25 @@ function renderSAbout() {
   });
 }
 
-// â”€â”€ Ticker Editor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Ticker Editor ─────────────────────────────
 function renderSTicker() {
   const s = DB.settings || {};
   ge('main-content').innerHTML = `
     <div class="a-card">
-      <div class="a-card-title">Ø§Ù„Ø´Ø±ÙŠØ· Ø§Ù„Ù…ØªØ­Ø±Ùƒ</div>
+      <div class="a-card-title">الشريط المتحرك</div>
       <p style="color:var(--warm-mid);font-size:.83rem;margin-bottom:20px;">
-        Ù†Øµ Ø§Ù„Ø´Ø±ÙŠØ· Ø§Ù„Ù…ØªØ­Ø±Ùƒ Ø§Ù„Ø°ÙŠ ÙŠØ¸Ù‡Ø± ÙÙŠ Ø§Ù„ØµÙØ­Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©. Ø§ØªØ±ÙƒÙ‡ ÙØ§Ø±ØºØ§Ù‹ Ù„Ù„Ù†Øµ Ø§Ù„Ø§ÙØªØ±Ø§Ø¶ÙŠ.
+        نص الشريط المتحرك الذي يظهر في الصفحة الرئيسية. اتركه فارغاً للنص الافتراضي.
       </p>
       <div class="fg">
-        <label class="fl">Ù†Øµ Ø§Ù„Ø´Ø±ÙŠØ· (Ø¹Ø±Ø¨ÙŠ)</label>
-        <input id="tk-ar" class="fi" dir="rtl" value="${esc(s.ticker_ar||'')}" placeholder="Ø§ÙƒØªØ´Ø§Ù Ø§Ù„Ù…ÙˆØ§Ù‡Ø¨ âœ¦ ØªØ·ÙˆÙŠØ± Ø§Ù„Ù„Ø§Ø¹Ø¨ÙŠÙ† âœ¦ ...">
-        <small style="color:var(--warm-dark);font-size:.75rem;margin-top:6px;display:block;">Ø§Ø³ØªØ®Ø¯Ù… âœ¦ Ø£Ùˆ | Ù„Ù„ÙØµÙ„ Ø¨ÙŠÙ† Ø§Ù„Ø¹Ø¨Ø§Ø±Ø§Øª</small>
+        <label class="fl">نص الشريط (عربي)</label>
+        <input id="tk-ar" class="fi" dir="rtl" value="${esc(s.ticker_ar||'')}" placeholder="اكتشاف المواهب ✦ تطوير اللاعبين ✦ ...">
+        <small style="color:var(--warm-dark);font-size:.75rem;margin-top:6px;display:block;">استخدم ✦ أو | للفصل بين العبارات</small>
       </div>
       <div class="fg">
         <label class="fl">Ticker Text (English)</label>
-        <input id="tk-en" class="fi" dir="ltr" value="${esc(s.ticker_en||'')}" placeholder="Talent Identification âœ¦ Player Development âœ¦ ...">
+        <input id="tk-en" class="fi" dir="ltr" value="${esc(s.ticker_en||'')}" placeholder="Talent Identification ✦ Player Development ✦ ...">
       </div>
-      <button class="btn btn-fill" id="btn-save-sticker" style="padding:11px 36px;margin-top:8px;">Ø­ÙØ¸ âœ“</button>
+      <button class="btn btn-fill" id="btn-save-sticker" style="padding:11px 36px;margin-top:8px;">حفظ ✓</button>
     </div>`;
 
   ge('btn-save-sticker').addEventListener('click', () => {
@@ -2631,76 +2631,76 @@ function renderSTicker() {
   });
 }
 
-// â”€â”€ Popup Editor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Popup Editor ──────────────────────────────
 function renderSPopup() {
   const s = DB.settings || {};
   const popup = s.popup || {};
   const notif = s.new_article_bar || {};
   ge('main-content').innerHTML = `
     <div class="a-card">
-      <div class="a-card-title">Ø´Ø±ÙŠØ· Ø§Ù„ÙƒØªØ§Ø¨ Ø§Ù„ØªØ´ÙˆÙŠÙ‚ÙŠ</div>
+      <div class="a-card-title">شريط الكتاب التشويقي</div>
       <p style="color:var(--warm-mid);font-size:.83rem;margin-bottom:20px;">
-        Ø´Ø±ÙŠØ· ÙŠØ¸Ù‡Ø± ÙÙŠ Ø§Ù„ØµÙØ­Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ© ÙŠØ´ÙˆÙ‘Ù‚ Ø§Ù„Ø²ÙˆØ§Ø± Ù„ØµÙØ­Ø© ÙƒØªØ§Ø¨ Ø§Ù„Ù…ÙˆÙ‡Ø¨Ø© Ø§Ù„ÙƒØ±ÙˆÙŠØ©. ÙŠÙ…ÙƒÙ† ØªÙØ¹ÙŠÙ„Ù‡ Ø£Ùˆ Ø¥ÙŠÙ‚Ø§ÙÙ‡.
+        شريط يظهر في الصفحة الرئيسية يشوّق الزوار لصفحة كتاب الموهبة الكروية. يمكن تفعيله أو إيقافه.
       </p>
       <div class="fg">
-        <label class="fl">Ø§Ù„Ø­Ø§Ù„Ø©</label>
+        <label class="fl">الحالة</label>
         <div class="tog-wrap">
           <label class="tog"><input type="checkbox" id="bt-enabled" ${s.book_teaser_enabled !== false ? 'checked' : ''}><span class="tog-sl"></span></label>
-          <span id="bt-enabled-lbl" style="font-size:.84rem;color:var(--warm-mid);">${s.book_teaser_enabled !== false ? 'Ù…ÙØ¹Ù‘Ù„' : 'Ù…Ø¹Ø·Ù‘Ù„'}</span>
+          <span id="bt-enabled-lbl" style="font-size:.84rem;color:var(--warm-mid);">${s.book_teaser_enabled !== false ? 'مفعّل' : 'معطّل'}</span>
         </div>
       </div>
-      <button class="btn btn-fill" id="btn-save-booktsr" style="padding:11px 36px;margin-top:8px;">Ø­ÙØ¸ âœ“</button>
+      <button class="btn btn-fill" id="btn-save-booktsr" style="padding:11px 36px;margin-top:8px;">حفظ ✓</button>
     </div>
     <div class="a-card">
-      <div class="a-card-title">Ø´Ø±ÙŠØ· Ø¥Ø´Ø¹Ø§Ø± Ø§Ù„Ù…Ù‚Ø§Ù„ Ø§Ù„Ø¬Ø¯ÙŠØ¯</div>
+      <div class="a-card-title">شريط إشعار المقال الجديد</div>
       <p style="color:var(--warm-mid);font-size:.83rem;margin-bottom:20px;">
-        ÙŠØ¸Ù‡Ø± Ø£Ø¹Ù„Ù‰ Ø§Ù„Ù…ÙˆÙ‚Ø¹ Ø¥Ø°Ø§ ÙƒØ§Ù† Ù‡Ù†Ø§Ùƒ Ù…Ù‚Ø§Ù„ Ø¹Ù„ÙŠÙ‡ Ø¹Ù„Ø§Ù…Ø© is_new: true. ÙŠÙ…ÙƒÙ† Ù„Ù„Ø²Ø§Ø¦Ø± Ø¥ØºÙ„Ø§Ù‚Ù‡ Ø®Ù„Ø§Ù„ Ø§Ù„Ø¬Ù„Ø³Ø©.
+        يظهر أعلى الموقع إذا كان هناك مقال عليه علامة is_new: true. يمكن للزائر إغلاقه خلال الجلسة.
       </p>
       <div class="fg">
-        <label class="fl">Ø§Ù„Ø­Ø§Ù„Ø©</label>
+        <label class="fl">الحالة</label>
         <div class="tog-wrap">
           <label class="tog"><input type="checkbox" id="nb-enabled" ${notif.enabled !== false ? 'checked' : ''}><span class="tog-sl"></span></label>
-          <span id="nb-enabled-lbl" style="font-size:.84rem;color:var(--warm-mid);">${notif.enabled !== false ? 'Ù…ÙØ¹Ù‘Ù„' : 'Ù…Ø¹Ø·Ù‘Ù„'}</span>
+          <span id="nb-enabled-lbl" style="font-size:.84rem;color:var(--warm-mid);">${notif.enabled !== false ? 'مفعّل' : 'معطّل'}</span>
         </div>
       </div>
     </div>
     <div class="a-card">
-      <div class="a-card-title">Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ø¨ÙˆØ¨ Ø£Ø¨</div>
+      <div class="a-card-title">إعدادات البوب أب</div>
       <p style="color:var(--warm-mid);font-size:.83rem;margin-bottom:20px;">
-        Ø±Ø³Ø§Ù„Ø© Ù…Ù†Ø¨Ø«Ù‚Ø© ØªØ¸Ù‡Ø± Ù„Ù„Ø²ÙˆØ§Ø± Ù…Ø±Ø© ÙˆØ§Ø­Ø¯Ø© ÙÙŠ ÙƒÙ„ Ø¬Ù„Ø³Ø©. ÙŠÙ…ÙƒÙ† ØªÙØ¹ÙŠÙ„Ù‡Ø§ Ø£Ùˆ Ø¥ÙŠÙ‚Ø§ÙÙ‡Ø§.
+        رسالة منبثقة تظهر للزوار مرة واحدة في كل جلسة. يمكن تفعيلها أو إيقافها.
       </p>
       <div class="fg">
-        <label class="fl">Ø§Ù„Ø­Ø§Ù„Ø©</label>
+        <label class="fl">الحالة</label>
         <div class="tog-wrap">
           <label class="tog"><input type="checkbox" id="pp-enabled" ${popup.enabled?'checked':''}><span class="tog-sl"></span></label>
-          <span id="pp-enabled-lbl" style="font-size:.84rem;color:var(--warm-mid);">${popup.enabled?'Ù…ÙØ¹Ù‘Ù„':'Ù…Ø¹Ø·Ù‘Ù„'}</span>
+          <span id="pp-enabled-lbl" style="font-size:.84rem;color:var(--warm-mid);">${popup.enabled?'مفعّل':'معطّل'}</span>
         </div>
       </div>
       <div class="fr">
         <div class="fg">
-          <label class="fl">ØªØ£Ø®ÙŠØ± Ø§Ù„Ø¸Ù‡ÙˆØ± (Ø«ÙˆØ§Ù†Ù)</label>
+          <label class="fl">تأخير الظهور (ثوانٍ)</label>
           <input type="number" id="pp-delay" class="fi" value="${popup.delay||2}" min="0" max="30">
         </div>
       </div>
       <div class="fg">
-        <label class="fl">Ù†Øµ Ø§Ù„Ø±Ø³Ø§Ù„Ø© (Ø¹Ø±Ø¨ÙŠ)</label>
-        <textarea id="pp-msg-ar" class="fi" rows="4" dir="rtl" placeholder="Ø§ÙƒØªØ¨ Ø±Ø³Ø§Ù„ØªÙƒ Ø£Ùˆ Ø¥Ø¹Ù„Ø§Ù†Ùƒ Ù‡Ù†Ø§...">${esc(popup.message_ar||'')}</textarea>
+        <label class="fl">نص الرسالة (عربي)</label>
+        <textarea id="pp-msg-ar" class="fi" rows="4" dir="rtl" placeholder="اكتب رسالتك أو إعلانك هنا...">${esc(popup.message_ar||'')}</textarea>
       </div>
       <div class="fg">
         <label class="fl">Message (English)</label>
         <textarea id="pp-msg-en" class="fi" rows="4" dir="ltr" placeholder="Write your announcement here...">${esc(popup.message_en||'')}</textarea>
       </div>
       <div class="fg">
-        <label class="fl">ØµÙˆØ±Ø© Ø§Ù„Ø¨ÙˆØ¨ Ø£Ø¨ (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)</label>
-        <div class="upzone"><input type="file" id="pp-img-file" accept="image/*"><div class="upzone-txt">ðŸ“ Ø§Ù†Ù‚Ø± Ù„Ø±ÙØ¹ ØµÙˆØ±Ø© (ØªØ¸Ù‡Ø± ÙÙŠ Ø£Ø¹Ù„Ù‰ Ø§Ù„Ø±Ø³Ø§Ù„Ø©)</div></div>
+        <label class="fl">صورة البوب أب (اختياري)</label>
+        <div class="upzone"><input type="file" id="pp-img-file" accept="image/*"><div class="upzone-txt">📁 انقر لرفع صورة (تظهر في أعلى الرسالة)</div></div>
         <input type="hidden" id="pp-img-val" value="${esc(popup.image||'')}">
         <img id="pp-img-prev" class="up-prev" ${popup.image?`src="../${popup.image}" style="display:block;"`:''}>
       </div>
-      <button class="btn btn-fill" id="btn-save-spopup" style="padding:11px 36px;margin-top:8px;">Ø­ÙØ¸ âœ“</button>
+      <button class="btn btn-fill" id="btn-save-spopup" style="padding:11px 36px;margin-top:8px;">حفظ ✓</button>
     </div>`;
 
   ge('bt-enabled').addEventListener('change', e => {
-    ge('bt-enabled-lbl').textContent = e.target.checked ? 'Ù…ÙØ¹Ù‘Ù„' : 'Ù…Ø¹Ø·Ù‘Ù„';
+    ge('bt-enabled-lbl').textContent = e.target.checked ? 'مفعّل' : 'معطّل';
   });
   ge('btn-save-booktsr').addEventListener('click', () => {
     if (!DB.settings) DB.settings = {};
@@ -2709,10 +2709,10 @@ function renderSPopup() {
     dbSave();
   });
   ge('pp-enabled').addEventListener('change', e => {
-    ge('pp-enabled-lbl').textContent = e.target.checked ? 'Ù…ÙØ¹Ù‘Ù„' : 'Ù…Ø¹Ø·Ù‘Ù„';
+    ge('pp-enabled-lbl').textContent = e.target.checked ? 'مفعّل' : 'معطّل';
   });
   ge('nb-enabled').addEventListener('change', e => {
-    ge('nb-enabled-lbl').textContent = e.target.checked ? 'Ù…ÙØ¹Ù‘Ù„' : 'Ù…Ø¹Ø·Ù‘Ù„';
+    ge('nb-enabled-lbl').textContent = e.target.checked ? 'مفعّل' : 'معطّل';
   });
   initUpload('pp-img-file', 'pp-img-prev', 'pp-img-val');
 
@@ -2732,7 +2732,7 @@ function renderSPopup() {
   });
 }
 
-// â”€â”€ Wire up all static buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Wire up all static buttons ─────────────────
 function wireButtons() {
   // Login
   ge('li-btn').addEventListener('click', doLogin);
@@ -2804,7 +2804,7 @@ function wireButtons() {
   initUpload('art-file', 'art-img-prev', 'f-art-image');
 }
 
-// â”€â”€ Bootstrap â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Bootstrap ─────────────────────────────────
 (async function init() {
   await dbLoad();
   wireButtons();
