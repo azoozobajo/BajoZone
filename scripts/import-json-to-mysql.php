@@ -1,33 +1,26 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/db.php';
 
-header('Content-Type: application/json; charset=utf-8');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, X-Admin-Token');
-
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    exit(0);
+if (PHP_SAPI !== 'cli') {
+    fwrite(STDERR, "Run this script from the command line only.\n");
+    exit(1);
 }
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['error' => 'Method not allowed']);
-    exit;
+$jsonPath = $argv[1] ?? (__DIR__ . '/../data/db.json');
+if (!is_file($jsonPath)) {
+    fwrite(STDERR, "JSON file not found: {$jsonPath}\n");
+    exit(1);
 }
 
-requireAdminAuth();
-
-$data = json_decode((string) file_get_contents('php://input'), true);
-if (!is_array($data) || !isset($data['settings']) || !isset($data['articles'])) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Invalid data structure']);
-    exit;
+$data = json_decode((string) file_get_contents($jsonPath), true);
+if (!is_array($data)) {
+    fwrite(STDERR, "Invalid JSON file.\n");
+    exit(1);
 }
 
-function apiSlug(string $value, string $fallback): string
+function importSlug(string $value, string $fallback): string
 {
     $slug = strtolower(trim($value));
     $slug = preg_replace('/[^a-z0-9]+/', '-', $slug);
@@ -35,30 +28,20 @@ function apiSlug(string $value, string $fallback): string
     return $slug !== '' ? $slug : $fallback;
 }
 
-function apiDateOrNull($value): ?string
+function importDateOrNull($value): ?string
 {
     if (!$value) {
         return null;
     }
+
     $timestamp = strtotime((string) $value);
     return $timestamp ? date('Y-m-d H:i:s', $timestamp) : null;
 }
 
-function deleteMissingRows(PDO $pdo, string $table, array $ids): void
-{
-    if (!$ids) {
-        $pdo->exec("DELETE FROM {$table}");
-        return;
-    }
-
-    $placeholders = implode(',', array_fill(0, count($ids), '?'));
-    $pdo->prepare("DELETE FROM {$table} WHERE id NOT IN ($placeholders)")->execute($ids);
-}
+$pdo = getDb();
+$pdo->beginTransaction();
 
 try {
-    $pdo = getDb();
-    $pdo->beginTransaction();
-
     $upsertSetting = $pdo->prepare(
         "INSERT INTO site_settings (setting_key, setting_value)
          VALUES (?, ?)
@@ -76,7 +59,7 @@ try {
     foreach (($data['categories'] ?? []) as $category) {
         $id = (string) ($category['id'] ?? uniqid('cat', true));
         $name = (string) ($category['name_ar'] ?? $category['name_en'] ?? $category['name'] ?? $id);
-        $slug = apiSlug((string) ($category['slug'] ?? $category['name_en'] ?? $id), $id);
+        $slug = importSlug((string) ($category['slug'] ?? $category['name_en'] ?? $id), $id);
         $description = $category['description'] ?? $category['description_ar'] ?? $category['description_en'] ?? null;
         $upsertCategory->execute([$id, $name, $slug, $description]);
     }
@@ -89,7 +72,7 @@ try {
     foreach (($data['tags'] ?? []) as $tag) {
         $id = (string) ($tag['id'] ?? uniqid('tag', true));
         $name = (string) ($tag['name'] ?? $id);
-        $slug = apiSlug((string) ($tag['slug'] ?? $name), $id);
+        $slug = importSlug((string) ($tag['slug'] ?? $name), $id);
         $upsertTag->execute([$id, $name, $slug]);
     }
 
@@ -101,7 +84,7 @@ try {
     foreach (($data['programs'] ?? []) as $program) {
         $id = (string) ($program['id'] ?? uniqid('prog', true));
         $title = (string) ($program['name_ar'] ?? $program['name_en'] ?? $program['title'] ?? $id);
-        $slug = apiSlug((string) ($program['slug'] ?? $program['name_en'] ?? $title), $id);
+        $slug = importSlug((string) ($program['slug'] ?? $program['name_en'] ?? $title), $id);
         $description = (string) ($program['description_ar'] ?? $program['description_en'] ?? $program['description'] ?? $program['short_description_ar'] ?? '');
         $content = (string) ($program['content'] ?? $description);
         $image = (string) ($program['image'] ?? $program['logo_url'] ?? '');
@@ -114,49 +97,32 @@ try {
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON DUPLICATE KEY UPDATE title = VALUES(title), slug = VALUES(slug), excerpt = VALUES(excerpt), content = VALUES(content), featured_image = VALUES(featured_image), category_id = VALUES(category_id), status = VALUES(status), published_at = VALUES(published_at)"
     );
-    $deleteArticleTags = $pdo->prepare('DELETE FROM article_tags WHERE article_id = ?');
-    $insertArticleTag = $pdo->prepare(
-        "INSERT IGNORE INTO article_tags (article_id, tag_id)
-         VALUES (?, ?)"
-    );
+    $deleteTags = $pdo->prepare('DELETE FROM article_tags WHERE article_id = ?');
+    $insertTag = $pdo->prepare('INSERT IGNORE INTO article_tags (article_id, tag_id) VALUES (?, ?)');
 
     foreach (($data['articles'] ?? []) as $article) {
         $id = (string) ($article['id'] ?? uniqid('article', true));
         $title = (string) ($article['title_ar'] ?? $article['title_en'] ?? $article['title'] ?? $id);
-        $slug = apiSlug((string) ($article['slug'] ?? $title), $id);
+        $slug = importSlug((string) ($article['slug'] ?? $title), $id);
         $excerpt = (string) ($article['excerpt_ar'] ?? $article['excerpt_en'] ?? $article['excerpt'] ?? '');
         $content = (string) ($article['content_ar'] ?? $article['content_en'] ?? $article['content'] ?? '');
         $image = (string) ($article['featured_image'] ?? $article['image'] ?? '');
         $categoryId = $article['category_id'] ?? null;
         $status = ($article['is_published'] ?? true) === false ? 'draft' : 'published';
-        $publishedAt = apiDateOrNull($article['published_at'] ?? $article['date'] ?? $article['created_at'] ?? null);
+        $publishedAt = importDateOrNull($article['published_at'] ?? $article['date'] ?? $article['created_at'] ?? null);
 
         $upsertArticle->execute([$id, $title, $slug, $excerpt, $content, $image, $categoryId, $status, $publishedAt]);
-        $deleteArticleTags->execute([$id]);
+        $deleteTags->execute([$id]);
         foreach (($article['tags'] ?? []) as $tagId) {
-            $insertArticleTag->execute([$id, (string) $tagId]);
+            $insertTag->execute([$id, (string) $tagId]);
         }
     }
 
-    $articleIds = array_values(array_filter(array_map(fn($article) => (string) ($article['id'] ?? ''), $data['articles'] ?? [])));
-    deleteMissingRows($pdo, 'articles', $articleIds);
-
-    $programIds = array_values(array_filter(array_map(fn($program) => (string) ($program['id'] ?? ''), $data['programs'] ?? [])));
-    deleteMissingRows($pdo, 'programs', $programIds);
-
-    $tagIds = array_values(array_filter(array_map(fn($tag) => (string) ($tag['id'] ?? ''), $data['tags'] ?? [])));
-    deleteMissingRows($pdo, 'tags', $tagIds);
-
-    $categoryIds = array_values(array_filter(array_map(fn($category) => (string) ($category['id'] ?? ''), $data['categories'] ?? [])));
-    deleteMissingRows($pdo, 'categories', $categoryIds);
-
     $pdo->commit();
-    echo json_encode(['success' => true, 'saved' => date('Y-m-d H:i:s'), 'storage' => 'mysql']);
+    echo "Imported content into MySQL.\n";
 } catch (Throwable $e) {
-    if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
-        $pdo->rollBack();
-    }
-    error_log('BajoZone MySQL save failed: ' . $e->getMessage());
-    http_response_code(500);
-    echo json_encode(['error' => 'Failed to save content']);
+    $pdo->rollBack();
+    fwrite(STDERR, "Import failed: {$e->getMessage()}\n");
+    exit(1);
 }
+

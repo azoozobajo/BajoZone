@@ -1,7 +1,7 @@
 <?php
-/**
- * BajoZone API - Upload Image
- */
+declare(strict_types=1);
+
+require_once __DIR__ . '/../includes/auth.php';
 
 header('Content-Type: application/json');
 
@@ -11,12 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$token = $_POST['token'] ?? '';
-if (empty($token)) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized']);
-    exit;
-}
+$_SERVER['HTTP_X_ADMIN_TOKEN'] = $_POST['token'] ?? ($_SERVER['HTTP_X_ADMIN_TOKEN'] ?? '');
+requireAdminAuth();
 
 if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
     http_response_code(400);

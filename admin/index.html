@@ -562,6 +562,15 @@ async function dbLoad() {
   }
 }
 
+async function dbLoadAdmin() {
+  const res = await fetch('../api/admin-content.php?t=' + Date.now(), {
+    headers: { 'X-Admin-Token': sessionStorage.getItem('bzt') || '' }
+  });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  DB = await res.json();
+  localStorage.setItem(LS_KEY, JSON.stringify(DB));
+}
+
 function saveUiFlag(key, value) {
   try {
     const f = JSON.parse(localStorage.getItem('bz_ui_flags') || '{}');
@@ -609,14 +618,22 @@ async function saveMySqlNow() {
 function doLogin() {
   const u = gv('li-u');
   const p = gv('li-p');
-  if (u === DB?.admin?.username && p === DB?.admin?.password) {
-    sessionStorage.setItem('bzt', btoa(u + ':' + Date.now()));
-    ge('login-screen').style.display = 'none';
-    ge('dashboard').style.display = 'block';
-    goSection('overview');
-  } else {
-    showLoginError();
-  }
+  fetch('../api/auth.php', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json' },
+    body: JSON.stringify({ email: u, password: p })
+  })
+    .then(async res => {
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok || !body.token) throw new Error(body.error || 'Login failed');
+      sessionStorage.setItem('bzt', body.token);
+      sessionStorage.setItem('bz_admin_email', body.user?.email || u);
+      await dbLoadAdmin();
+      ge('login-screen').style.display = 'none';
+      ge('dashboard').style.display = 'block';
+      goSection('overview');
+    })
+    .catch(err => showLoginError(err?.message || 'Login failed'));
 }
 
 function showLoginError(message) {
@@ -1485,7 +1502,7 @@ function renderSSec() {
   ge('main-content').innerHTML = `
     <div class="a-card" style="max-width:480px;">
       <div class="a-card-title">ØªØºÙŠÙŠØ± Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø¯Ø®ÙˆÙ„</div>
-      <div class="fg"><label class="fl">Ø§Ø³Ù… Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… Ø§Ù„Ø¬Ø¯ÙŠØ¯</label><input id="sec-u" class="fi" value="${esc(DB.admin?.username||'')}"></div>
+      <div class="fg"><label class="fl">Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ</label><input id="sec-u" class="fi" value="${esc(sessionStorage.getItem('bz_admin_email') || '')}"></div>
       <div class="fg"><label class="fl">ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ø§Ù„Ø­Ø§Ù„ÙŠØ©</label><input type="password" id="sec-op" class="fi"></div>
       <div class="fg"><label class="fl">ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©</label><input type="password" id="sec-np" class="fi"></div>
       <div class="fg"><label class="fl">ØªØ£ÙƒÙŠØ¯ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±</label><input type="password" id="sec-cp" class="fi"></div>
@@ -1493,19 +1510,29 @@ function renderSSec() {
       <button class="btn btn-fill" id="btn-save-sec" style="padding:11px 32px;">Ø­ÙØ¸ Ø§Ù„ØªØºÙŠÙŠØ±Ø§Øª âœ“</button>
     </div>`;
 
-  ge('btn-save-sec').addEventListener('click', () => {
+  ge('btn-save-sec').addEventListener('click', async () => {
     const op = gv('sec-op'), np = gv('sec-np'), cp = gv('sec-cp');
     const errEl = ge('sec-err');
-    if (op !== DB.admin.password) {
-      errEl.textContent = 'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ø§Ù„Ø­Ø§Ù„ÙŠØ© ØºÙŠØ± ØµØ­ÙŠØ­Ø©'; errEl.style.display = 'block'; return;
-    }
     if (np && np !== cp) {
       errEl.textContent = 'ÙƒÙ„Ù…Ø§Øª Ø§Ù„Ù…Ø±ÙˆØ± Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø© ØºÙŠØ± Ù…ØªØ·Ø§Ø¨Ù‚Ø©'; errEl.style.display = 'block'; return;
     }
     errEl.style.display = 'none';
-    DB.admin.username = gv('sec-u') || DB.admin.username;
-    if (np) DB.admin.password = np;
-    dbSave();
+    try {
+      const res = await fetch('../api/admin-password.php', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json', 'X-Admin-Token': sessionStorage.getItem('bzt')||'' },
+        body: JSON.stringify({ email: gv('sec-u'), current_password: op, new_password: np })
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error || 'Failed to update account');
+      showToast('تم تحديث بيانات الدخول', 'ok');
+      ge('sec-op').value = '';
+      ge('sec-np').value = '';
+      ge('sec-cp').value = '';
+    } catch (err) {
+      errEl.textContent = err?.message || 'فشل تحديث بيانات الدخول';
+      errEl.style.display = 'block';
+    }
   });
 }
 

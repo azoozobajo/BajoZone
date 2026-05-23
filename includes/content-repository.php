@@ -433,3 +433,66 @@ function getContentSnapshot(): array
         return $fallback;
     }
 }
+
+function getAdminArticles(): array
+{
+    $rows = contentFetchAll(
+        "SELECT a.*, c.name AS category_name
+         FROM articles a
+         LEFT JOIN categories c ON c.id = a.category_id
+         ORDER BY COALESCE(a.published_at, a.created_at) DESC, a.id DESC"
+    );
+
+    $articles = attachArticleTags(array_map('normalizeArticle', $rows));
+    foreach ($articles as $index => $article) {
+        $status = $rows[$index]['status'] ?? 'draft';
+        $articles[$index]['status'] = $status;
+        $articles[$index]['is_published'] = $status === 'published';
+    }
+
+    return $articles;
+}
+
+function getAdminPrograms(): array
+{
+    $rows = contentFetchAll('SELECT * FROM programs ORDER BY COALESCE(updated_at, created_at) DESC, id DESC');
+    $programs = array_map('normalizeProgram', $rows);
+    foreach ($programs as $index => $program) {
+        $status = $rows[$index]['status'] ?? 'draft';
+        $programs[$index]['status'] = $status;
+        $programs[$index]['is_active'] = $status === 'published';
+    }
+
+    return $programs;
+}
+
+function getAllCategories(): array
+{
+    return array_map('normalizeCategory', contentFetchAll('SELECT * FROM categories ORDER BY name'));
+}
+
+function getAllTags(): array
+{
+    return array_map('normalizeTag', contentFetchAll('SELECT * FROM tags ORDER BY name'));
+}
+
+function getAdminContentSnapshot(): array
+{
+    try {
+        return [
+            'settings' => getSiteSettings(),
+            'programs' => getAdminPrograms(),
+            'articles' => getAdminArticles(),
+            'categories' => getAllCategories(),
+            'tags' => getAllTags(),
+            'books' => [],
+            'resources' => [],
+            '_source' => 'mysql-admin',
+        ];
+    } catch (Throwable $e) {
+        error_log('BajoZone MySQL admin content unavailable: ' . $e->getMessage());
+        $fallback = getFallbackJsonContent();
+        $fallback['_source'] = 'development-json-fallback';
+        return $fallback;
+    }
+}
