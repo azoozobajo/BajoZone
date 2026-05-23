@@ -2,4 +2,4 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/ososod18r4e/public_html/
-    - /bin/rsync -av --delete --exclude='.git' --exclude='.cpanel.yml' --exclude='.env' ./ $DEPLOYPATH
+    - /bin/rsync -av --exclude='.git' --exclude='.cpanel.yml' --exclude='.env' ./ $DEPLOYPATH
