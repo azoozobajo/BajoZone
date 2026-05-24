@@ -1546,7 +1546,7 @@ function renderHomeStory() {
                     : `<div class="fci-prog-initial">${progName.slice(0,1)}</div>`}
                   <span class="fci-prog-name">${progName}</span>
                 </div>` : '';
-                return `<div class="featured-cycle-item${i===0?' fci-active':''}" data-fci="${i}" onclick="Router.go('/article/${a.id}')">
+                return `<div class="featured-cycle-item${i===0?' fci-active':''}" data-fci="${i}" onclick="Router.go('/article/${a.slug || a.id}')">
                   ${a.image ? `<img class="fci-img" src="${imgSrc(a.image)}" alt="${t}" loading="lazy">` : '<div class="fci-img-ph"></div>'}
                   <div class="fci-body">
                     ${progIdHtml}
@@ -1584,7 +1584,7 @@ function renderHomeStory() {
                 const logoHtml = prog?.logo_url
                   ? `<img src="${imgSrc(prog.logo_url)}" alt="">`
                   : `<div class="li-prog-initial">${initial}</div>`;
-                return `<div class="latest-item${i===0?' li-active':''}" data-li="${i}" onclick="Router.go('/article/${a.id}')">
+                return `<div class="latest-item${i===0?' li-active':''}" data-li="${i}" onclick="Router.go('/article/${a.slug || a.id}')">
                   <div class="li-prog-logo">${logoHtml}</div>
                   <div class="li-body">
                     <div class="li-title">${t}</div>
@@ -1820,7 +1820,7 @@ function buildTickerHtml(arts, programs, isAr) {
     const logoHtml = prog?.logo_url
       ? `<img class="ticker-prog-logo" src="${imgSrc(prog.logo_url)}" alt="">`
       : `<span class="ticker-prog-initial">${initial}</span>`;
-    return `<span class="ticker-item" onclick="Router.go('/article/${a.id}')" role="link" tabindex="0" onkeydown="if(event.key==='Enter')Router.go('/article/${a.id}')">${logoHtml}<span class="ticker-title">${title}</span></span><span class="ticker-dot" aria-hidden="true"></span>`;
+    return `<span class="ticker-item" onclick="Router.go('/article/${a.slug || a.id}')" role="link" tabindex="0" onkeydown="if(event.key==='Enter')Router.go('/article/${a.slug || a.id}')">${logoHtml}<span class="ticker-title">${title}</span></span><span class="ticker-dot" aria-hidden="true"></span>`;
   }
   const items = sorted.map(tickerItem).join('');
   return `<div class="topics-ticker">

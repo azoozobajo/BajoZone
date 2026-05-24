@@ -77,6 +77,7 @@
         <div class="a-nav-group-lbl">المحتوى</div>
         <button class="a-nav-btn" id="nav-programs">📺 البرامج</button>
         <button class="a-nav-btn" id="nav-articles">✍ المواضيع</button>
+        <button class="a-nav-btn" id="nav-categories">🗂 التصنيفات</button>
         <button class="a-nav-btn" id="nav-tags">🏷 التاقات</button>
         <button class="a-nav-btn" id="nav-resources">🗂 المكتبة الرقمية</button>
       </div>
@@ -228,6 +229,11 @@
             <option value="">-- بدون برنامج --</option>
           </select>
         </div>
+        <div class="fg"><label class="fl">التصنيف</label>
+          <select id="f-art-category" class="fi">
+            <option value="">-- بدون تصنيف --</option>
+          </select>
+        </div>
         <div class="fg"><label class="fl">التاقات</label>
           <div class="tag-box" id="tag-box" onclick="ge('tag-input')?.focus()">
             <div class="tag-chips-wrap" id="f-art-tags-display"></div>
@@ -330,6 +336,25 @@
 </div>
 
 <!-- ═══════ TAG MODAL ═══════ -->
+<div class="overlay" id="modal-category">
+  <div class="modal sm">
+    <div class="modal-hd">
+      <span class="modal-hd-title">تصنيف</span>
+      <button class="modal-x" id="modal-category-close">×</button>
+    </div>
+    <div class="modal-bd">
+      <input type="hidden" id="f-cat-id">
+      <div class="fg"><label class="fl">اسم التصنيف</label><input id="f-cat-name" class="fi" dir="rtl" placeholder="اكتشاف المواهب"></div>
+      <div class="fg"><label class="fl">Slug (URL)</label><input id="f-cat-slug" class="fi" dir="ltr" placeholder="talent-identification"></div>
+      <div class="fg"><label class="fl">وصف مختصر</label><textarea id="f-cat-desc" class="fi" rows="4" dir="rtl"></textarea></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" id="modal-category-cancel" style="padding:9px 22px;">إلغاء</button>
+      <button class="btn btn-fill" id="modal-category-save" style="padding:9px 30px;">حفظ ✓</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="modal-tag">
   <div class="modal sm">
     <div class="modal-hd">
@@ -646,13 +671,14 @@ function showLoginError(message) {
 // ── Section Navigation ────────────────────────
 const SECTION_TITLES = {
   overview:'نظرة عامة', programs:'البرامج', articles:'المواضيع',
-  tags:'التاقات', resources:'المكتبة الرقمية', sabout:'إعرف عني',
+  categories:'التصنيفات', tags:'التاقات', resources:'المكتبة الرقمية', sabout:'إعرف عني',
   sgeneral:'الإعدادات العامة', sticker:'الشريط المتحرك', spopup:'البوب أب',
   ssocial:'وسائل التواصل', ssec:'الأمان'
 };
 
 const SECTION_RENDERERS = {
   overview: renderOverview, programs: renderAdminPrograms, articles: renderArticles,
+  categories: renderAdminCategories,
   tags: renderAdminTags,
   resources: renderAdminResources, sabout: renderSAbout,
   sgeneral: renderSGeneral, sticker: renderSTicker, spopup: renderSPopup,
@@ -668,7 +694,7 @@ function goSection(name) {
   if (activeBtn) activeBtn.classList.add('on');
   // Show/hide add button
   const addBtn = ge('btn-add');
-  addBtn.style.display = ['programs','articles','tags','resources'].includes(name) ? '' : 'none';
+  addBtn.style.display = ['programs','articles','categories','tags','resources'].includes(name) ? '' : 'none';
   // Render section
   SECTION_RENDERERS[name]?.();
 }
@@ -1561,6 +1587,11 @@ function openArticleModal(article) {
     (DB.programs||[]).filter(p=>p.is_active!==false).sort((a,b)=>(a.sort_order||99)-(b.sort_order||99))
       .map(p=>`<option value="${p.id}" ${article?.program_id===p.id?'selected':''}>${esc(p.name_ar)}</option>`).join('');
 
+  const catSel = ge('f-art-category');
+  catSel.innerHTML = '<option value="">-- بدون تصنيف --</option>' +
+    (DB.categories||[]).sort((a,b)=>(a.name||a.name_ar||'').localeCompare(b.name||b.name_ar||'', 'ar'))
+      .map(c=>`<option value="${c.id}" ${article?.category_id===c.id?'selected':''}>${esc(c.name||c.name_ar||c.id)}</option>`).join('');
+
   // Tags
   const currentTags = Array.isArray(article?.tags) ? [...article.tags] : [];
   ge('f-art-tags-val').value = JSON.stringify(currentTags);
@@ -1601,6 +1632,9 @@ async function saveArticle() {
     content_ar:  ge('rte-ar').innerHTML,
     content_en:  ge('rte-en').innerHTML,
     program_id:  gv('f-art-program') || null,
+    category_id: gv('f-art-category') || '',
+    category_ar: (DB.categories||[]).find(c=>c.id===gv('f-art-category'))?.name || '',
+    category_en: (DB.categories||[]).find(c=>c.id===gv('f-art-category'))?.name || '',
     date:        gv('f-art-date'),
     is_published: ge('f-art-published').value === 'true',
     featured:    gv('f-art-featured') === 'true',
@@ -1734,6 +1768,67 @@ async function saveProgramAdmin() {
 }
 
 // ── Tags Admin ────────────────────────────────
+function renderAdminCategories() {
+  const cats = DB.categories || [];
+  ge('main-content').innerHTML = `
+    <div class="a-card">
+      <div class="a-card-title">التصنيفات (${cats.length})</div>
+      <table class="a-table">
+        <thead><tr><th>اسم التصنيف</th><th>Slug</th><th>عدد المواضيع</th><th>الوصف</th><th>إجراءات</th></tr></thead>
+        <tbody>
+          ${cats.map(c => {
+            const count = (DB.articles||[]).filter(a=>a.category_id===c.id).length;
+            return `<tr>
+              <td><strong>${esc(c.name||c.name_ar||'—')}</strong></td>
+              <td style="font-family:var(--ff-mono);font-size:.75rem;">${esc(c.slug||'')}</td>
+              <td style="font-family:var(--ff-mono);">${count}</td>
+              <td style="font-size:.78rem;color:var(--warm-mid);">${esc(c.description||'')}</td>
+              <td>
+                <div class="actions">
+                  <button class="ibtn" data-edit-cat="${c.id}">✏</button>
+                  <button class="ibtn red" data-del-cat="${c.id}">🗑</button>
+                </div>
+              </td>
+            </tr>`;
+          }).join('')||`<tr><td colspan="5" style="text-align:center;color:var(--warm-dark);padding:28px;">لا توجد تصنيفات — اضغط "+ إضافة"</td></tr>`}
+        </tbody>
+      </table>
+    </div>`;
+  bindEditBtns();
+}
+
+function openCategoryModal(cat) {
+  ge('f-cat-id').value = cat?.id || '';
+  ge('f-cat-name').value = cat?.name || cat?.name_ar || '';
+  ge('f-cat-slug').value = cat?.slug || '';
+  ge('f-cat-desc').value = cat?.description || '';
+  modalOpen('category');
+}
+
+async function saveCategoryAdmin() {
+  const id = ge('f-cat-id').value;
+  const name = ge('f-cat-name').value.trim();
+  const cat = {
+    id: id || String(Date.now()),
+    name,
+    name_ar: name,
+    name_en: name,
+    slug: ge('f-cat-slug').value.trim() || slugify(name),
+    description: ge('f-cat-desc').value.trim()
+  };
+  if (!DB.categories) DB.categories = [];
+  if (id) {
+    const idx = DB.categories.findIndex(c => c.id === id);
+    if (idx > -1) DB.categories[idx] = cat; else DB.categories.push(cat);
+  } else {
+    DB.categories.push(cat);
+  }
+  dbSave(false);
+  if (!(await saveMySqlNow())) return;
+  modalClose('category');
+  if (currentSection === 'categories') renderAdminCategories();
+}
+
 function renderAdminTags() {
   const tags = DB.tags || [];
   ge('main-content').innerHTML = `
@@ -1927,6 +2022,10 @@ function confirmDelete(type, id) {
     if (type === 'article')  DB.articles   = (DB.articles||[]).filter(a => a.id !== id);
     else if (type === 'book') DB.books     = (DB.books||[]).filter(b => b.id !== id);
     else if (type === 'program') DB.programs = (DB.programs||[]).filter(p => p.id !== id);
+    else if (type === 'category') {
+      DB.categories = (DB.categories||[]).filter(c => c.id !== id);
+      (DB.articles||[]).forEach(a => { if (a.category_id === id) a.category_id = ''; });
+    }
     else if (type === 'tag')      DB.tags      = (DB.tags||[]).filter(t => t.id !== id);
     else if (type === 'resource') DB.resources = (DB.resources||[]).filter(r => r.id !== id);
     dbSave();
@@ -1934,6 +2033,7 @@ function confirmDelete(type, id) {
     if (type === 'article') renderArticles();
     else if (type === 'book') renderBooks();
     else if (type === 'program') renderAdminPrograms();
+    else if (type === 'category') renderAdminCategories();
     else if (type === 'tag') renderAdminTags();
     else if (type === 'resource') renderAdminResources();
     else renderOverview();
@@ -1961,6 +2061,15 @@ function bindEditBtns() {
   });
   mc.querySelectorAll('[data-del-prog]').forEach(btn => {
     btn.addEventListener('click', () => confirmDelete('program', btn.dataset.delProg));
+  });
+  mc.querySelectorAll('[data-edit-cat]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const cat = DB.categories?.find(c => c.id === btn.dataset.editCat);
+      if (cat) openCategoryModal(cat);
+    });
+  });
+  mc.querySelectorAll('[data-del-cat]').forEach(btn => {
+    btn.addEventListener('click', () => confirmDelete('category', btn.dataset.delCat));
   });
   mc.querySelectorAll('[data-edit-tag]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -2749,7 +2858,7 @@ function wireButtons() {
   ge('btn-site').addEventListener('click', () => window.open('../index.html','_blank'));
 
   // Nav buttons
-  ['overview','programs','articles','tags','resources','sabout','sgeneral','sticker','spopup','ssocial','ssec'].forEach(name => {
+  ['overview','programs','articles','categories','tags','resources','sabout','sgeneral','sticker','spopup','ssocial','ssec'].forEach(name => {
     ge('nav-' + name)?.addEventListener('click', () => goSection(name));
   });
 
@@ -2757,6 +2866,7 @@ function wireButtons() {
   ge('btn-add').addEventListener('click', () => {
     if (currentSection === 'articles')  openArticleModal(null);
     else if (currentSection === 'programs') openProgramModal(null);
+    else if (currentSection === 'categories') openCategoryModal(null);
     else if (currentSection === 'tags') openTagModal(null);
     else if (currentSection === 'resources') openResourceModal(null);
   });
@@ -2773,6 +2883,11 @@ function wireButtons() {
   initTabs('prog-tabs');
   initUpload('prog-logo-file', 'prog-logo-prev', 'f-prog-logo');
   initUpload('prog-cover-file', 'prog-cover-prev', 'f-prog-cover');
+
+  // Tag modal
+  ge('modal-category-close').addEventListener('click', () => modalClose('category'));
+  ge('modal-category-cancel').addEventListener('click', () => modalClose('category'));
+  ge('modal-category-save').addEventListener('click', saveCategoryAdmin);
 
   // Tag modal
   ge('modal-tag-close').addEventListener('click', () => modalClose('tag'));

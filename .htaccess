@@ -9,17 +9,11 @@ DirectoryIndex index.php index.html
     Header set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
 
-# Protect data directory
-<FilesMatch "\.json$">
+# Protect data and database files
+<FilesMatch "\.(json|sql|log|yml)$">
     Order allow,deny
     Deny from all
 </FilesMatch>
-
-# Allow JSON access from same origin API
-<Files "db.json">
-    Order allow,deny
-    Allow from all
-</Files>
 
 # Gzip compression
 <IfModule mod_deflate.c>
@@ -42,6 +36,8 @@ DirectoryIndex index.php index.html
     RewriteRule ^admin/ - [L]
     RewriteRule ^api/ - [L]
     RewriteRule ^sitemap\.xml$ /sitemap.php [L]
+    RewriteRule ^database/ - [F,L]
+    RewriteRule ^scripts/ - [F,L]
     RewriteRule ^assets/ - [L]
     RewriteRule ^css/ - [L]
     RewriteRule ^js/ - [L]

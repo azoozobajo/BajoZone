@@ -47,7 +47,7 @@ const adminContentApi = read(files.adminContentApi);
 const saveApi = read(files.saveApi);
 const uploadApi = read(files.uploadApi);
 
-for (const table of ['categories', 'tags', 'articles', 'article_tags', 'programs', 'admin_users', 'site_settings']) {
+for (const table of ['categories', 'tags', 'articles', 'article_tags', 'programs', 'books', 'resources', 'admin_users', 'site_settings']) {
   if (!new RegExp(`CREATE TABLE\\s+${table}\\b`, 'i').test(schema)) {
     fail(`schema.sql missing ${table} table.`);
   }
@@ -58,8 +58,12 @@ for (const needle of [
   'UNIQUE KEY uq_categories_slug',
   'UNIQUE KEY uq_tags_slug',
   'UNIQUE KEY uq_programs_slug',
+  'UNIQUE KEY uq_books_slug',
+  'UNIQUE KEY uq_resources_slug',
   'KEY idx_articles_status',
   'KEY idx_articles_category_id',
+  'KEY idx_programs_status',
+  'KEY idx_resources_status',
   'KEY idx_article_tags_article_id',
   'KEY idx_article_tags_tag_id',
 ]) {
@@ -122,6 +126,10 @@ if (!sitemap.includes('count($taggedArticles) >= 3')) {
   fail('sitemap.php does not enforce the 3 published article rule for tag pages.');
 }
 
+if (sitemap.includes('/programs/')) {
+  fail('sitemap.php includes individual program URLs without a matching /programs/slug route.');
+}
+
 if (!app.includes("/api/content.php")) {
   fail('js/app.js does not load content from the MySQL content API.');
 }
@@ -140,6 +148,16 @@ if (!adminContentApi.includes('requireAdminAuth') || !adminContentApi.includes('
 
 if (!saveApi.includes('requireAdminAuth') || !saveApi.includes('deleteMissingRows')) {
   fail('api/save.php does not protect MySQL writes or delete removed content.');
+}
+
+for (const needle of ['books', 'resources', 'data_json', 'is_featured']) {
+  if (!schema.includes(needle) || !repository.includes(needle) || !saveApi.includes(needle)) {
+    fail(`MySQL content layer missing production support for ${needle}.`);
+  }
+}
+
+if (!admin.includes('nav-categories') || !admin.includes('f-art-category') || !admin.includes('renderAdminCategories')) {
+  fail('Admin panel does not expose category management and article category selection.');
 }
 
 if (!uploadApi.includes('requireAdminAuth')) {

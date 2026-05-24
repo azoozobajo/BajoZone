@@ -25,92 +25,183 @@ function contentSlug(string $value): string
     return trim((string) $slug, '-');
 }
 
+function decodeDataJson(array $row): array
+{
+    $raw = $row['data_json'] ?? '';
+    if (!is_string($raw) || trim($raw) === '') {
+        return [];
+    }
+
+    $decoded = json_decode($raw, true);
+    return is_array($decoded) ? $decoded : [];
+}
+
+function encodeArrayValue($value): string
+{
+    return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+}
+
 function normalizeArticle(array $row): array
 {
+    $data = decodeDataJson($row);
     $title = (string) ($row['title'] ?? '');
     $excerpt = (string) ($row['excerpt'] ?? '');
     $content = (string) ($row['content'] ?? '');
     $publishedAt = $row['published_at'] ?? $row['created_at'] ?? null;
+    $sources = [];
+    if (!empty($row['sources_json']) && is_string($row['sources_json'])) {
+        $decodedSources = json_decode($row['sources_json'], true);
+        $sources = is_array($decodedSources) ? $decodedSources : [];
+    }
 
-    return [
+    return array_merge($data, [
         'id' => (string) ($row['id'] ?? ''),
         'title' => $title,
-        'title_ar' => $title,
-        'title_en' => $title,
+        'title_ar' => (string) ($data['title_ar'] ?? $title),
+        'title_en' => (string) ($data['title_en'] ?? $title),
         'slug' => (string) ($row['slug'] ?? ''),
         'excerpt' => $excerpt,
-        'excerpt_ar' => $excerpt,
-        'excerpt_en' => $excerpt,
+        'excerpt_ar' => (string) ($data['excerpt_ar'] ?? $excerpt),
+        'excerpt_en' => (string) ($data['excerpt_en'] ?? $excerpt),
         'content' => $content,
-        'content_ar' => $content,
-        'content_en' => $content,
+        'content_ar' => (string) ($data['content_ar'] ?? $content),
+        'content_en' => (string) ($data['content_en'] ?? $content),
         'featured_image' => (string) ($row['featured_image'] ?? ''),
         'image' => (string) ($row['featured_image'] ?? ''),
         'category_id' => isset($row['category_id']) ? (string) $row['category_id'] : '',
+        'program_id' => isset($row['program_id']) ? (string) $row['program_id'] : (string) ($data['program_id'] ?? ''),
         'category' => $row['category_name'] ?? '',
         'category_ar' => $row['category_name'] ?? '',
         'category_en' => $row['category_name'] ?? '',
-        'status' => 'published',
-        'is_published' => true,
+        'status' => (string) ($row['status'] ?? 'published'),
+        'is_published' => ($row['status'] ?? 'published') === 'published',
+        'featured' => (bool) ($row['is_featured'] ?? $data['featured'] ?? false),
+        'read_time' => isset($row['read_time']) ? (int) $row['read_time'] : ($data['read_time'] ?? null),
+        'youtube_url' => (string) ($row['youtube_url'] ?? $data['youtube_url'] ?? ''),
+        'video_url' => (string) ($row['video_url'] ?? $data['video_url'] ?? ''),
+        'sources' => $sources ?: ($data['sources'] ?? []),
         'date' => $publishedAt,
         'published_at' => $publishedAt,
         'created_at' => $row['created_at'] ?? null,
         'updated_at' => $row['updated_at'] ?? null,
         'tags' => [],
-    ];
+    ]);
 }
 
 function normalizeCategory(array $row): array
 {
+    $data = decodeDataJson($row);
     $name = (string) ($row['name'] ?? '');
-    return [
+    return array_merge($data, [
         'id' => (string) ($row['id'] ?? ''),
         'name' => $name,
-        'name_ar' => $name,
-        'name_en' => $name,
+        'name_ar' => (string) ($data['name_ar'] ?? $name),
+        'name_en' => (string) ($data['name_en'] ?? $name),
         'slug' => (string) ($row['slug'] ?? ''),
         'description' => (string) ($row['description'] ?? ''),
         'created_at' => $row['created_at'] ?? null,
         'updated_at' => $row['updated_at'] ?? null,
         'published_count' => (int) ($row['published_count'] ?? 0),
-    ];
+    ]);
 }
 
 function normalizeTag(array $row): array
 {
-    return [
+    $data = decodeDataJson($row);
+    return array_merge($data, [
         'id' => (string) ($row['id'] ?? ''),
         'name' => (string) ($row['name'] ?? ''),
         'slug' => (string) ($row['slug'] ?? ''),
         'created_at' => $row['created_at'] ?? null,
         'updated_at' => $row['updated_at'] ?? null,
         'published_count' => (int) ($row['published_count'] ?? 0),
-    ];
+    ]);
 }
 
 function normalizeProgram(array $row): array
 {
+    $data = decodeDataJson($row);
     $title = (string) ($row['title'] ?? '');
     $description = (string) ($row['description'] ?? '');
-    return [
+    return array_merge($data, [
         'id' => (string) ($row['id'] ?? ''),
         'title' => $title,
-        'name_ar' => $title,
-        'name_en' => $title,
+        'name_ar' => (string) ($data['name_ar'] ?? $title),
+        'name_en' => (string) ($data['name_en'] ?? $title),
         'slug' => (string) ($row['slug'] ?? ''),
         'description' => $description,
-        'description_ar' => $description,
-        'description_en' => $description,
-        'short_description_ar' => $description,
-        'short_description_en' => $description,
+        'description_ar' => (string) ($data['description_ar'] ?? $description),
+        'description_en' => (string) ($data['description_en'] ?? $description),
+        'short_description_ar' => (string) ($data['short_description_ar'] ?? $row['short_description'] ?? $description),
+        'short_description_en' => (string) ($data['short_description_en'] ?? $row['short_description'] ?? $description),
         'content' => (string) ($row['content'] ?? ''),
         'image' => (string) ($row['image'] ?? ''),
         'logo_url' => (string) ($row['image'] ?? ''),
-        'status' => 'published',
-        'is_active' => true,
+        'accent_color' => (string) ($row['accent_color'] ?? $data['accent_color'] ?? ''),
+        'sort_order' => (int) ($row['sort_order'] ?? $data['sort_order'] ?? 99),
+        'is_featured' => (bool) ($row['is_featured'] ?? $data['is_featured'] ?? false),
+        'cover_image' => (string) ($row['cover_image'] ?? $data['cover_image'] ?? ''),
+        'status' => (string) ($row['status'] ?? 'published'),
+        'is_active' => ($row['status'] ?? 'published') === 'published',
         'created_at' => $row['created_at'] ?? null,
         'updated_at' => $row['updated_at'] ?? null,
-    ];
+    ]);
+}
+
+function normalizeBook(array $row): array
+{
+    $data = decodeDataJson($row);
+    return array_merge($data, [
+        'id' => (string) ($row['id'] ?? ''),
+        'title' => (string) ($row['title'] ?? ''),
+        'title_ar' => (string) ($data['title_ar'] ?? $row['title'] ?? ''),
+        'title_en' => (string) ($data['title_en'] ?? $row['title'] ?? ''),
+        'slug' => (string) ($row['slug'] ?? ''),
+        'subtitle_ar' => (string) ($data['subtitle_ar'] ?? $row['subtitle'] ?? ''),
+        'subtitle_en' => (string) ($data['subtitle_en'] ?? $row['subtitle'] ?? ''),
+        'description_ar' => (string) ($data['description_ar'] ?? $row['description'] ?? ''),
+        'description_en' => (string) ($data['description_en'] ?? $row['description'] ?? ''),
+        'cover' => (string) ($row['cover'] ?? ''),
+        'external_url' => (string) ($row['external_url'] ?? ''),
+        'amazon_url' => (string) ($row['amazon_url'] ?? ''),
+        'price' => (string) ($row['price'] ?? ''),
+        'available' => (bool) ($row['available'] ?? true),
+        'has_landing' => (bool) ($row['has_landing'] ?? false),
+        'landing_route' => (string) ($row['landing_route'] ?? ''),
+        'created_at' => $row['created_at'] ?? null,
+        'updated_at' => $row['updated_at'] ?? null,
+    ]);
+}
+
+function normalizeResource(array $row): array
+{
+    $data = decodeDataJson($row);
+    return array_merge($data, [
+        'id' => (string) ($row['id'] ?? ''),
+        'title' => (string) ($row['title'] ?? ''),
+        'title_ar' => (string) ($data['title_ar'] ?? $row['title'] ?? ''),
+        'title_en' => (string) ($data['title_en'] ?? $row['title'] ?? ''),
+        'slug' => (string) ($row['slug'] ?? ''),
+        'type' => (string) ($row['type'] ?? $data['type'] ?? ''),
+        'short_description_ar' => (string) ($data['short_description_ar'] ?? $row['short_description'] ?? ''),
+        'short_description_en' => (string) ($data['short_description_en'] ?? $row['short_description'] ?? ''),
+        'full_description_ar' => (string) ($data['full_description_ar'] ?? $row['full_description'] ?? ''),
+        'full_description_en' => (string) ($data['full_description_en'] ?? $row['full_description'] ?? ''),
+        'language' => (string) ($row['language'] ?? $data['language'] ?? ''),
+        'author_or_org' => (string) ($row['author_or_org'] ?? $data['author_or_org'] ?? ''),
+        'publisher' => (string) ($row['publisher'] ?? $data['publisher'] ?? ''),
+        'publication_year' => $row['publication_year'] ?? $data['publication_year'] ?? null,
+        'cover_image' => (string) ($row['cover_image'] ?? $data['cover_image'] ?? ''),
+        'source_url' => (string) ($row['source_url'] ?? $data['source_url'] ?? ''),
+        'download_url' => (string) ($row['download_url'] ?? $data['download_url'] ?? ''),
+        'access_type' => (string) ($row['access_type'] ?? $data['access_type'] ?? ''),
+        'rights' => (string) ($row['rights'] ?? $data['rights'] ?? ''),
+        'is_featured' => (bool) ($row['is_featured'] ?? $data['is_featured'] ?? false),
+        'status' => (string) ($row['status'] ?? 'published'),
+        'is_published' => ($row['status'] ?? 'published') === 'published',
+        'created_at' => $row['created_at'] ?? null,
+        'updated_at' => $row['updated_at'] ?? null,
+    ]);
 }
 
 function attachArticleTags(array $articles): array
@@ -205,13 +296,36 @@ function getPublishedProgramBySlug($slug): ?array
     return $row ? normalizeProgram($row) : null;
 }
 
+function getBooks(): array
+{
+    $rows = contentFetchAll(
+        "SELECT *
+         FROM books
+         ORDER BY available DESC, COALESCE(updated_at, created_at) DESC, id DESC"
+    );
+
+    return array_map('normalizeBook', $rows);
+}
+
+function getPublishedResources(): array
+{
+    $rows = contentFetchAll(
+        "SELECT *
+         FROM resources
+         WHERE status = 'published'
+         ORDER BY is_featured DESC, COALESCE(updated_at, created_at) DESC, id DESC"
+    );
+
+    return array_map('normalizeResource', $rows);
+}
+
 function getCategoriesWithPublishedArticles(): array
 {
     $rows = contentFetchAll(
         "SELECT c.*, COUNT(a.id) AS published_count
          FROM categories c
          INNER JOIN articles a ON a.category_id = c.id AND a.status = 'published'
-         GROUP BY c.id, c.name, c.slug, c.description, c.created_at, c.updated_at
+         GROUP BY c.id, c.name, c.slug, c.description, c.data_json, c.created_at, c.updated_at
          ORDER BY c.name"
     );
 
@@ -225,7 +339,7 @@ function getCategoryBySlug($slug): ?array
          FROM categories c
          LEFT JOIN articles a ON a.category_id = c.id AND a.status = 'published'
          WHERE c.slug = ?
-         GROUP BY c.id, c.name, c.slug, c.description, c.created_at, c.updated_at
+         GROUP BY c.id, c.name, c.slug, c.description, c.data_json, c.created_at, c.updated_at
          LIMIT 1",
         [(string) $slug]
     );
@@ -254,7 +368,7 @@ function getTagsWithPublishedArticles(): array
          FROM tags t
          INNER JOIN article_tags at ON at.tag_id = t.id
          INNER JOIN articles a ON a.id = at.article_id AND a.status = 'published'
-         GROUP BY t.id, t.name, t.slug, t.created_at, t.updated_at
+         GROUP BY t.id, t.name, t.slug, t.data_json, t.created_at, t.updated_at
          ORDER BY t.name"
     );
 
@@ -269,7 +383,7 @@ function getTagBySlug($slug): ?array
          LEFT JOIN article_tags at ON at.tag_id = t.id
          LEFT JOIN articles a ON a.id = at.article_id AND a.status = 'published'
          WHERE t.slug = ?
-         GROUP BY t.id, t.name, t.slug, t.created_at, t.updated_at
+         GROUP BY t.id, t.name, t.slug, t.data_json, t.created_at, t.updated_at
          LIMIT 1",
         [(string) $slug]
     );
@@ -422,8 +536,8 @@ function getContentSnapshot(): array
             'articles' => getPublishedArticles(),
             'categories' => getCategoriesWithPublishedArticles(),
             'tags' => getTagsWithPublishedArticles(),
-            'books' => [],
-            'resources' => [],
+            'books' => getBooks(),
+            'resources' => getPublishedResources(),
             '_source' => 'mysql',
         ];
     } catch (Throwable $e) {
@@ -476,6 +590,11 @@ function getAllTags(): array
     return array_map('normalizeTag', contentFetchAll('SELECT * FROM tags ORDER BY name'));
 }
 
+function getAllResources(): array
+{
+    return array_map('normalizeResource', contentFetchAll('SELECT * FROM resources ORDER BY COALESCE(updated_at, created_at) DESC, id DESC'));
+}
+
 function getAdminContentSnapshot(): array
 {
     try {
@@ -485,8 +604,8 @@ function getAdminContentSnapshot(): array
             'articles' => getAdminArticles(),
             'categories' => getAllCategories(),
             'tags' => getAllTags(),
-            'books' => [],
-            'resources' => [],
+            'books' => getBooks(),
+            'resources' => getAllResources(),
             '_source' => 'mysql-admin',
         ];
     } catch (Throwable $e) {

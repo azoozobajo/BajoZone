@@ -89,20 +89,6 @@ foreach ($publishedArticles as $article) {
     addUrl($urls, '/article/' . rawurlencode((string) $slug), $lastmod, 'monthly', '0.7');
 }
 
-foreach (($content['programs'] ?? []) as $program) {
-    if (($program['status'] ?? 'published') !== 'published') {
-        continue;
-    }
-
-    $slug = $program['slug'] ?? '';
-    if ($slug === '') {
-        continue;
-    }
-
-    $lastmod = normalizedDate($program['updated_at'] ?? $program['created_at'] ?? null);
-    addUrl($urls, '/programs/' . rawurlencode((string) $slug), $lastmod, 'monthly', '0.6');
-}
-
 echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
 echo "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n";
 
