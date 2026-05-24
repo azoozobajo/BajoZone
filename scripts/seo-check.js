@@ -4,6 +4,7 @@ const path = require('path');
 const root = path.resolve(__dirname, '..');
 const files = {
   schema: path.join(root, 'database', 'schema.sql'),
+  seedPrograms: path.join(root, 'database', 'seed-programs.sql'),
   repository: path.join(root, 'includes', 'content-repository.php'),
   db: path.join(root, 'includes', 'db.php'),
   config: path.join(root, 'includes', 'config.php'),
@@ -34,6 +35,7 @@ for (const [name, file] of Object.entries(files)) {
 }
 
 const schema = read(files.schema);
+const seedPrograms = read(files.seedPrograms);
 const repository = read(files.repository);
 const db = read(files.db);
 const config = read(files.config);
@@ -50,6 +52,12 @@ const uploadApi = read(files.uploadApi);
 for (const table of ['categories', 'tags', 'articles', 'article_tags', 'programs', 'books', 'resources', 'admin_users', 'site_settings']) {
   if (!new RegExp(`CREATE TABLE\\s+${table}\\b`, 'i').test(schema)) {
     fail(`schema.sql missing ${table} table.`);
+  }
+}
+
+for (const programId of ['prog1', 'prog2', 'prog3', 'prog4', 'prog5', 'prog6', 'prog7', 'prog8', 'prog9', 'prog10']) {
+  if (!seedPrograms.includes(programId)) {
+    fail(`seed-programs.sql missing ${programId}.`);
   }
 }
 
