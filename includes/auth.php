@@ -39,7 +39,7 @@ function createAdminToken(array $user): string
 
 function verifyAdminToken(?string $token): ?array
 {
-    if (!$token || !str_contains($token, '.')) {
+    if (!$token || strpos($token, '.') === false) {
         return null;
     }
 
@@ -76,4 +76,3 @@ function getAdminUserByEmail(string $email): ?array
     $row = $stmt->fetch();
     return is_array($row) ? $row : null;
 }
-

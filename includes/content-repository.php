@@ -527,6 +527,15 @@ function contentRepositoryUsesMysql(): bool
     }
 }
 
+function contentAllowDevelopmentFallback(): bool
+{
+    $host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
+    return PHP_SAPI === 'cli'
+        || $host === ''
+        || strpos($host, 'localhost') !== false
+        || strpos($host, '127.0.0.1') !== false;
+}
+
 function getContentSnapshot(): array
 {
     try {
@@ -542,6 +551,9 @@ function getContentSnapshot(): array
         ];
     } catch (Throwable $e) {
         error_log('BajoZone MySQL content unavailable: ' . $e->getMessage());
+        if (!contentAllowDevelopmentFallback()) {
+            throw $e;
+        }
         $fallback = getFallbackJsonContent();
         $fallback['_source'] = 'development-json-fallback';
         return $fallback;
@@ -610,6 +622,9 @@ function getAdminContentSnapshot(): array
         ];
     } catch (Throwable $e) {
         error_log('BajoZone MySQL admin content unavailable: ' . $e->getMessage());
+        if (!contentAllowDevelopmentFallback()) {
+            throw $e;
+        }
         $fallback = getFallbackJsonContent();
         $fallback['_source'] = 'development-json-fallback';
         return $fallback;

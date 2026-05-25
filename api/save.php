@@ -55,6 +55,15 @@ function deleteMissingRows(PDO $pdo, string $table, array $ids): void
     $pdo->prepare("DELETE FROM {$table} WHERE id NOT IN ($placeholders)")->execute($ids);
 }
 
+function encodeSettingValue($value): string
+{
+    if (is_bool($value) || is_array($value) || is_object($value) || $value === null) {
+        return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    return (string) $value;
+}
+
 try {
     $pdo = getDb();
     $pdo->beginTransaction();
@@ -65,7 +74,7 @@ try {
          ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), updated_at = CURRENT_TIMESTAMP"
     );
     foreach (($data['settings'] ?? []) as $key => $value) {
-        $upsertSetting->execute([(string) $key, is_scalar($value) ? (string) $value : json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)]);
+        $upsertSetting->execute([(string) $key, encodeSettingValue($value)]);
     }
 
     $upsertCategory = $pdo->prepare(

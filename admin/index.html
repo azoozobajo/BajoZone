@@ -553,11 +553,20 @@ const LS_KEY = 'bz_db_v8';
 let currentSection = 'overview';
 let pendingDeleteFn = null;
 
+function normalizeAdminDb() {
+  if (!DB || typeof DB !== 'object') DB = {};
+  if (!DB.settings || Array.isArray(DB.settings) || typeof DB.settings !== 'object') DB.settings = {};
+  ['programs', 'articles', 'books', 'categories', 'tags', 'resources'].forEach(key => {
+    if (!Array.isArray(DB[key])) DB[key] = [];
+  });
+}
+
 async function dbLoad() {
   try {
-    const res = await fetch('../api/content.php?t=' + Date.now());
+    const res = await fetch('../api/content.php?t=' + Date.now(), { cache: 'no-store' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     DB = await res.json();
+    normalizeAdminDb();
     DB.admin ||= { username:'bajo', password:'BajoZone2025!' };
     localStorage.setItem(LS_KEY, JSON.stringify(DB));
     return;
@@ -567,7 +576,7 @@ async function dbLoad() {
 
   const saved = localStorage.getItem(LS_KEY);
   if (saved) {
-    try { DB = JSON.parse(saved); } catch(e) { DB = null; }
+    try { DB = JSON.parse(saved); normalizeAdminDb(); } catch(e) { DB = null; }
   }
   if (DB) return;
   try {
@@ -575,6 +584,7 @@ async function dbLoad() {
     const res = await fetch('../data/db.json?t=' + Date.now());
     if (!res.ok) throw new Error('HTTP ' + res.status);
     DB = await res.json();
+    normalizeAdminDb();
     localStorage.setItem(LS_KEY, JSON.stringify(DB));
   } catch (_) {
     if (!DB) {
@@ -589,10 +599,12 @@ async function dbLoad() {
 
 async function dbLoadAdmin() {
   const res = await fetch('../api/admin-content.php?t=' + Date.now(), {
+    cache: 'no-store',
     headers: { 'X-Admin-Token': sessionStorage.getItem('bzt') || '' }
   });
   if (!res.ok) throw new Error('HTTP ' + res.status);
   DB = await res.json();
+  normalizeAdminDb();
   localStorage.setItem(LS_KEY, JSON.stringify(DB));
 }
 
@@ -616,8 +628,8 @@ function dbSave(sync = true) {
     }
     return;
   }
-  if (sync) saveMySqlNow();
-  return;
+  if (sync) return saveMySqlNow();
+  return Promise.resolve(true);
   showToast('تم الحفظ بنجاح ✓', 'ok');
 }
 
@@ -625,6 +637,7 @@ async function saveMySqlNow() {
   try {
     const res = await fetch('../api/save.php', {
       method: 'POST',
+      cache: 'no-store',
       headers: { 'Content-Type':'application/json', 'X-Admin-Token': sessionStorage.getItem('bzt')||'' },
       body: JSON.stringify(DB)
     });
@@ -2693,7 +2706,7 @@ function renderSAbout() {
   bindGalleryEditor();
   bindLogoEditor();
 
-  ge('btn-save-sabout').addEventListener('click', () => {
+  ge('btn-save-sabout').addEventListener('click', async () => {
     if (!DB.settings) DB.settings = {};
     DB.settings.about_image = gv('about-profile-val');
     DB.settings.about_gallery = collectGallery();
@@ -2707,7 +2720,10 @@ function renderSAbout() {
     DB.settings.about_var_data = (varReviewing || varResult)
       ? { reviewing: varReviewing, result: varResult }
       : null;
-    dbSave();
+    if (await dbSave()) {
+      await dbLoadAdmin();
+      showToast('تم حفظ صفحة تعرف علي وتحديث MySQL', 'ok');
+    }
   });
 }
 

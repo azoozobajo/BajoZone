@@ -8,15 +8,27 @@
 /* ── CMS ─────────────────────────────────────── */
 const CMS = {
   db: null, LS_KEY: 'bz_db_v9',
+  isDevelopmentHost() {
+    const host = window.location.hostname;
+    return window.location.protocol === 'file:' || host === 'localhost' || host === '127.0.0.1' || host === '';
+  },
   async init() {
+    const isDev = this.isDevelopmentHost();
     try {
-      const r = await fetch('/api/content.php?t=' + Date.now());
-      if (!r.ok) throw 0;
+      const r = await fetch('/api/content.php?t=' + Date.now(), { cache: 'no-store' });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
       this.db = await r.json();
+      if (!isDev && this.db?._source && this.db._source !== 'mysql') {
+        throw new Error('Unexpected content source: ' + this.db._source);
+      }
       localStorage.setItem(this.LS_KEY, JSON.stringify(this.db));
       return true;
     } catch(err) {
-      console.warn('MySQL content API unavailable, trying development fallback', err);
+      console.warn('MySQL content API unavailable', err);
+      if (!isDev) {
+        this.db = null;
+        return false;
+      }
     }
 
     const s = localStorage.getItem(this.LS_KEY);
@@ -26,7 +38,7 @@ const CMS = {
     if (this.db) return true;
     try {
       // Do not use data/db.json in production. This is only a temporary local-development fallback.
-      const r = await fetch('/data/db.json?t=' + Date.now());
+      const r = await fetch('/data/db.json?t=' + Date.now(), { cache: 'no-store' });
       if (!r.ok) throw 0;
       this.db = await r.json();
       localStorage.setItem(this.LS_KEY, JSON.stringify(this.db));
