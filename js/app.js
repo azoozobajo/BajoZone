@@ -3264,12 +3264,12 @@ const AboutPremium = {
     }
   },
   logos: [
-    { src: 'images/about/logos/logo-marburg.png',             alt_ar: 'جامعة ماربورغ',               alt_en: 'University of Marburg' },
-    { src: 'images/about/logos/logo-ifi.png',                 alt_ar: 'المعهد الدولي لكرة القدم',    alt_en: 'International Football Institute' },
-    { src: 'images/about/logos/logo-barca-innovation-hub.png',alt_ar: 'برشلونة إنوفيشن هاب',        alt_en: 'Barça Innovation Hub' },
-    { src: 'images/about/logos/logo-oliver-kahn-academy.png', alt_ar: 'أكاديمية أوليفر كان',        alt_en: 'Oliver Kahn Academy' },
-    { src: 'images/about/logos/logo-vfb-marburg.png',         alt_ar: 'في إف بي ماربورغ',           alt_en: 'VfB Marburg' },
-    { src: 'images/about/logos/logo-saudi-fa.png',            alt_ar: 'الاتحاد السعودي لكرة القدم', alt_en: 'Saudi Arabian Football Federation' }
+    { src: 'images/about/logos/logo-marburg.svg',             alt_ar: 'جامعة ماربورغ',               alt_en: 'University of Marburg' },
+    { src: 'images/about/logos/logo-ifi.svg',                 alt_ar: 'المعهد الدولي لكرة القدم',    alt_en: 'International Football Institute' },
+    { src: 'images/about/logos/logo-barca-innovation-hub.svg',alt_ar: 'برشلونة إنوفيشن هاب',        alt_en: 'Barça Innovation Hub' },
+    { src: 'images/about/logos/logo-oliver-kahn-academy.svg', alt_ar: 'أكاديمية أوليفر كان',        alt_en: 'Oliver Kahn Academy' },
+    { src: 'images/about/logos/logo-vfb-marburg.svg',         alt_ar: 'في إف بي ماربورغ',           alt_en: 'VfB Marburg' },
+    { src: 'images/about/logos/logo-saudi-fa.svg',            alt_ar: 'الاتحاد السعودي لكرة القدم', alt_en: 'Saudi Arabian Football Federation' }
   ]
 };
 
@@ -3307,20 +3307,39 @@ function renderAboutPremium() {
     title: isAr ? (item.title_ar || item.title_en || '') : (item.title_en || item.title_ar || ''),
     idx
   }));
-  const filmSlotsHtml = Array.from({ length: 4 }, (_, idx) => `
-    <figure class="about-film-slot${filmItems.length ? '' : ' is-empty'}" data-film-slot="${idx}">
-      ${filmItems.length ? `<img src="${aboutEsc(filmItems[idx % filmItems.length].src)}" alt="${aboutEsc(filmItems[idx % filmItems.length].title)}" loading="eager" decoding="async">` : ''}
-      <figcaption>${aboutEsc(filmItems.length ? (filmItems[idx % filmItems.length].title || (isAr ? 'محطة من الرحلة' : 'Journey moment')) : (isAr ? 'أضف صورة من لوحة التحكم' : 'Add an image from admin'))}</figcaption>
-    </figure>
-  `).join('');
+  const visibleFilmItems = filmItems.length
+    ? Array.from({ length: 4 }, (_, idx) => filmItems[idx % filmItems.length])
+    : [];
+  const filmSlotsHtml = visibleFilmItems.length
+    ? visibleFilmItems.map((item, idx) => `
+      <figure class="about-film-slot" data-film-slot="${idx}">
+        <img src="${aboutEsc(item.src)}" alt="${aboutEsc(item.title || (isAr ? 'محطة من الرحلة' : 'Journey moment'))}" loading="lazy" decoding="async">
+        <figcaption>${aboutEsc(item.title || (isAr ? 'محطة من الرحلة' : 'Journey moment'))}</figcaption>
+      </figure>
+    `).join('')
+    : `
+      <figure class="about-film-slot is-empty">
+        <figcaption>${isAr ? 'أضف صورة من لوحة التحكم' : 'Add an image from admin'}</figcaption>
+      </figure>
+    `;
 
   const savedLogos = CMS.s('about_journey_logos', null);
   const logos = (Array.isArray(savedLogos) && savedLogos.length ? savedLogos : AboutPremium.logos)
-    .filter(logo => logo && logo.src);
-  const logoItems = logos.map(logo =>
-    `<div class="about-logo-item"><img src="${mediaSrc(logo.src || '')}" alt="${isAr ? logo.alt_ar : logo.alt_en}" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`
-  ).join('');
-  const logoTrack = logoItems.repeat(8);
+    .filter(logo => logo && (logo.src || logo.alt_ar || logo.alt_en || logo.label));
+  const logoItems = logos.map((logo, idx) => {
+    const rawLabel = (isAr ? logo.alt_ar : logo.alt_en) || logo.alt_ar || logo.alt_en || logo.label || `Logo ${idx + 1}`;
+    const label = aboutEsc(rawLabel);
+    const src = mediaSrc(logo.src || '');
+    /* img starts opacity:0 so fallback text shows cleanly during load;
+       onload: reveals image and hides fallback via is-loaded class;
+       onerror: removes broken img, fallback text stays visible */
+    return `<div class="about-logo-item${src ? '' : ' is-missing'}" data-logo-label="${label}">
+      ${src ? `<img src="${src}" alt="${label}" loading="eager" style="opacity:0;transition:opacity .3s ease" onload="this.style.opacity=1;this.closest('.about-logo-item').classList.add('is-loaded')" onerror="this.closest('.about-logo-item').classList.add('is-missing');this.remove();">` : ''}
+      <span class="about-logo-fallback">${label}</span>
+    </div>`;
+  }).join('');
+  const logoLoop = logoItems ? logoItems.repeat(6) : '';
+  const logoTrack = logoLoop + logoLoop;
 
   const SVG = {
     whatsapp: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`,
@@ -3331,22 +3350,21 @@ function renderAboutPremium() {
     linkedin:  `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>`
   };
 
-  const socialPlatforms = [
-    { key: 'whatsapp',  label: 'WhatsApp', href: v => `https://wa.me/${v.replace(/\D/g,'')}` },
-    { key: 'instagram', label: 'Instagram', href: v => `https://instagram.com/${v}` },
-    { key: 'twitter',   label: 'X',         href: v => `https://x.com/${v}` },
-    { key: 'snapchat',  label: 'Snapchat',  href: v => `https://snapchat.com/add/${v}` },
-    { key: 'email',     label: 'Email',     href: v => v.includes('@') ? `mailto:${v}` : '#' },
-    { key: 'linkedin',  label: 'LinkedIn',  href: v => v.startsWith('http') ? v : `https://linkedin.com/in/${v}` }
+  const contactPlatforms = [
+    { key: 'whatsapp', label: Lang.t('whatsapp'), href: v => `https://wa.me/${v.replace(/\D/g,'')}` },
+    { key: 'email',    label: Lang.t('email'),    href: v => v.includes('@') ? `mailto:${v}` : '#' },
+    { key: 'phone',    label: Lang.t('phone'),    href: v => `tel:${v}` }
   ];
-  const socialLinksHtml = socialPlatforms.map(p => {
+  const socialLinksHtml = contactPlatforms.map(p => {
     const raw = social[p.key];
-    const val = raw ? (typeof raw === 'string' ? raw : (raw.value || '')) : '';
+    const val = raw && typeof raw === 'object' ? (raw.value || '') : (raw || '');
+    const visible = raw && typeof raw === 'object' ? raw.visible !== false : !!val;
     if (!val) return '';
-    return `<a class="about-social-link" href="${p.href(val)}" target="_blank" rel="noopener noreferrer" aria-label="${p.label}" title="${p.label}">${SVG[p.key]}</a>`;
+    if (!visible) return '';
+    return `<a class="about-social-link" href="${p.href(val)}" target="_blank" rel="noopener noreferrer" aria-label="${p.label}" title="${p.label}">${SI[p.key] || SVG[p.key] || ''}<span>${p.label}</span></a>`;
   }).filter(Boolean).join('');
 
-  const contactInvite = CMS.s(isAr ? 'about_contact_invite_ar' : 'about_contact_invite_en', '') || c.closing.invite || '';
+  const contactInvite = CMS.s(isAr ? 'about_contact_invite_ar' : 'about_contact_invite_en', '') || (isAr ? 'يسعدني تواصلك لأي فكرة أو تعاون أو سؤال.' : 'Feel free to reach out for ideas, collaboration, or questions.');
   const varEnabled = CMS.s('about_var_enabled', true);
   const varOverride = CMS.s('about_var_data', null);
   const varData = {
@@ -3359,7 +3377,7 @@ function renderAboutPremium() {
   document.body.classList.add('is-about-page');
 
   document.getElementById('app').innerHTML = `
-    <div class="about-page" dir="${c.dir}">
+    <div class="about-page is-scroll-page" dir="${c.dir}">
 
       <div class="about-scene-shell" id="about-shell">
 
@@ -3423,14 +3441,6 @@ function renderAboutPremium() {
             <div class="about-moments-photos-col">
               <div class="about-film-reel" id="about-film-reel" data-count="${filmItems.length}">
                 <div class="about-film-grid" dir="${isAr ? 'rtl' : 'ltr'}">${filmSlotsHtml}</div>
-                <div class="about-film-meta">
-                  <span class="about-film-count" id="about-film-count">${filmItems.length ? `01 / ${String(Math.max(1, Math.ceil(filmItems.length / 4))).padStart(2, '0')}` : '00 / 00'}</span>
-                  <span class="about-film-line" aria-hidden="true"></span>
-                  <div class="about-film-controls" aria-label="${isAr ? 'التنقل بين مجموعات الصور' : 'Navigate photo groups'}">
-                    <button type="button" class="about-film-btn" data-film-prev aria-label="${isAr ? 'المجموعة السابقة' : 'Previous group'}">‹</button>
-                    <button type="button" class="about-film-btn" data-film-next aria-label="${isAr ? 'المجموعة التالية' : 'Next group'}">›</button>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -3455,33 +3465,21 @@ function renderAboutPremium() {
 
         <!-- Scene 5: Closing + Social -->
         <div class="about-scene" data-scene="${varEnabled !== false ? 5 : 4}">
-          <p class="about-scene-label">${isAr ? '06 — الخاتمة' : '06 — CLOSING'}</p>
-          <h2 class="about-scene-title">${c.closing.title}</h2>
+          <p class="about-scene-label">${isAr ? '06 — تواصل معنا' : '06 — CONTACT'}</p>
+          <h2 class="about-scene-title">${isAr ? 'تواصل معي' : 'Contact Me'}</h2>
           <div class="about-divider" aria-hidden="true"></div>
-          ${c.closing.paragraphs.map(p => `<p class="about-scene-para">${p}</p>`).join('')}
-          <p class="about-closing-statement">${c.closing.statement}</p>
-          ${contactInvite ? `<p class="about-contact-invite">${contactInvite}</p>` : ''}
-          ${socialLinksHtml ? `<div class="about-social-row">${socialLinksHtml}</div>` : ''}
-          <div class="about-social-row">
-            <a class="about-btn-fill" href="/articles" onclick="Router.go('/articles');return false;">${isAr ? 'المقالات' : 'Articles'}</a>
-            <a class="about-btn-fill" href="/programs" onclick="Router.go('/programs');return false;">${Lang.t('programs')}</a>
-            <a class="about-btn-fill" href="/author/abdulaziz-bajkhaif" onclick="Router.go('/author/abdulaziz-bajkhaif');return false;">${isAr ? 'صفحة الكاتب' : 'Author'}</a>
+          <div class="about-contact-card">
+            <p class="about-scene-para">${isAr
+              ? 'BajoZone مساحة شخصية معرفية وتحليلية عن كرة القدم، اكتشاف المواهب، تطوير اللاعبين، وتحليل الأداء.'
+              : 'BajoZone is a personal knowledge and analysis space about football, talent identification, player development, and performance analysis.'}</p>
+            ${contactInvite ? `<p class="about-contact-invite">${contactInvite}</p>` : ''}
+            ${socialLinksHtml ? `<div class="about-social-row about-contact-links">${socialLinksHtml}</div>` : `<p class="about-contact-invite">${isAr ? 'أضف وسائل التواصل من لوحة التحكم لتظهر هنا.' : 'Add contact methods from the admin panel to show them here.'}</p>`}
           </div>
           <p class="about-scene-para">${isAr
             ? 'المحتوى في BajoZone معرفي وتحليلي، ولا يمثل نصيحة قانونية أو طبية أو قرارًا رسميًا في تقييم اللاعبين.'
             : 'BajoZone content is educational and analytical, and should not be treated as legal, medical, or official player-evaluation advice.'}</p>
-          <a class="about-btn-fill" href="/" onclick="Router.go('/');return false;">${c.closing.button}</a>
         </div>
 
-      </div>
-
-      <div class="about-scene-controls">
-        <div class="about-scene-dots" role="tablist" aria-label="${isAr ? 'المشاهد' : 'Scenes'}">
-          ${(varEnabled !== false ? [0,1,2,3,4,5] : [0,1,2,3,4]).map(i => `<button class="about-dot${i===0?' is-active':''}" role="tab" aria-selected="${i===0}" data-target="${i}" aria-label="${isAr?'المشهد '+(i+1):'Scene '+(i+1)}"></button>`).join('')}
-        </div>
-        <button class="about-scene-next" id="about-next-btn" aria-label="${isAr ? 'المشهد التالي' : 'Next scene'}">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4,7 9,12 14,7"/></svg>
-        </button>
       </div>
 
     </div>`;
@@ -3496,8 +3494,6 @@ function renderAboutPremium() {
   );
 
   requestAnimationFrame(() => {
-    initAboutScenes();
-    initAboutFilmReel(filmItems);
     if (varEnabled !== false) initVarCheck(varData);
   });
 }
