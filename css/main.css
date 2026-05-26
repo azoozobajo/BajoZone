@@ -3108,19 +3108,19 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   position: relative;
   width: 100%;
   min-height: 96px;
-  overflow: visible;
+  overflow: hidden;
   border-radius: 0;
-  padding: 12px;
+  padding: 12px 0;
   border: 1px solid rgba(255,255,255,.065);
   background: rgba(255,255,255,.018);
 }
 .about-logo-strip-wrap::before,
 .about-logo-strip-wrap::after {
-  content: none;
+  content: '';
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 48px;
+  width: 60px;
   z-index: 2;
   pointer-events: none;
 }
@@ -3135,13 +3135,12 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
 .about-logo-track {
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding: 0;
-  animation: none;
-  width: 100%;
-  will-change: auto;
+  flex-wrap: nowrap;
+  gap: 14px;
+  padding: 0 14px;
+  width: max-content;
+  animation: aboutLogoScroll 30s linear infinite;
+  will-change: transform;
 }
 @keyframes aboutLogoScroll {
   from { transform: translateX(0); }
