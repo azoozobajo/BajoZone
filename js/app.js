@@ -3447,7 +3447,7 @@ function renderAboutPremium() {
                 <div class="about-film-grid" dir="${isAr ? 'rtl' : 'ltr'}">${filmSlotsHtml}</div>
                 ${filmItems.length ? `
                 <div class="about-film-meta">
-                  <span>${filmItems.length} ${isAr ? 'صور' : 'photos'}</span>
+                  <span id="about-film-count">01 / ${String(Math.max(1,Math.ceil(filmItems.length/4))).padStart(2,'0')}</span>
                   <span class="about-film-line" aria-hidden="true"></span>
                 </div>` : ''}
               </div>

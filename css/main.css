@@ -3134,6 +3134,7 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
 }
 .about-logo-track {
   display: flex;
+  direction: ltr; /* always LTR so animation starts at visible position (translateX 0→-50%) */
   align-items: center;
   flex-wrap: nowrap;
   gap: 14px;
@@ -3146,7 +3147,7 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
 }
-[dir="rtl"] .about-logo-track { animation-direction: reverse; }
+/* No RTL reversal — logos always scroll LTR; starting at translateX(-50%) would hide everything */
 /* ── Logo item: always-visible CSS card ── */
 .about-logo-item {
   flex-shrink: 0;
