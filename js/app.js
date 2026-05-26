@@ -3310,10 +3310,11 @@ function renderAboutPremium() {
   const visibleFilmItems = filmItems.length
     ? Array.from({ length: 4 }, (_, idx) => filmItems[idx % filmItems.length])
     : [];
+  const filmBatches = Math.max(1, Math.ceil(filmItems.length / 4));
   const filmSlotsHtml = visibleFilmItems.length
     ? visibleFilmItems.map((item, idx) => `
       <figure class="about-film-slot" data-film-slot="${idx}">
-        <img src="${aboutEsc(item.src)}" alt="${aboutEsc(item.title || (isAr ? 'محطة من الرحلة' : 'Journey moment'))}" loading="lazy" decoding="async">
+        <img src="${aboutEsc(item.src)}" alt="${aboutEsc(item.title || (isAr ? 'محطة من الرحلة' : 'Journey moment'))}" loading="eager" decoding="async">
         <figcaption>${aboutEsc(item.title || (isAr ? 'محطة من الرحلة' : 'Journey moment'))}</figcaption>
       </figure>
     `).join('')
@@ -3441,11 +3442,25 @@ function renderAboutPremium() {
             <div class="about-moments-photos-col">
               <div class="about-film-reel" id="about-film-reel" data-count="${filmItems.length}">
                 <div class="about-film-grid" dir="${isAr ? 'rtl' : 'ltr'}">${filmSlotsHtml}</div>
+                ${filmItems.length > 4 ? `
+                <div class="about-film-meta">
+                  <span id="about-film-count">01 / ${String(filmBatches).padStart(2,'0')}</span>
+                  <span class="about-film-line" aria-hidden="true"></span>
+                  <div class="about-film-controls">
+                    <button class="about-film-btn" data-film-prev aria-label="${isAr ? 'السابق' : 'Previous'}">&#8249;</button>
+                    <button class="about-film-btn" data-film-next aria-label="${isAr ? 'التالي' : 'Next'}">&#8250;</button>
+                  </div>
+                </div>` : ''}
               </div>
             </div>
           </div>
-          <div class="about-logo-strip-wrap">
-            <div class="about-logo-track">${logoTrack}</div>
+
+          <!-- Logos band — scrolling institutions strip -->
+          <div class="about-logos-band">
+            <p class="about-logos-band-label">${isAr ? 'جهات وتجارب أكاديمية ومهنية وكروية' : 'Academic, Professional & Football Institutions'}</p>
+            <div class="about-logo-strip-wrap">
+              <div class="about-logo-track">${logoTrack}</div>
+            </div>
           </div>
         </div>
 
@@ -3495,6 +3510,8 @@ function renderAboutPremium() {
 
   requestAnimationFrame(() => {
     if (varEnabled !== false) initVarCheck(varData);
+    /* init photo reel — must run after innerHTML is set */
+    initAboutFilmReel(filmItems);
   });
 }
 

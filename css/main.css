@@ -3033,7 +3033,7 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   background: linear-gradient(135deg, rgba(200,168,110,.07), rgba(255,255,255,.018));
 }
 .about-film-meta {
-  height: 18px;
+  min-height: 28px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -3211,6 +3211,22 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
 .about-logo-item.is-loaded {
   min-width: 200px;
   min-height: 72px;
+}
+
+/* ── Logo band wrapper (sits below film reel in scene 3) ── */
+.about-logos-band {
+  margin-top: 36px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255,255,255,.065);
+}
+.about-logos-band-label {
+  font-family: var(--ff-mono);
+  font-size: .58rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(200,168,110,.55);
+  text-align: center;
+  margin-bottom: 16px;
 }
 
 /* ══ SCENE 6 — CLOSING ══ */
