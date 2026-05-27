@@ -3324,10 +3324,13 @@ function renderAboutPremium() {
     const label = aboutEsc(rawLabel);
     const rawAbbr = logo.abbr || (logo.alt_en || '').split(/\s+/).slice(0, 4).map(w => w[0]).join('').toUpperCase() || String(idx + 1);
     const abbr = aboutEsc(rawAbbr);
-    const uploadedSrc = (logo.src && !logo.abbr) ? mediaSrc(logo.src) : '';
-    return `<div class="ap-logo-item"><div class="ap-logo-card"><span class="ap-logo-abbr">${abbr}</span><span class="ap-logo-name">${label}</span></div>${uploadedSrc ? `<img class="ap-logo-img" src="${uploadedSrc}" alt="${label}" loading="lazy" onload="this.closest('.ap-logo-item').classList.add('has-real-img')" onerror="this.remove();">` : ''}</div>`;
+    const uploadedSrc = logo.src ? mediaSrc(logo.src) : '';
+    return `<div class="ap-logo-item">\
+<div class="ap-logo-card"><span class="ap-logo-abbr">${abbr}</span><span class="ap-logo-name">${label}</span></div>\
+${uploadedSrc ? `<img class="ap-logo-img" src="${uploadedSrc}" alt="${label}" loading="lazy" onerror="this.style.display='none'">` : ''}\
+<div class="ap-logo-hover-name">${label}</div>\
+</div>`;
   }).join('');
-  const logoTrack = logoItems + logoItems;
 
   /* ── Social links ── */
   const SVG = {
@@ -3462,9 +3465,7 @@ function renderAboutPremium() {
   <!-- 05 LOGOS BAND -->
   <section class="ap-logos-band" aria-label="${isAr ? 'جهات وتجارب' : 'Institutions'}">
     <p class="ap-logos-label">${isAr ? 'جهات وتجارب أكاديمية ومهنية وكروية' : 'Academic, Professional & Football Institutions'}</p>
-    <div class="ap-logos-strip">
-      <div class="ap-logos-track" id="ap-logos-track">${logoTrack}</div>
-    </div>
+    <div class="ap-logos-grid">${logoItems}</div>
   </section>
 
   <!-- 06 VAR CHECK -->
