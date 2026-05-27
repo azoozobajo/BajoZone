@@ -3307,7 +3307,7 @@ function renderAboutPremium() {
     title: isAr ? (item.title_ar || item.title_en || '') : (item.title_en || item.title_ar || ''),
     idx
   }));
-  /* Always render exactly 4 slots — initAboutFilmReel fills them and handles rotation */
+  /* Render first batch (up to 4 photos) as static HTML — rotation handled inline after render */
   const filmSlotsHtml = Array.from({ length: 4 }, (_, i) => {
     const item = filmItems[i];
     return item
@@ -3319,6 +3319,7 @@ function renderAboutPremium() {
         <figcaption>${isAr ? 'أضف صورة من لوحة التحكم' : 'Add an image from admin'}</figcaption>
       </figure>`;
   }).join('');
+  const totalBatches = filmItems.length > 4 ? Math.ceil(filmItems.length / 4) : 0;
 
   const savedLogos = CMS.s('about_journey_logos', null);
   let logos = (Array.isArray(savedLogos) && savedLogos.length ? savedLogos : AboutPremium.logos)
@@ -3509,10 +3510,32 @@ function renderAboutPremium() {
 
   requestAnimationFrame(() => {
     if (varEnabled !== false) initVarCheck(varData);
-    /* Start film reel rotation (fills slots + auto-rotates every 4s if > 4 photos) */
-    initAboutFilmReel(filmItems);
-    /* Wire up wheel / keyboard / dot scene navigation */
     initAboutScenes();
+
+    /* ── Simple inline rotation — never touches the static 4 photos on first load ── */
+    if (totalBatches > 1) {
+      let curBatch = 0;
+      const counter = document.getElementById('about-film-count');
+      const rotate = () => {
+        const reel = document.getElementById('about-film-reel');
+        if (!reel) return; /* page changed — stop */
+        curBatch = (curBatch + 1) % totalBatches;
+        const slots = reel.querySelectorAll('[data-film-slot]');
+        slots.forEach((slot, i) => {
+          const item = filmItems[(curBatch * 4 + i) % filmItems.length];
+          if (!item) return;
+          const lbl = item.title || (isAr ? 'محطة من الرحلة' : 'Journey moment');
+          const img = slot.querySelector('img');
+          const cap = slot.querySelector('figcaption');
+          if (img) { img.src = item.src; img.alt = lbl; }
+          if (cap) cap.textContent = lbl;
+          slot.classList.remove('is-empty');
+        });
+        if (counter) counter.textContent = `${String(curBatch + 1).padStart(2,'0')} / ${String(totalBatches).padStart(2,'0')}`;
+        window.setTimeout(rotate, 4000);
+      };
+      window.setTimeout(rotate, 4000); /* first rotation after 4s — don't touch initial render */
+    }
   });
 }
 
