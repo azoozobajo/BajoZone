@@ -3276,76 +3276,60 @@ const AboutPremium = {
 function renderAboutPremium() {
   const isAr = Lang.cur === 'ar';
   const c = AboutPremium[isAr ? 'ar' : 'en'];
+  const dir = c.dir;
+  const aboutEsc = value => String(value || '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
+  /* ── CMS data ── */
   const social = CMS.s('social', {}) || {};
-  const emailRaw = social?.email?.value || (typeof social?.email === 'string' ? social.email : '') || '';
-  const contactHref = emailRaw.includes('@') ? `mailto:${emailRaw}` : '#';
-
   const heroPhoto = mediaSrc(CMS.s('about_image', ''));
   const defaultKeywords = isAr
     ? ['اكتشاف المواهب','علوم الرياضة','تطوير المواهب','رعاية المواهب','أكاديميات كرة القدم','الفئات السنية','بناء الفريق','استقطاب اللاعبين']
     : ['Talent Discovery','Sport Science','Talent Development','Player Care','Football Academies','Youth Categories','Team Building','Player Scouting'];
   const keywords = CMS.s('about_keywords', null) || defaultKeywords;
-  const kwItems = keywords.map(kw => `<span class="about-hero-kw">${kw}</span>`).join('');
-  const aboutEsc = value => String(value || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+  const kwItems = keywords.map(kw => `<span class="ap-hero-kw">${aboutEsc(kw)}</span>`).join('');
 
+  /* ── Gallery ── */
   const gallery = CMS.s('about_gallery', []);
   const galleryWithImages = Array.isArray(gallery) ? gallery.filter(item => item && item.image) : [];
-  galleryWithImages.forEach(item => {
-    const src = mediaSrc(item.image || '');
-    if (!src) return;
-    const img = new Image();
-    img.decoding = 'async';
-    img.src = src;
-  });
   const filmItems = galleryWithImages.map((item, idx) => ({
     src: mediaSrc(item.image || ''),
     title: isAr ? (item.title_ar || item.title_en || '') : (item.title_en || item.title_ar || ''),
     idx
   }));
-  /* Render first batch (up to 4 photos) as static HTML — rotation handled inline after render */
-  const filmSlotsHtml = Array.from({ length: 4 }, (_, i) => {
-    const item = filmItems[i];
-    return item
-      ? `<figure class="about-film-slot" data-film-slot="${i}">
-        <img src="${aboutEsc(item.src)}" alt="${aboutEsc(item.title || (isAr ? 'محطة من الرحلة' : 'Journey moment'))}" loading="eager" decoding="async">
-        <figcaption>${aboutEsc(item.title || (isAr ? 'محطة من الرحلة' : 'Journey moment'))}</figcaption>
-      </figure>`
-      : `<figure class="about-film-slot is-empty" data-film-slot="${i}">
-        <figcaption>${isAr ? 'أضف صورة من لوحة التحكم' : 'Add an image from admin'}</figcaption>
-      </figure>`;
-  }).join('');
-  const totalBatches = filmItems.length > 4 ? Math.ceil(filmItems.length / 4) : 0;
+  galleryWithImages.forEach(item => {
+    const src = mediaSrc(item.image || '');
+    if (!src) return;
+    const img = new Image(); img.decoding = 'async'; img.src = src;
+  });
+  const PAGE_SIZE = 6;
+  const totalPages = filmItems.length ? Math.ceil(filmItems.length / PAGE_SIZE) : 0;
+  const firstPage = filmItems.slice(0, PAGE_SIZE);
+  const displayCount = firstPage.length;
 
+  const buildGalleryGrid = (items) => {
+    if (!items.length) return `<div class="ap-gp" style="grid-column:span 12;aspect-ratio:5/2;display:flex;align-items:center;justify-content:center;color:rgba(200,168,110,.28);font-size:.78rem;font-family:'Space Mono',monospace;letter-spacing:.1em">${isAr ? 'أضف صوراً من لوحة التحكم' : 'ADD PHOTOS FROM ADMIN'}</div>`;
+    return items.map((item, i) => `<div class="ap-gp ap-reveal ap-reveal-delay-${(i % 4) + 1}" data-gp="${i}">
+        <img src="${aboutEsc(item.src)}" alt="${aboutEsc(item.title || (isAr ? 'لقطة من الرحلة' : 'Journey moment'))}" loading="${i < 4 ? 'eager' : 'lazy'}" decoding="async">${item.title ? `<span class="ap-gp-cap">${aboutEsc(item.title)}</span>` : ''}
+      </div>`).join('');
+  };
+
+  /* ── Logos ── */
   const savedLogos = CMS.s('about_journey_logos', null);
   let logos = (Array.isArray(savedLogos) && savedLogos.length ? savedLogos : AboutPremium.logos)
     .filter(logo => logo && (logo.src || logo.abbr || logo.alt_ar || logo.alt_en || logo.label));
-  if (!logos.length) logos = AboutPremium.logos; /* safety net */
+  if (!logos.length) logos = AboutPremium.logos;
   const logoItems = logos.map((logo, idx) => {
     const rawLabel = (isAr ? logo.alt_ar : logo.alt_en) || logo.alt_ar || logo.alt_en || logo.label || `Logo ${idx + 1}`;
     const label = aboutEsc(rawLabel);
-    /* abbr: use stored abbr (default logos) or generate from English initials (admin logos) */
     const rawAbbr = logo.abbr || (logo.alt_en || '').split(/\s+/).slice(0, 4).map(w => w[0]).join('').toUpperCase() || String(idx + 1);
     const abbr = aboutEsc(rawAbbr);
-    /* Only use src for real uploaded images — default logos now render as CSS cards */
     const uploadedSrc = (logo.src && !logo.abbr) ? mediaSrc(logo.src) : '';
-    return `<div class="about-logo-item" data-logo-label="${label}">
-      <div class="about-logo-card">
-        <span class="about-logo-abbr">${abbr}</span>
-        <span class="about-logo-name">${label}</span>
-      </div>${uploadedSrc ? `
-      <img class="about-logo-img" src="${uploadedSrc}" alt="${label}" loading="lazy"
-           onload="this.closest('.about-logo-item').classList.add('has-real-img')"
-           onerror="this.remove();">` : ''}
-    </div>`;
+    return `<div class="ap-logo-item"><div class="ap-logo-card"><span class="ap-logo-abbr">${abbr}</span><span class="ap-logo-name">${label}</span></div>${uploadedSrc ? `<img class="ap-logo-img" src="${uploadedSrc}" alt="${label}" loading="lazy" onload="this.closest('.ap-logo-item').classList.add('has-real-img')" onerror="this.remove();">` : ''}</div>`;
   }).join('');
-  /* Duplicate items for seamless CSS infinite scroll: animate translateX(-50%) */
   const logoTrack = logoItems + logoItems;
 
+  /* ── Social links ── */
   const SVG = {
     whatsapp: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`,
     instagram: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>`,
@@ -3354,7 +3338,6 @@ function renderAboutPremium() {
     email:     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>`,
     linkedin:  `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>`
   };
-
   const contactPlatforms = [
     { key: 'whatsapp', label: Lang.t('whatsapp'), href: v => `https://wa.me/${v.replace(/\D/g,'')}` },
     { key: 'email',    label: Lang.t('email'),    href: v => v.includes('@') ? `mailto:${v}` : '#' },
@@ -3364,140 +3347,166 @@ function renderAboutPremium() {
     const raw = social[p.key];
     const val = raw && typeof raw === 'object' ? (raw.value || '') : (raw || '');
     const visible = raw && typeof raw === 'object' ? raw.visible !== false : !!val;
-    if (!val) return '';
-    if (!visible) return '';
-    return `<a class="about-social-link" href="${p.href(val)}" target="_blank" rel="noopener noreferrer" aria-label="${p.label}" title="${p.label}">${SI[p.key] || SVG[p.key] || ''}<span>${p.label}</span></a>`;
+    if (!val || !visible) return '';
+    return `<a class="ap-social-link" href="${p.href(val)}" target="_blank" rel="noopener noreferrer" aria-label="${p.label}" title="${p.label}">${SI[p.key] || SVG[p.key] || ''}<span>${p.label}</span></a>`;
   }).filter(Boolean).join('');
 
   const contactInvite = CMS.s(isAr ? 'about_contact_invite_ar' : 'about_contact_invite_en', '') || (isAr ? 'يسعدني تواصلك لأي فكرة أو تعاون أو سؤال.' : 'Feel free to reach out for ideas, collaboration, or questions.');
   const varEnabled = CMS.s('about_var_enabled', true);
   const varOverride = CMS.s('about_var_data', null);
   const varData = {
-    btn: c.varCheck.btn,
-    eyebrow: c.varCheck.eyebrow,
+    btn:       c.varCheck.btn,
+    eyebrow:   c.varCheck.eyebrow,
     reviewing: (varOverride && varOverride.reviewing) || c.varCheck.reviewing,
     result:    (varOverride && varOverride.result)    || c.varCheck.result
   };
 
   document.body.classList.add('is-about-page');
 
+  /* ── Hero column ordering: photo-left/text-right in LTR; text-right/photo-left in RTL ── */
+  const photoBlock = `<div class="ap-hero-photo-wrap ap-reveal">
+        <div class="ap-hero-photo-frame">
+          ${heroPhoto
+            ? `<img src="${aboutEsc(heroPhoto)}" alt="${aboutEsc(c.hero.name)}" loading="eager" onerror="this.style.display='none'">`
+            : `<div class="ap-hero-photo-placeholder">${isAr ? 'ع.ب' : 'A.B'}</div>`}
+        </div>
+      </div>`;
+  const textBlock = `<div class="ap-hero-text">
+        <p class="ap-eyebrow">${isAr ? '— عن صاحب BAJOZONE' : '— ABOUT THE FOUNDER'}</p>
+        <h1 class="ap-hero-name ap-reveal">${aboutEsc(c.hero.name)}</h1>
+        <div class="ap-divider ap-reveal" aria-hidden="true"></div>
+        <p class="ap-hero-tagline ap-reveal">${aboutEsc(c.hero.tagline)}</p>
+        <p class="ap-hero-bio ap-reveal">${aboutEsc(c.hero.bio)}</p>
+        <div class="ap-hero-kw-cloud ap-reveal">${kwItems}</div>
+        <div class="ap-hero-actions ap-reveal">
+          <a class="ap-btn-fill" href="#/programs">${aboutEsc(c.hero.primary)}</a>
+          <a class="ap-btn-ghost" href="#contact-section">${aboutEsc(c.hero.secondary)}</a>
+        </div>
+      </div>`;
+
   document.getElementById('app').innerHTML = `
-    <div class="about-page is-scroll-page" dir="${c.dir}">
+<div class="ap" dir="${dir}" id="ap-root">
 
-      <div class="about-scene-shell" id="about-shell">
+  <!-- 01 HERO -->
+  <section class="ap-hero" aria-label="${isAr ? 'نبذة' : 'About'}">
+    <div class="ap-watermark" aria-hidden="true">01</div>
+    <div class="ap-hero-inner">
+      ${isAr ? textBlock + photoBlock : photoBlock + textBlock}
+    </div>
+  </section>
 
-        <!-- Scene 0: Intro + Photo + Keywords -->
-        <div class="about-scene is-active" data-scene="0">
-          <div class="about-hero-row">
-            <div class="about-hero-text">
-              <p class="about-eyebrow">${isAr ? 'عن صاحب BAJOZONE' : 'ABOUT THE FOUNDER'}</p>
-              <p class="about-name">${c.hero.name}</p>
-              <h1 class="about-headline">${isAr ? 'بين كرة القدم، البحث، والتقنية' : 'Where football, research, and technology meet'}</h1>
-              <div class="about-divider" aria-hidden="true"></div>
-              <p class="about-lead">${c.hero.tagline}</p>
-              <p class="about-bio">${c.hero.bio}</p>
-            </div>
-            <div class="about-hero-side">
-              <div class="about-hero-card">
-                ${heroPhoto
-                  ? `<img class="about-hero-card-photo" src="${heroPhoto}" alt="${c.hero.name}" loading="eager" onerror="this.style.display='none'">`
-                  : `<div class="about-hero-card-placeholder">${isAr ? 'ع.ب' : 'A.B'}</div>`}
-                <div class="about-hero-card-overlay">
-                  <div class="about-hero-card-tags">${kwItems}</div>
-                </div>
-              </div>
-            </div>
-          </div>
+  <!-- 02 JOURNEY -->
+  <section class="ap-section ap-journey">
+    <div class="ap-watermark" aria-hidden="true">02</div>
+    <div class="ap-section-inner">
+      <p class="ap-eyebrow ap-reveal">${isAr ? '— رحلتي' : '— JOURNEY'}</p>
+      <h2 class="ap-heading ap-reveal">${aboutEsc(c.journey.title)}</h2>
+      <div class="ap-divider ap-reveal" aria-hidden="true"></div>
+      <div class="ap-journey-text ap-reveal">
+        <p class="ap-journey-para">${aboutEsc(c.journey.intro)}</p>
+        ${c.journey.para2 ? `<p class="ap-journey-para">${aboutEsc(c.journey.para2)}</p>` : ''}
+      </div>
+    </div>
+    <div class="ap-timeline-wrap">
+      <div class="ap-timeline" dir="${dir}">
+        ${c.journey.items.map(([title, text], idx) => `<div class="ap-tl-item">
+          <div class="ap-tl-dot" aria-hidden="true"></div>
+          <span class="ap-tl-num">${String(idx + 1).padStart(2, '0')}</span>
+          <p class="ap-tl-title">${aboutEsc(title)}</p>
+          ${text ? `<p class="ap-tl-text">${aboutEsc(text)}</p>` : ''}
+        </div>`).join('')}
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 FOCUS -->
+  <section class="ap-section">
+    <div class="ap-watermark" aria-hidden="true">03</div>
+    <div class="ap-section-inner">
+      <p class="ap-eyebrow ap-reveal">${isAr ? '— ما أركز عليه' : '— FOCUS'}</p>
+      <h2 class="ap-heading ap-reveal">${aboutEsc(c.focus.title)}</h2>
+      <div class="ap-divider ap-reveal" aria-hidden="true"></div>
+      <p class="ap-intro ap-reveal">${aboutEsc(c.focus.intro)}</p>
+      <div class="ap-focus-grid">
+        ${c.focus.cards.map(([title, text], idx) => `<div class="ap-fc ap-reveal ap-reveal-delay-${(idx % 3) + 1}">
+          <span class="ap-fc-num">${String(idx + 1).padStart(2, '0')}</span>
+          <p class="ap-fc-title">${aboutEsc(title)}</p>
+          <p class="ap-fc-body">${aboutEsc(text)}</p>
+        </div>`).join('')}
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 MOMENTS -->
+  <section class="ap-section ap-moments">
+    <div class="ap-watermark" aria-hidden="true">04</div>
+    <div class="ap-section-inner">
+      <p class="ap-eyebrow ap-reveal">${isAr ? '— لقطات من الرحلة' : '— JOURNEY MOMENTS'}</p>
+      <h2 class="ap-heading ap-reveal">${aboutEsc(c.fragments.title)}</h2>
+      <div class="ap-divider ap-reveal" aria-hidden="true"></div>
+      <p class="ap-intro ap-reveal">${aboutEsc(c.fragments.text)}</p>
+      <div class="ap-gallery" id="ap-gallery" data-page="0" data-total-pages="${totalPages}">
+        <div class="ap-gallery-grid" id="ap-gallery-grid" data-count="${displayCount}">
+          ${buildGalleryGrid(firstPage)}
         </div>
-
-        <!-- Scene 1: Journey -->
-        <div class="about-scene" data-scene="1">
-          <p class="about-scene-label">${isAr ? '02 — رحلتي' : '02 — JOURNEY'}</p>
-          <h2 class="about-scene-title">${c.journey.title}</h2>
-          <div class="about-divider" aria-hidden="true"></div>
-          <p class="about-scene-intro">${c.journey.intro}</p>
-          ${c.journey.para2 ? `<p class="about-scene-para">${c.journey.para2}</p>` : ''}
-          <div class="about-journey-path">
-            ${c.journey.items.map(([title, text], idx) => `<div class="about-journey-step" style="--step-delay:${idx * 80}ms"><span class="about-journey-marker" aria-hidden="true"></span><div class="about-journey-copy"><p class="about-journey-title">${title}</p>${text ? `<p class="about-journey-text">${text}</p>` : ''}</div></div>`).join('')}
-          </div>
-        </div>
-
-        <!-- Scene 2: Focus -->
-        <div class="about-scene" data-scene="2">
-          <p class="about-scene-label">${isAr ? '03 — ما أركز عليه' : '03 — FOCUS'}</p>
-          <h2 class="about-scene-title">${c.focus.title}</h2>
-          <div class="about-divider" aria-hidden="true"></div>
-          <p class="about-scene-intro">${c.focus.intro}</p>
-          <div class="about-focus-grid">
-            ${c.focus.cards.map(([title, text]) => `<div class="about-focus-card"><p class="about-focus-card-title">${title}</p><p class="about-focus-card-text">${text}</p></div>`).join('')}
-          </div>
-        </div>
-
-        <!-- Scene 3: Moments & Milestones (album + text + logo strip) -->
-        <div class="about-scene" data-scene="3">
-          <p class="about-scene-label">${isAr ? '04 — لقطات ومحطات' : '04 — MOMENTS & MILESTONES'}</p>
-          <h2 class="about-scene-title">${isAr ? 'لقطات ومحطات من الرحلة' : 'Moments and Milestones'}</h2>
-          <div class="about-divider" aria-hidden="true"></div>
-          <div class="about-moments-main">
-            <div class="about-moments-text-col">
-              <p class="about-moments-text-eyebrow">${isAr ? 'جهات وتجارب' : 'Institutions'}</p>
-              <p class="about-moments-text-body">${c.experience.text}</p>
-            </div>
-            <div class="about-moments-photos-col">
-              <div class="about-film-reel" id="about-film-reel" data-count="${filmItems.length}">
-                <div class="about-film-grid" dir="${isAr ? 'rtl' : 'ltr'}">${filmSlotsHtml}</div>
-                ${filmItems.length ? `
-                <div class="about-film-meta">
-                  <span id="about-film-count">01 / ${String(Math.max(1,Math.ceil(filmItems.length/4))).padStart(2,'0')}</span>
-                  <span class="about-film-line" aria-hidden="true"></span>
-                </div>` : ''}
-              </div>
-            </div>
-          </div>
-
-          <!-- Logos band — scrolling institutions strip -->
-          <div class="about-logos-band">
-            <p class="about-logos-band-label">${isAr ? 'جهات وتجارب أكاديمية ومهنية وكروية' : 'Academic, Professional & Football Institutions'}</p>
-            <div class="about-logo-strip-wrap">
-              <div class="about-logo-track">${logoTrack}</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Scene 4: VAR Check Easter Egg -->
-        ${varEnabled !== false ? `
-        <div class="about-scene" data-scene="4">
-          <p class="about-scene-label">05 — VAR CHECK</p>
-          <h2 class="about-scene-title">${isAr ? 'لحظة VAR' : 'VAR Moment'}</h2>
-          <div class="about-divider" aria-hidden="true"></div>
-          <p class="about-scene-intro">${isAr ? 'توقف للحظة. كل قرار مهم يستحق نظرة ثانية.' : 'Pause for a moment. Every important decision deserves a second look.'}</p>
-          <div class="about-var-area">
-            <p class="about-var-eyebrow">${varData.eyebrow}</p>
-            <button class="about-var-btn" id="about-var-btn" aria-label="${isAr ? 'مراجعة VAR' : 'VAR Review'}">${varData.btn}</button>
-            <p class="about-var-status" id="about-var-status" aria-live="polite"></p>
+        ${totalPages > 1 ? `<div class="ap-gallery-nav">
+          <span class="ap-gallery-counter" id="ap-gallery-counter">01 / ${String(totalPages).padStart(2,'0')}</span>
+          <div class="ap-gallery-btns">
+            <button class="ap-gallery-btn" id="ap-gallery-prev" aria-label="${isAr ? 'السابق' : 'Previous'}" disabled>&#8592;</button>
+            <button class="ap-gallery-btn" id="ap-gallery-next" aria-label="${isAr ? 'التالي' : 'Next'}">&#8594;</button>
           </div>
         </div>` : ''}
-
-        <!-- Scene 5: Closing + Social -->
-        <div class="about-scene" data-scene="${varEnabled !== false ? 5 : 4}">
-          <p class="about-scene-label">${isAr ? '06 — تواصل معنا' : '06 — CONTACT'}</p>
-          <h2 class="about-scene-title">${isAr ? 'تواصل معي' : 'Contact Me'}</h2>
-          <div class="about-divider" aria-hidden="true"></div>
-          <div class="about-contact-card">
-            <p class="about-scene-para">${isAr
-              ? 'BajoZone مساحة شخصية معرفية وتحليلية عن كرة القدم، اكتشاف المواهب، تطوير اللاعبين، وتحليل الأداء.'
-              : 'BajoZone is a personal knowledge and analysis space about football, talent identification, player development, and performance analysis.'}</p>
-            ${contactInvite ? `<p class="about-contact-invite">${contactInvite}</p>` : ''}
-            ${socialLinksHtml ? `<div class="about-social-row about-contact-links">${socialLinksHtml}</div>` : `<p class="about-contact-invite">${isAr ? 'أضف وسائل التواصل من لوحة التحكم لتظهر هنا.' : 'Add contact methods from the admin panel to show them here.'}</p>`}
-          </div>
-          <p class="about-scene-para">${isAr
-            ? 'المحتوى في BajoZone معرفي وتحليلي، ولا يمثل نصيحة قانونية أو طبية أو قرارًا رسميًا في تقييم اللاعبين.'
-            : 'BajoZone content is educational and analytical, and should not be treated as legal, medical, or official player-evaluation advice.'}</p>
-        </div>
-
       </div>
+    </div>
+  </section>
 
-    </div>`;
+  <!-- 05 LOGOS BAND -->
+  <section class="ap-logos-band" aria-label="${isAr ? 'جهات وتجارب' : 'Institutions'}">
+    <p class="ap-logos-label">${isAr ? 'جهات وتجارب أكاديمية ومهنية وكروية' : 'Academic, Professional & Football Institutions'}</p>
+    <div class="ap-logos-strip">
+      <div class="ap-logos-track" id="ap-logos-track">${logoTrack}</div>
+    </div>
+  </section>
+
+  <!-- 06 VAR CHECK -->
+  ${varEnabled !== false ? `<section class="ap-section ap-var" id="var-section">
+    <div class="ap-watermark" aria-hidden="true">VAR</div>
+    <div class="ap-section-inner">
+      <p class="ap-eyebrow ap-reveal">— VAR CHECK</p>
+      <h2 class="ap-heading ap-reveal">${isAr ? 'لحظة VAR' : 'VAR Moment'}</h2>
+      <div class="ap-divider ap-reveal" aria-hidden="true"></div>
+      <p class="ap-intro ap-reveal">${isAr ? 'توقف للحظة. كل قرار مهم يستحق نظرة ثانية.' : 'Pause for a moment. Every important decision deserves a second look.'}</p>
+      <div class="ap-var-area ap-reveal">
+        <p class="ap-var-eyebrow-text">${aboutEsc(varData.eyebrow)}</p>
+        <button id="about-var-btn" aria-label="${isAr ? 'مراجعة VAR' : 'VAR Review'}">${aboutEsc(varData.btn)}</button>
+        <p id="about-var-status" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>` : ''}
+
+  <!-- 07 CONTACT -->
+  <section class="ap-section" id="contact-section">
+    <div class="ap-watermark" aria-hidden="true">07</div>
+    <div class="ap-section-inner">
+      <p class="ap-eyebrow ap-reveal">${isAr ? '— تواصل معي' : '— CONTACT'}</p>
+      <h2 class="ap-heading ap-reveal">${isAr ? 'تواصل معي' : 'Contact Me'}</h2>
+      <div class="ap-divider ap-reveal" aria-hidden="true"></div>
+      <div class="ap-contact-card ap-reveal">
+        <p class="ap-contact-para">${isAr
+          ? 'BajoZone مساحة شخصية معرفية وتحليلية عن كرة القدم، اكتشاف المواهب، تطوير اللاعبين، وتحليل الأداء.'
+          : 'BajoZone is a personal knowledge and analysis space about football, talent identification, player development, and performance analysis.'}</p>
+        ${contactInvite ? `<p class="ap-contact-invite">${aboutEsc(contactInvite)}</p>` : ''}
+        ${socialLinksHtml
+          ? `<div class="ap-social-row">${socialLinksHtml}</div>`
+          : `<p class="ap-contact-invite" style="opacity:.42">${isAr ? 'أضف وسائل التواصل من لوحة التحكم.' : 'Add contact methods from the admin panel.'}</p>`}
+      </div>
+      <p class="ap-contact-disclaimer ap-reveal">${isAr
+        ? 'المحتوى في BajoZone معرفي وتحليلي، ولا يمثل نصيحة قانونية أو طبية أو قرارًا رسميًا في تقييم اللاعبين.'
+        : 'BajoZone content is educational and analytical, and should not be treated as legal, medical, or official player-evaluation advice.'}</p>
+    </div>
+  </section>
+
+</div>`;
 
   updatePageMeta(
     `${isAr ? 'عن BajoZone' : 'About BajoZone'} — ${CMS.s('site_name_en', 'BajoZone')}`,
@@ -3510,33 +3519,61 @@ function renderAboutPremium() {
 
   requestAnimationFrame(() => {
     if (varEnabled !== false) initVarCheck(varData);
-    initAboutScenes();
-
-    /* ── Simple inline rotation — never touches the static 4 photos on first load ── */
-    if (totalBatches > 1) {
-      let curBatch = 0;
-      const counter = document.getElementById('about-film-count');
-      const rotate = () => {
-        const reel = document.getElementById('about-film-reel');
-        if (!reel) return; /* page changed — stop */
-        curBatch = (curBatch + 1) % totalBatches;
-        const slots = reel.querySelectorAll('[data-film-slot]');
-        slots.forEach((slot, i) => {
-          const item = filmItems[(curBatch * 4 + i) % filmItems.length];
-          if (!item) return;
-          const lbl = item.title || (isAr ? 'محطة من الرحلة' : 'Journey moment');
-          const img = slot.querySelector('img');
-          const cap = slot.querySelector('figcaption');
-          if (img) { img.src = item.src; img.alt = lbl; }
-          if (cap) cap.textContent = lbl;
-          slot.classList.remove('is-empty');
-        });
-        if (counter) counter.textContent = `${String(curBatch + 1).padStart(2,'0')} / ${String(totalBatches).padStart(2,'0')}`;
-        window.setTimeout(rotate, 4000);
-      };
-      window.setTimeout(rotate, 4000); /* first rotation after 4s — don't touch initial render */
-    }
+    initApGallery(filmItems, PAGE_SIZE);
+    initApReveal();
   });
+}
+
+/* ── Gallery pagination + auto-advance ── */
+function initApGallery(filmItems, PAGE_SIZE) {
+  const gallery = document.getElementById('ap-gallery');
+  const grid = document.getElementById('ap-gallery-grid');
+  const counter = document.getElementById('ap-gallery-counter');
+  const prevBtn = document.getElementById('ap-gallery-prev');
+  const nextBtn = document.getElementById('ap-gallery-next');
+  if (!gallery || !grid) return;
+  const totalPages = parseInt(gallery.dataset.totalPages, 10) || 0;
+  if (totalPages <= 1) return;
+  const isAr = Lang.cur === 'ar';
+  let curPage = 0;
+  let autoTimer = null;
+  const esc = v => String(v || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+  const showPage = (page) => {
+    curPage = ((page % totalPages) + totalPages) % totalPages;
+    const slice = filmItems.slice(curPage * PAGE_SIZE, (curPage + 1) * PAGE_SIZE);
+    grid.setAttribute('data-count', String(slice.length));
+    grid.innerHTML = slice.map((item, i) => `<div class="ap-gp" data-gp="${i}"><img src="${esc(item.src)}" alt="${esc(item.title || (isAr ? 'لقطة من الرحلة' : 'Journey moment'))}" loading="lazy" decoding="async">${item.title ? `<span class="ap-gp-cap">${esc(item.title)}</span>` : ''}</div>`).join('');
+    if (counter) counter.textContent = `${String(curPage + 1).padStart(2,'0')} / ${String(totalPages).padStart(2,'0')}`;
+    if (prevBtn) prevBtn.disabled = (curPage === 0);
+    if (nextBtn) nextBtn.disabled = (curPage === totalPages - 1);
+  };
+
+  const startAuto = () => {
+    if (autoTimer) clearInterval(autoTimer);
+    autoTimer = setInterval(() => {
+      if (!document.getElementById('ap-gallery')) { clearInterval(autoTimer); return; }
+      showPage(curPage < totalPages - 1 ? curPage + 1 : 0);
+    }, 5200);
+  };
+
+  if (prevBtn) prevBtn.addEventListener('click', () => { showPage(curPage - 1); startAuto(); });
+  if (nextBtn) nextBtn.addEventListener('click', () => { showPage(curPage + 1); startAuto(); });
+  gallery.addEventListener('mouseenter', () => { if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } });
+  gallery.addEventListener('mouseleave', startAuto);
+  if (prevBtn) prevBtn.disabled = true;
+  startAuto();
+}
+
+/* ── IntersectionObserver scroll-reveal ── */
+function initApReveal() {
+  const els = document.querySelectorAll('.ap-reveal:not(.is-visible)');
+  if (!els.length) return;
+  if (!window.IntersectionObserver) { els.forEach(el => el.classList.add('is-visible')); return; }
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.1, rootMargin: '0px 0px -28px 0px' });
+  els.forEach(el => obs.observe(el));
 }
 
 function initAboutFilmReel(items) {
