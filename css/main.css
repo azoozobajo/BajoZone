@@ -3186,7 +3186,7 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   align-items: center;
   flex-wrap: nowrap;
   gap: 10px;
-  padding: 0 10px;
+  padding: 0;
   width: max-content;
   animation: apLogoScroll 34s linear infinite;
   will-change: transform;
@@ -3382,23 +3382,38 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
 /* ══════════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════════ */
+
+/* ── Tablet landscape (≤1024px) ── */
 @media (max-width: 1024px) {
   .ap-section-inner { padding: 0 28px; }
   .ap-hero-inner { padding: 0 28px; gap: 38px; }
   .ap-hero-photo-wrap { width: min(252px, 31vw); }
   .ap-focus-grid { grid-template-columns: repeat(2, 1fr); }
+  .ap-logos-band::before,
+  .ap-logos-band::after { width: 60px; }
 }
 
+/* ── Tablet portrait + large mobile (≤768px) ── */
 @media (max-width: 768px) {
-  .ap-section { padding: 54px 0; }
+  .ap-section { padding: 52px 0; }
   .ap-section-inner { padding: 0 20px; }
   .ap-section + .ap-section::before { inset-inline: 20px; }
-  .ap-hero { padding: 34px 0 54px; }
-  .ap-hero-inner { flex-direction: column !important; padding: 0 20px; gap: 26px; }
-  .ap-hero-photo-wrap { width: 100%; max-width: 260px; margin: 0 auto; }
+
+  /* Hero */
+  .ap-hero { padding: 30px 0 50px; }
+  .ap-hero-inner { flex-direction: column !important; padding: 0 20px; gap: 24px; }
+  .ap-hero-photo-wrap { width: 100%; max-width: 240px; margin: 0 auto; }
   .ap-hero-photo-frame { aspect-ratio: 1/1; }
   .ap-hero-name { font-size: 1.9rem; }
+  .ap-hero-tagline { font-size: .9rem; }
+  .ap-hero-bio { font-size: .84rem; max-width: 100%; }
+  .ap-hero-kw-cloud { gap: 5px; }
+
+  /* Focus grid */
   .ap-focus-grid { grid-template-columns: 1fr; gap: 0; }
+  .ap-fc { padding: 24px 18px; }
+
+  /* Gallery */
   .ap-gallery-grid { gap: 3px; }
   .ap-gallery-grid[data-count="1"] .ap-gp { grid-column: span 12; }
   .ap-gallery-grid[data-count="2"] .ap-gp,
@@ -3407,16 +3422,68 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   .ap-gallery-grid[data-count="5"] .ap-gp,
   .ap-gallery-grid[data-count="6"] .ap-gp { grid-column: span 6 !important; grid-row: span 1 !important; }
   .ap-gallery-grid:not([data-count="1"]):not([data-count="2"]):not([data-count="3"]):not([data-count="4"]):not([data-count="5"]):not([data-count="6"]) .ap-gp { grid-column: span 6; }
-  .ap-tl-item { flex: 0 0 208px; padding: 40px 16px 16px; }
-  .ap-contact-card { padding: 26px 20px; }
+  .ap-gallery-nav { gap: 10px; flex-wrap: wrap; justify-content: center; }
+
+  /* Timeline */
+  .ap-tl-item { flex: 0 0 200px; padding: 40px 14px 16px; }
+  .ap-tl-title { font-size: .84rem; }
+
+  /* Logos band */
+  .ap-logos-band { padding: 36px 0; }
+  .ap-logos-band::before,
+  .ap-logos-band::after { width: 40px; }
+  .ap-logo-card { min-width: 118px; padding: 10px 13px; }
+
+  /* Contact */
+  .ap-contact-card { padding: 26px 18px; }
+  .ap-social-row { gap: 8px; }
+  .ap-social-link { padding: 8px 13px; font-size: .7rem; }
+
+  /* Watermark */
   .ap-watermark { font-size: 22vw; }
 }
 
+/* ── Mobile (≤480px) ── */
 @media (max-width: 480px) {
+  .ap-section { padding: 44px 0; }
+  .ap-section-inner { padding: 0 16px; }
+  .ap-section + .ap-section::before { inset-inline: 16px; }
+
+  .ap-hero { padding: 24px 0 44px; }
+  .ap-hero-inner { padding: 0 16px; gap: 20px; }
+  .ap-hero-photo-wrap { max-width: 200px; }
   .ap-hero-name { font-size: 1.65rem; }
-  .ap-hero-actions { flex-direction: column; }
-  .ap-btn-fill, .ap-btn-ghost { justify-content: center; text-align: center; }
+  .ap-hero-actions { flex-direction: column; align-items: flex-start; }
+  .ap-btn-fill, .ap-btn-ghost { justify-content: center; text-align: center; width: 100%; box-sizing: border-box; }
+
+  /* Gallery — single column */
   .ap-gallery-grid .ap-gp { grid-column: span 12 !important; grid-row: span 1 !important; }
+
+  /* Logos band — slow down slightly for small screens */
+  .ap-logo-card { min-width: 108px; padding: 9px 12px; }
+  .ap-logo-abbr { font-size: .7rem; }
+  .ap-logo-name { font-size: .58rem; }
+
+  /* Contact */
+  .ap-contact-card { padding: 22px 16px; }
+  .ap-social-row { gap: 6px; }
+  .ap-social-link { padding: 8px 12px; font-size: .68rem; }
+  .ap-contact-para { font-size: .85rem; }
+  .ap-contact-invite { font-size: .85rem; }
+
+  /* Focus */
+  .ap-fc { padding: 22px 16px; }
+}
+
+/* ── Very small phones (≤360px) ── */
+@media (max-width: 360px) {
+  .ap-section-inner { padding: 0 14px; }
+  .ap-hero-inner { padding: 0 14px; }
+  .ap-hero-name { font-size: 1.45rem; }
+  .ap-heading { font-size: 1.45rem; }
+  .ap-hero-photo-wrap { max-width: 180px; }
+  .ap-contact-card { padding: 18px 14px; }
+  .ap-watermark { font-size: 24vw; }
 }
 
 @media (prefers-reduced-motion: reduce) {

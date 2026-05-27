@@ -3380,7 +3380,6 @@ function renderAboutPremium() {
         <div class="ap-hero-kw-cloud ap-reveal">${kwItems}</div>
         <div class="ap-hero-actions ap-reveal">
           <a class="ap-btn-fill" href="#/programs">${aboutEsc(c.hero.primary)}</a>
-          <a class="ap-btn-ghost" href="#contact-section">${aboutEsc(c.hero.secondary)}</a>
         </div>
       </div>`;
 
@@ -3489,13 +3488,15 @@ function renderAboutPremium() {
     <div class="ap-watermark" aria-hidden="true">07</div>
     <div class="ap-section-inner">
       <p class="ap-eyebrow ap-reveal">${isAr ? '— تواصل معي' : '— CONTACT'}</p>
-      <h2 class="ap-heading ap-reveal">${isAr ? 'تواصل معي' : 'Contact Me'}</h2>
+      <h2 class="ap-heading ap-reveal">${isAr ? 'خلنا نتواصل ⚽' : "Let's Talk ⚽"}</h2>
       <div class="ap-divider ap-reveal" aria-hidden="true"></div>
       <div class="ap-contact-card ap-reveal">
         <p class="ap-contact-para">${isAr
-          ? 'BajoZone مساحة شخصية معرفية وتحليلية عن كرة القدم، اكتشاف المواهب، تطوير اللاعبين، وتحليل الأداء.'
-          : 'BajoZone is a personal knowledge and analysis space about football, talent identification, player development, and performance analysis.'}</p>
-        ${contactInvite ? `<p class="ap-contact-invite">${aboutEsc(contactInvite)}</p>` : ''}
+          ? 'سواء كنت لاعب، مدرب، كشاف، أو مجرد شخص يحب كرة القدم… أكيد عندنا شيء نتكلم عنه.'
+          : "Whether you're a player, coach, scout, or just someone who loves football… I'm sure we have something to talk about."}</p>
+        <p class="ap-contact-invite">${isAr
+          ? 'أي فكرة، سؤال، تعاون أو حتى رأي كروي مرحب فيه 👌'
+          : 'Any idea, question, collaboration, or even a football opinion is welcome 👌'}</p>
         ${socialLinksHtml
           ? `<div class="ap-social-row">${socialLinksHtml}</div>`
           : `<p class="ap-contact-invite" style="opacity:.42">${isAr ? 'أضف وسائل التواصل من لوحة التحكم.' : 'Add contact methods from the admin panel.'}</p>`}
