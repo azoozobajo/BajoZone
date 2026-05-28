@@ -3327,7 +3327,7 @@ function renderAboutPremium() {
     const uploadedSrc = logo.src ? mediaSrc(logo.src) : '';
     return `<div class="ap-logo-item">\
 <div class="ap-logo-card"><span class="ap-logo-abbr">${abbr}</span><span class="ap-logo-name">${label}</span></div>\
-${uploadedSrc ? `<img class="ap-logo-img" src="${uploadedSrc}" alt="${label}" loading="lazy" onerror="this.style.display='none'">` : ''}\
+${uploadedSrc ? `<img class="ap-logo-img" src="${uploadedSrc}" alt="${label}" onerror="this.style.display='none'">` : ''}\
 <div class="ap-logo-hover-name">${label}</div>\
 </div>`;
   }).join('');

@@ -3216,13 +3216,13 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
 }
 .ap-logo-img {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  top: 6px;
+  bottom: 6px;
+  left: 10px;
+  right: 10px;
   object-fit: contain;
-  padding: 10px 14px;
-  filter: brightness(0) invert(1);
-  opacity: .52;
+  opacity: .82;
+  z-index: 1;
 }
 .ap-logo-hover-name {
   position: absolute;
@@ -3231,7 +3231,7 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   align-items: center;
   justify-content: center;
   padding: 8px;
-  background: rgba(10,10,10,.88);
+  background: rgba(10,10,10,.9);
   color: #c8a86e;
   font-size: .58rem;
   font-family: 'Space Mono', monospace;
@@ -3241,6 +3241,7 @@ input:checked + .tog-sl::before { transform: translateX(18px); background: var(-
   opacity: 0;
   transition: opacity .22s;
   pointer-events: none;
+  z-index: 2;
 }
 .ap-logo-item:hover .ap-logo-hover-name { opacity: 1; }
 
