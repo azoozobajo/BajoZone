@@ -3302,13 +3302,13 @@ function renderAboutPremium() {
     if (!src) return;
     const img = new Image(); img.decoding = 'async'; img.src = src;
   });
-  const PAGE_SIZE = 6;
+  const PAGE_SIZE = 9;
   const totalPages = filmItems.length ? Math.ceil(filmItems.length / PAGE_SIZE) : 0;
   const firstPage = filmItems.slice(0, PAGE_SIZE);
   const displayCount = firstPage.length;
 
   const buildGalleryGrid = (items) => {
-    if (!items.length) return `<div class="ap-gp" style="grid-column:span 12;aspect-ratio:5/2;display:flex;align-items:center;justify-content:center;color:rgba(200,168,110,.28);font-size:.78rem;font-family:'Space Mono',monospace;letter-spacing:.1em">${isAr ? 'أضف صوراً من لوحة التحكم' : 'ADD PHOTOS FROM ADMIN'}</div>`;
+    if (!items.length) return `<div class="ap-gp" style="min-height:160px;display:flex;align-items:center;justify-content:center;color:rgba(200,168,110,.28);font-size:.78rem;font-family:'Space Mono',monospace;letter-spacing:.1em">${isAr ? 'أضف صوراً من لوحة التحكم' : 'ADD PHOTOS FROM ADMIN'}</div>`;
     return items.map((item, i) => `<div class="ap-gp ap-reveal ap-reveal-delay-${(i % 4) + 1}" data-gp="${i}">
         <img src="${aboutEsc(item.src)}" alt="${aboutEsc(item.title || (isAr ? 'لقطة من الرحلة' : 'Journey moment'))}" loading="${i < 4 ? 'eager' : 'lazy'}" decoding="async">${item.title ? `<span class="ap-gp-cap">${aboutEsc(item.title)}</span>` : ''}
       </div>`).join('');
@@ -3526,7 +3526,7 @@ ${uploadedSrc ? `<img class="ap-logo-img" src="${uploadedSrc}" alt="${label}" on
   });
 }
 
-/* ── Gallery pagination + auto-advance ── */
+/* ── Gallery pagination ── */
 function initApGallery(filmItems, PAGE_SIZE) {
   const gallery = document.getElementById('ap-gallery');
   const grid = document.getElementById('ap-gallery-grid');
@@ -3538,33 +3538,23 @@ function initApGallery(filmItems, PAGE_SIZE) {
   if (totalPages <= 1) return;
   const isAr = Lang.cur === 'ar';
   let curPage = 0;
-  let autoTimer = null;
   const esc = v => String(v || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
   const showPage = (page) => {
-    curPage = ((page % totalPages) + totalPages) % totalPages;
+    curPage = Math.max(0, Math.min(page, totalPages - 1));
     const slice = filmItems.slice(curPage * PAGE_SIZE, (curPage + 1) * PAGE_SIZE);
     grid.setAttribute('data-count', String(slice.length));
-    grid.innerHTML = slice.map((item, i) => `<div class="ap-gp" data-gp="${i}"><img src="${esc(item.src)}" alt="${esc(item.title || (isAr ? 'لقطة من الرحلة' : 'Journey moment'))}" loading="lazy" decoding="async">${item.title ? `<span class="ap-gp-cap">${esc(item.title)}</span>` : ''}</div>`).join('');
+    grid.innerHTML = slice.map((item, i) => `<div class="ap-gp" data-gp="${i}"><img src="${esc(item.src)}" alt="${esc(item.title || (isAr ? 'لقطة من الرحلة' : 'Journey moment'))}" loading="${i < 6 ? 'eager' : 'lazy'}" decoding="async">${item.title ? `<span class="ap-gp-cap">${esc(item.title)}</span>` : ''}</div>`).join('');
     if (counter) counter.textContent = `${String(curPage + 1).padStart(2,'0')} / ${String(totalPages).padStart(2,'0')}`;
     if (prevBtn) prevBtn.disabled = (curPage === 0);
     if (nextBtn) nextBtn.disabled = (curPage === totalPages - 1);
+    /* smooth scroll to gallery top */
+    gallery.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  const startAuto = () => {
-    if (autoTimer) clearInterval(autoTimer);
-    autoTimer = setInterval(() => {
-      if (!document.getElementById('ap-gallery')) { clearInterval(autoTimer); return; }
-      showPage(curPage < totalPages - 1 ? curPage + 1 : 0);
-    }, 5200);
-  };
-
-  if (prevBtn) prevBtn.addEventListener('click', () => { showPage(curPage - 1); startAuto(); });
-  if (nextBtn) nextBtn.addEventListener('click', () => { showPage(curPage + 1); startAuto(); });
-  gallery.addEventListener('mouseenter', () => { if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } });
-  gallery.addEventListener('mouseleave', startAuto);
+  if (prevBtn) prevBtn.addEventListener('click', () => showPage(curPage - 1));
+  if (nextBtn) nextBtn.addEventListener('click', () => showPage(curPage + 1));
   if (prevBtn) prevBtn.disabled = true;
-  startAuto();
 }
 
 /* ── IntersectionObserver scroll-reveal ── */
