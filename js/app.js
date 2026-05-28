@@ -3326,8 +3326,8 @@ function renderAboutPremium() {
     const abbr = aboutEsc(rawAbbr);
     const uploadedSrc = logo.src ? mediaSrc(logo.src) : '';
     return `<div class="ap-logo-item">\
-<div class="ap-logo-card"><span class="ap-logo-abbr">${abbr}</span><span class="ap-logo-name">${label}</span></div>\
-${uploadedSrc ? `<img class="ap-logo-img" src="${uploadedSrc}" alt="${label}" onerror="this.style.display='none'">` : ''}\
+${!uploadedSrc ? `<div class="ap-logo-card"><span class="ap-logo-abbr">${abbr}</span><span class="ap-logo-name">${label}</span></div>` : ''}\
+${uploadedSrc ? `<img class="ap-logo-img" src="${uploadedSrc}" alt="${label}" onerror="this.style.display='none';this.insertAdjacentHTML('beforebegin','<div class=\\'ap-logo-card\\'><span class=\\'ap-logo-abbr\\'>${abbr}</span><span class=\\'ap-logo-name\\'>${label}</span></div>')">` : ''}\
 <div class="ap-logo-hover-name">${label}</div>\
 </div>`;
   }).join('');
