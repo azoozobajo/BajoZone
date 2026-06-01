@@ -641,6 +641,12 @@ async function saveMySqlNow() {
       headers: { 'Content-Type':'application/json', 'X-Admin-Token': sessionStorage.getItem('bzt')||'' },
       body: JSON.stringify(DB)
     });
+    if (res.status === 401) {
+      sessionStorage.removeItem('bzt');
+      showToast('انتهت صلاحية الجلسة — سيتم تسجيل الخروج...', 'err');
+      setTimeout(() => location.reload(), 2000);
+      return false;
+    }
     if (!res.ok) throw new Error('HTTP ' + res.status);
     showToast('تم تحديث MySQL بنجاح', 'ok');
     return true;
