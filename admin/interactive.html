@@ -223,6 +223,7 @@ body { font-family: var(--ff); background: var(--off-white); color: var(--ink); 
             <!-- Save button + status -->
             <div style="display:flex;gap:.75rem;align-items:center;margin-top:1rem;flex-wrap:wrap;">
               <button class="btn btn-save" onclick="saveBlocks()">💾 حفظ البلوكات</button>
+              <a id="preview-link" href="#" target="_blank" class="btn btn-ghost btn-sm" style="display:none;text-decoration:none;padding:9px 16px;" title="معاينة المقال على الموقع">🔗 معاينة المقال</a>
               <div class="status-bar" id="save-status"></div>
             </div>
           </div>
@@ -254,7 +255,9 @@ body { font-family: var(--ff); background: var(--off-white); color: var(--ink); 
 /* ── State ──────────────────────────────────────────────────────── */
 let token      = sessionStorage.getItem('bzt') || '';
 let allArticles = [];
-let selectedId  = null;
+let selectedId    = null;
+let selectedSlug  = null;
+let selectedTitle = null;
 let articleType = 'standard';
 let blocks      = [];        // [{id, type, order, data}]
 let editingIdx  = null;      // index in blocks[]
@@ -327,6 +330,7 @@ async function loadArticles() {
       id:    a.id,
       title: a.title_ar || a.title || a.title_en || a.id,
       status: a.status || 'published',
+      slug:  a.slug || a.id,
     }));
     renderArtList(allArticles);
   } catch(e) {
@@ -358,11 +362,20 @@ async function selectArticle(id) {
 
   const art = allArticles.find(a => a.id === id);
   const artTitle = art ? art.title : id;
+  selectedSlug  = art?.slug || id;
+  selectedTitle = artTitle;
   document.getElementById('selected-article-name').textContent = artTitle;
 
   // Keep topbar in sync when article came from URL param
   const tb = document.getElementById('topbar-article-name');
   if (tb) tb.textContent = artTitle;
+
+  // Show preview link
+  const prevLink = document.getElementById('preview-link');
+  if (prevLink) {
+    prevLink.href = '/article/' + encodeURIComponent(selectedSlug);
+    prevLink.style.display = '';
+  }
 
   // Scroll article into view in the list
   const activeItem = document.querySelector('.art-item.active');
@@ -646,10 +659,12 @@ async function saveBlocks() {
     if (r.status === 401) { showAuthScreen('انتهت الجلسة. الرجاء تسجيل الدخول مجدداً.'); return; }
     const j = await r.json();
     if (!r.ok) {
-      const msg = j.errors ? j.errors.join('\n') : (j.error || 'فشل الحفظ');
+      const msg = j.errors ? j.errors.join(' · ') : (j.error || 'فشل الحفظ');
       setStatus(msg, true);
     } else {
-      setStatus(`✔ تم الحفظ — ${j.blocks_saved} بلوك`, false);
+      const typeLabel = { standard: 'عادية', interactive: 'تفاعلية', report: 'تقرير' }[j.article_type] || j.article_type;
+      const title = selectedTitle ? ` — "${selectedTitle.slice(0, 35)}"` : '';
+      setStatus(`✔ تم الحفظ${title} · ${j.blocks_saved} بلوك · نوع: ${typeLabel}`, false);
     }
   } catch(e) {
     setStatus('خطأ: ' + e.message, true);
@@ -660,6 +675,10 @@ function setStatus(msg, isErr = false) {
   const el = document.getElementById('save-status');
   el.textContent = msg;
   el.className = 'status-bar' + (msg ? (isErr ? ' err' : ' ok') : '');
+  clearTimeout(el._autoHide);
+  if (msg && !isErr) {
+    el._autoHide = setTimeout(() => setStatus(''), 8000);
+  }
 }
 
 /* ── JSON import ─────────────────────────────────────────────────── */

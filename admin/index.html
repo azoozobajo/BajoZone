@@ -1771,6 +1771,10 @@ async function saveArticle() {
     return;
   }
   if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = origLabel; }
+  // Ensure f-art-id holds the real DB id (needed for interactive editor link on new articles)
+  ge('f-art-id').value = articleId;
+  const iBtn = ge('modal-article-interactive');
+  if (iBtn) iBtn.style.display = '';
   modalClose('article');
   if (currentSection === 'articles') renderArticles();
   else if (currentSection === 'overview') renderOverview();
