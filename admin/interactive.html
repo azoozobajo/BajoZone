@@ -146,8 +146,12 @@ body { font-family: var(--ff); background: var(--off-white); color: var(--ink); 
 <!-- ── App Shell ───────────────────────────────── -->
 <div id="app-screen">
   <div class="topbar">
-    <div class="topbar-brand">Bajo<span>Zone</span> · محرر البلوكات</div>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <a href="/admin/" style="color:rgba(255,255,255,.6);font-size:.8rem;text-decoration:none;white-space:nowrap;" title="العودة إلى لوحة التحكم">← لوحة التحكم</a>
+      <div class="topbar-brand">Bajo<span>Zone</span> · محرر البلوكات</div>
+    </div>
     <div class="topbar-right">
+      <span id="topbar-article-name" style="font-size:.78rem;color:rgba(255,255,255,.55);max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
       <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:#444" onclick="doLogout()">خروج</button>
     </div>
   </div>
@@ -281,10 +285,19 @@ async function doLogin() {
 
 document.getElementById('auth-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
-function doLogout() {
+function showAuthScreen(msg) {
+  token = '';
   sessionStorage.removeItem('bzt');
-  location.reload();
+  document.getElementById('app-screen').style.display  = 'none';
+  document.getElementById('auth-screen').style.display = 'flex';
+  if (msg) {
+    const err = document.getElementById('auth-err');
+    err.textContent = msg;
+    err.classList.add('show');
+  }
 }
+
+function doLogout() { showAuthScreen(); }
 
 function apiHeaders() {
   return { 'Content-Type': 'application/json', 'X-Admin-Token': token };
@@ -301,12 +314,14 @@ async function showApp() {
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app-screen').style.display  = 'block';
   await loadArticles();
+  const urlId = new URLSearchParams(location.search).get('article_id');
+  if (urlId) await selectArticle(urlId);
 }
 
 async function loadArticles() {
   try {
     const r = await fetch('/api/admin-content.php', { headers: apiHeaders() });
-    if (r.status === 401) { doLogout(); return; }
+    if (r.status === 401) { showAuthScreen('انتهت الجلسة. الرجاء تسجيل الدخول مجدداً.'); return; }
     const j = await r.json();
     allArticles = (j.articles || []).map(a => ({
       id:    a.id,
@@ -337,19 +352,28 @@ function filterArticles() {
 /* ── Article selection ───────────────────────────────────────────── */
 async function selectArticle(id) {
   selectedId = id;
-  filterArticles(); // re-render list with active highlight
+  filterArticles();
   document.getElementById('no-article-msg').style.display  = 'none';
   document.getElementById('editor-panel').style.display    = 'block';
 
   const art = allArticles.find(a => a.id === id);
-  document.getElementById('selected-article-name').textContent = art ? art.title : id;
+  const artTitle = art ? art.title : id;
+  document.getElementById('selected-article-name').textContent = artTitle;
+
+  // Keep topbar in sync when article came from URL param
+  const tb = document.getElementById('topbar-article-name');
+  if (tb) tb.textContent = artTitle;
+
+  // Scroll article into view in the list
+  const activeItem = document.querySelector('.art-item.active');
+  if (activeItem) activeItem.scrollIntoView({ block: 'nearest' });
 
   closeBlockEditor();
   setStatus('');
 
   try {
     const r = await fetch(`/api/blocks.php?article_id=${encodeURIComponent(id)}`, { headers: apiHeaders() });
-    if (r.status === 401) { doLogout(); return; }
+    if (r.status === 401) { showAuthScreen('انتهت الجلسة. الرجاء تسجيل الدخول مجدداً.'); return; }
     const j = await r.json();
     articleType = j.article_type || 'standard';
     blocks = (j.blocks || []).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
@@ -619,6 +643,7 @@ async function saveBlocks() {
       headers: apiHeaders(),
       body: JSON.stringify(payload),
     });
+    if (r.status === 401) { showAuthScreen('انتهت الجلسة. الرجاء تسجيل الدخول مجدداً.'); return; }
     const j = await r.json();
     if (!r.ok) {
       const msg = j.errors ? j.errors.join('\n') : (j.error || 'فشل الحفظ');

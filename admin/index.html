@@ -267,6 +267,7 @@
     </div>
     <div class="modal-ft">
       <button class="btn btn-ghost" id="modal-article-cancel" style="padding:9px 22px;">إلغاء</button>
+      <button class="btn btn-ghost" id="modal-article-interactive" style="padding:9px 18px;display:none;" onclick="openInteractiveEditor()">⚡ بلوكات تفاعلية</button>
       <button class="btn btn-fill" id="modal-article-save" style="padding:9px 30px;">حفظ الموضوع ✓</button>
     </div>
   </div>
@@ -1299,6 +1300,7 @@ function renderArticles(opts = {}) {
               <td>
                 <div class="actions">
                   <button class="ibtn" data-edit-art="${a.id}">✏ تعديل</button>
+                  <button class="ibtn" title="البلوكات التفاعلية" onclick="window.open('interactive.html?article_id=${encodeURIComponent(a.id)}','_blank')">⚡ بلوكات</button>
                   <button class="ibtn red" data-del-art="${a.id}">🗑</button>
                 </div>
               </td>
@@ -1699,8 +1701,17 @@ function openArticleModal(article) {
   if (article?.image) { prev.src = mediaSrc(article.image); prev.style.display = 'block'; }
   else prev.style.display = 'none';
 
+  const iBtn = ge('modal-article-interactive');
+  if (iBtn) iBtn.style.display = isNew ? 'none' : '';
+
   switchTab('art-tabs', 'art-ar');
   modalOpen('article');
+}
+
+function openInteractiveEditor() {
+  const id = ge('f-art-id').value;
+  if (!id) { alert('احفظ الموضوع أولاً للحصول على معرّفه.'); return; }
+  window.open('interactive.html?article_id=' + encodeURIComponent(id), '_blank');
 }
 
 async function saveArticle() {

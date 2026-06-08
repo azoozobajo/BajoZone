@@ -159,31 +159,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 
     try {
-        $pdo = getDb();
+        /* article_type — falls back to 'standard' if column missing (pre-migration) */
+        $articleType = 'standard';
+        try {
+            $row = contentFetchOne(
+                'SELECT article_type FROM articles WHERE id = ? LIMIT 1',
+                [$articleId]
+            );
+            if ($row !== null) {
+                $articleType = isset($row['article_type']) ? (string) $row['article_type'] : 'standard';
+            }
+        } catch (Throwable $colErr) {
+            /* column not yet created — try data_json fallback */
+            $row = contentFetchOne('SELECT data_json FROM articles WHERE id = ? LIMIT 1', [$articleId]);
+            if ($row !== null) {
+                $d = json_decode((string) ($row['data_json'] ?? '{}'), true);
+                $articleType = (string) ($d['article_type'] ?? 'standard');
+            }
+        }
 
-        $row = contentFetchOne(
-            'SELECT article_type FROM articles WHERE id = ? LIMIT 1',
-            [$articleId]
-        );
-        $articleType = isset($row['article_type']) ? (string) $row['article_type'] : 'standard';
-
-        $rows = contentFetchAll(
-            'SELECT id, block_type, block_order, block_data
-             FROM article_blocks
-             WHERE article_id = ?
-             ORDER BY block_order ASC, id ASC',
-            [$articleId]
-        );
-
-        $blocks = array_map(function (array $r): array {
-            $data = json_decode((string) $r['block_data'], true);
-            return [
-                'id'    => (string) $r['id'],
-                'type'  => (string) $r['block_type'],
-                'order' => (int)    $r['block_order'],
-                'data'  => is_array($data) ? $data : [],
-            ];
-        }, $rows);
+        /* blocks — falls back to [] if table missing (pre-migration) */
+        $blocks = [];
+        try {
+            $rows = contentFetchAll(
+                'SELECT id, block_type, block_order, block_data
+                 FROM article_blocks
+                 WHERE article_id = ?
+                 ORDER BY block_order ASC, id ASC',
+                [$articleId]
+            );
+            $blocks = array_map(function (array $r): array {
+                $data = json_decode((string) $r['block_data'], true);
+                return [
+                    'id'    => (string) $r['id'],
+                    'type'  => (string) $r['block_type'],
+                    'order' => (int)    $r['block_order'],
+                    'data'  => is_array($data) ? $data : [],
+                ];
+            }, $rows);
+        } catch (Throwable $tblErr) {
+            /* table not yet created */
+        }
 
         echo json_encode([
             'article_id'   => $articleId,
