@@ -144,7 +144,7 @@
             <span class="rte-sep"></span>
             <button class="rte-btn" data-cmd="formatBlock" data-val="h2" data-ed="rte-ar">H2</button>
             <button class="rte-btn" data-cmd="formatBlock" data-val="h3" data-ed="rte-ar">H3</button>
-            <button class="rte-btn" data-cmd="formatBlock" data-val="p" data-ed="rte-ar">¶</button>
+            <button class="rte-btn" data-cmd="formatBlock" data-val="p" data-ed="rte-ar">نص عادي</button>
             <span class="rte-sep"></span>
             <button class="rte-btn" data-cmd="justifyRight" data-ed="rte-ar">⇒</button>
             <button class="rte-btn" data-cmd="justifyCenter" data-ed="rte-ar">≡</button>
@@ -183,7 +183,7 @@
             <span class="rte-sep"></span>
             <button class="rte-btn" data-cmd="formatBlock" data-val="h2" data-ed="rte-en">H2</button>
             <button class="rte-btn" data-cmd="formatBlock" data-val="h3" data-ed="rte-en">H3</button>
-            <button class="rte-btn" data-cmd="formatBlock" data-val="p" data-ed="rte-en">¶</button>
+            <button class="rte-btn" data-cmd="formatBlock" data-val="p" data-ed="rte-en">Normal</button>
             <span class="rte-sep"></span>
             <button class="rte-btn" data-cmd="justifyLeft" data-ed="rte-en">⇐</button>
             <button class="rte-btn" data-cmd="justifyCenter" data-ed="rte-en">≡</button>
@@ -770,10 +770,81 @@ function switchTab(containerId, tabId) {
 }
 
 // ── Rich Text Editor ──────────────────────────
+function sanitizeRTEHtml(html) {
+  if (!html) return '';
+  const allowedTags = new Set(['P','BR','H2','H3','UL','OL','LI','B','STRONG','I','EM','U','BLOCKQUOTE','A','IMG','IFRAME']);
+  const allowedAttrs = {
+    A: ['href', 'target', 'rel'],
+    IMG: ['src', 'alt'],
+    IFRAME: ['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen']
+  };
+  const template = document.createElement('template');
+  template.innerHTML = String(html)
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/<\/?o:p[^>]*>/gi, '');
+
+  const cleanNode = node => {
+    if (node.nodeType === Node.TEXT_NODE) return;
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+      node.remove();
+      return;
+    }
+
+    const tag = node.tagName;
+    [...node.childNodes].forEach(cleanNode);
+
+    if (!allowedTags.has(tag)) {
+      node.replaceWith(...node.childNodes);
+      return;
+    }
+
+    [...node.attributes].forEach(attr => {
+      const name = attr.name.toLowerCase();
+      const keep = (allowedAttrs[tag] || []).includes(name);
+      if (!keep || name === 'href' && /^javascript:/i.test(attr.value) || name === 'src' && /^javascript:/i.test(attr.value)) {
+        node.removeAttribute(attr.name);
+      }
+    });
+
+    if (tag === 'A' && node.getAttribute('href')) {
+      node.setAttribute('target', '_blank');
+      node.setAttribute('rel', 'noopener');
+    }
+  };
+
+  [...template.content.childNodes].forEach(cleanNode);
+  return template.innerHTML
+    .replace(/<p>\s*<\/p>/gi, '')
+    .replace(/(?:<br\s*\/?>\s*){3,}/gi, '<br><br>')
+    .trim();
+}
+
+function insertCleanRTEHtml(editor, html, plainText) {
+  const clean = sanitizeRTEHtml(html);
+  const fallback = (plainText || '')
+    .split(/\n{2,}/)
+    .map(part => part.trim())
+    .filter(Boolean)
+    .map(part => `<p>${esc(part).replace(/\n/g, '<br>')}</p>`)
+    .join('');
+  document.execCommand('insertHTML', false, clean || fallback);
+}
+
 function initRTE(barId, editorId) {
   const bar = ge(barId);
   const editor = ge(editorId);
   if (!bar || !editor) return;
+
+  if (!editor.dataset.cleanPasteReady) {
+    editor.dataset.cleanPasteReady = 'true';
+    editor.addEventListener('paste', e => {
+      const clipboard = e.clipboardData || window.clipboardData;
+      if (!clipboard) return;
+      e.preventDefault();
+      editor.focus();
+      insertCleanRTEHtml(editor, clipboard.getData('text/html'), clipboard.getData('text/plain'));
+    });
+  }
 
   bar.querySelectorAll('.rte-btn').forEach(btn => {
     btn.addEventListener('mousedown', function(e) {
@@ -807,7 +878,8 @@ function initRTE(barId, editorId) {
         document.execCommand('insertHTML', false, html);
       } else if (cmd) {
         ed.focus();
-        document.execCommand(cmd, false, val);
+        const formatVal = cmd === 'formatBlock' && val && !/^<.+>$/.test(val) ? `<${val}>` : val;
+        document.execCommand(cmd, false, formatVal);
       }
     });
   });
@@ -1648,8 +1720,8 @@ async function saveArticle() {
     title_en:    gv('f-art-title-en'),
     excerpt_ar:  gv('f-art-exc-ar'),
     excerpt_en:  gv('f-art-exc-en'),
-    content_ar:  ge('rte-ar').innerHTML,
-    content_en:  ge('rte-en').innerHTML,
+    content_ar:  sanitizeRTEHtml(ge('rte-ar').innerHTML),
+    content_en:  sanitizeRTEHtml(ge('rte-en').innerHTML),
     program_id:  gv('f-art-program') || null,
     category_id: gv('f-art-category') || '',
     category_ar: (DB.categories||[]).find(c=>c.id===gv('f-art-category'))?.name || '',
@@ -2460,7 +2532,7 @@ function renderSAbout() {
             <span class="rte-sep"></span>
             <button class="rte-btn" data-cmd="formatBlock" data-val="h2" data-ed="abt-rte-ar">H2</button>
             <button class="rte-btn" data-cmd="formatBlock" data-val="h3" data-ed="abt-rte-ar">H3</button>
-            <button class="rte-btn" data-cmd="formatBlock" data-val="p" data-ed="abt-rte-ar">¶</button>
+            <button class="rte-btn" data-cmd="formatBlock" data-val="p" data-ed="abt-rte-ar">نص عادي</button>
             <span class="rte-sep"></span>
             <button class="rte-btn" data-cmd="justifyRight" data-ed="abt-rte-ar">⇒</button>
             <button class="rte-btn" data-cmd="justifyCenter" data-ed="abt-rte-ar">≡</button>
@@ -2485,7 +2557,7 @@ function renderSAbout() {
             <span class="rte-sep"></span>
             <button class="rte-btn" data-cmd="formatBlock" data-val="h2" data-ed="abt-rte-en">H2</button>
             <button class="rte-btn" data-cmd="formatBlock" data-val="h3" data-ed="abt-rte-en">H3</button>
-            <button class="rte-btn" data-cmd="formatBlock" data-val="p" data-ed="abt-rte-en">¶</button>
+            <button class="rte-btn" data-cmd="formatBlock" data-val="p" data-ed="abt-rte-en">Normal</button>
             <span class="rte-sep"></span>
             <button class="rte-btn" data-cmd="justifyLeft" data-ed="abt-rte-en">⇐</button>
             <button class="rte-btn" data-cmd="justifyCenter" data-ed="abt-rte-en">≡</button>
@@ -2530,8 +2602,8 @@ function renderSAbout() {
       ar: collectAboutProfileLang('ar'),
       en: collectAboutProfileLang('en')
     };
-    DB.settings.about_content_ar = ge('abt-rte-ar').innerHTML;
-    DB.settings.about_content_en = ge('abt-rte-en').innerHTML;
+    DB.settings.about_content_ar = sanitizeRTEHtml(ge('abt-rte-ar').innerHTML);
+    DB.settings.about_content_en = sanitizeRTEHtml(ge('abt-rte-en').innerHTML);
     DB.settings.about_gallery = collectGallery();
     dbSave();
   });

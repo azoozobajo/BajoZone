@@ -84,7 +84,9 @@ function normalizeArticle(array $row): array
         'published_at' => $publishedAt,
         'created_at' => $row['created_at'] ?? null,
         'updated_at' => $row['updated_at'] ?? null,
+        'article_type' => (string) ($row['article_type'] ?? $data['article_type'] ?? 'standard'),
         'tags' => [],
+        'blocks' => [],
     ]);
 }
 
@@ -239,6 +241,55 @@ function attachArticleTags(array $articles): array
     return $articles;
 }
 
+function attachArticleBlocks(array $articles): array
+{
+    if (!$articles) {
+        return [];
+    }
+
+    $interactiveIds = [];
+    foreach ($articles as $article) {
+        if (($article['article_type'] ?? 'standard') !== 'standard') {
+            $interactiveIds[] = (string) $article['id'];
+        }
+    }
+
+    if (!$interactiveIds) {
+        return $articles;
+    }
+
+    try {
+        $placeholders = implode(',', array_fill(0, count($interactiveIds), '?'));
+        $rows = contentFetchAll(
+            "SELECT article_id, block_type, block_order, block_data
+             FROM article_blocks
+             WHERE article_id IN ($placeholders)
+             ORDER BY block_order ASC, id ASC",
+            $interactiveIds
+        );
+    } catch (Throwable $e) {
+        return $articles;
+    }
+
+    $blocksByArticle = [];
+    foreach ($rows as $row) {
+        $aid = (string) $row['article_id'];
+        $data = json_decode((string) $row['block_data'], true);
+        $blocksByArticle[$aid][] = [
+            'type'  => (string) $row['block_type'],
+            'order' => (int)    $row['block_order'],
+            'data'  => is_array($data) ? $data : [],
+        ];
+    }
+
+    foreach ($articles as &$article) {
+        $article['blocks'] = $blocksByArticle[$article['id']] ?? [];
+    }
+    unset($article);
+
+    return $articles;
+}
+
 function getPublishedArticles(): array
 {
     $rows = contentFetchAll(
@@ -249,7 +300,7 @@ function getPublishedArticles(): array
          ORDER BY COALESCE(a.published_at, a.created_at) DESC, a.id DESC"
     );
 
-    return attachArticleTags(array_map('normalizeArticle', $rows));
+    return attachArticleBlocks(attachArticleTags(array_map('normalizeArticle', $rows)));
 }
 
 function getPublishedArticleBySlug($slug): ?array
@@ -267,7 +318,7 @@ function getPublishedArticleBySlug($slug): ?array
         return null;
     }
 
-    $articles = attachArticleTags([normalizeArticle($row)]);
+    $articles = attachArticleBlocks(attachArticleTags([normalizeArticle($row)]));
     return $articles[0] ?? null;
 }
 
@@ -569,7 +620,7 @@ function getAdminArticles(): array
          ORDER BY COALESCE(a.published_at, a.created_at) DESC, a.id DESC"
     );
 
-    $articles = attachArticleTags(array_map('normalizeArticle', $rows));
+    $articles = attachArticleBlocks(attachArticleTags(array_map('normalizeArticle', $rows)));
     foreach ($articles as $index => $article) {
         $status = $rows[$index]['status'] ?? 'draft';
         $articles[$index]['status'] = $status;

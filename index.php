@@ -158,7 +158,9 @@ if ($path === '/articles' || $path === '/programs') {
 } elseif (preg_match('#^/article/([^/]+)$#', $path, $matches)) {
     $articleKey = urldecode($matches[1]);
     foreach (($content['articles'] ?? []) as $item) {
-        if (($item['slug'] ?? '') === $articleKey && ($item['status'] ?? 'published') === 'published') {
+        $itemSlug = (string) ($item['slug'] ?? '');
+        $itemId = (string) ($item['id'] ?? '');
+        if (($itemSlug === $articleKey || $itemId === $articleKey) && ($item['status'] ?? 'published') === 'published') {
             $currentArticle = $item;
             break;
         }
@@ -210,6 +212,7 @@ if ($path === '/articles' || $path === '/programs') {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Tajawal:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/interactive-articles.css">
   <link rel="icon" type="image/png" href="/assets/images/logo-bajo.png">
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>

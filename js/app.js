@@ -2076,10 +2076,10 @@ function renderArticleSingle(id) {
           <button type="button" class="share-btn pdf" title="PDF" aria-label="PDF" onclick="downloadArticlePDF('${a.id}')">PDF</button>
         </div>
       </div>
-      ${articleTags.length ? `<div class="article-detail-tags"><span>${isAr ? 'وسوم:' : 'Tags:'}</span> ${tagChipsHtml(a)}</div>` : ''}
       ${(a.featured_image || a.image) ? `<figure class="art-hero-frame"><img class="art-hero" src="${imgSrc(a.featured_image || a.image)}" alt="${t}"></figure>` : ''}
       ${youtubeEmbedHtml(a.youtube_url)}
       <div class="art-body">${con}</div>
+      ${renderInteractiveBlocks(a)}
       ${sourcesAccordionHtml(a)}
       ${related.length ? `
         <section class="related-articles">
@@ -2091,6 +2091,9 @@ function renderArticleSingle(id) {
       <button type="button" class="focus-exit" onclick="toggleFocusReading()">${isAr ? 'الخروج من وضع القراءة' : 'Exit focus mode'}</button>
     </div>`;
   initReveal();
+  if (Array.isArray(a.blocks) && a.blocks.length && (a.article_type || 'standard') !== 'standard') {
+    bzLoadInteractiveScript();
+  }
   updatePageMeta(
     `${t} — ${CMS.s('site_name_en', 'BajoZone')}`,
     con,
@@ -4101,6 +4104,174 @@ function initAboutPinnedStory(scenes) {
     scrollToScene(active + 1);
   });
   setScene(0);
+}
+
+/* ══════════════════════════════════════════════
+   INTERACTIVE BLOCKS — renderer
+══════════════════════════════════════════════ */
+function bzE(str) {
+  return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function bzSafeUrl(url) {
+  const s = String(url ?? '').trim();
+  if (!s) return '';
+  if (/^(javascript|vbscript|data)\s*:/i.test(s)) return '';
+  return s;
+}
+
+const BZ_TONE_SET = new Set(['success','warning','danger','info','gold','dark']);
+function bzToneClass(tone, prefix) {
+  return BZ_TONE_SET.has(tone) ? ` ${prefix}--${tone}` : '';
+}
+
+function bzBlockStatCards(d) {
+  const cards = Array.isArray(d.cards) ? d.cards : [];
+  if (!cards.length) return '';
+  const title = d.title ? `<h3 class="bz-block-title">${bzE(d.title)}</h3>` : '';
+  const items = cards.map(c => {
+    const dir = c.change_dir === 'up' ? 'up' : c.change_dir === 'down' ? 'down' : 'flat';
+    return `<div class="bz-stat-card">
+      <div class="bz-stat-card__value">${bzE(c.value ?? '')}</div>
+      <div class="bz-stat-card__label">${bzE(c.label ?? '')}</div>
+      ${c.change ? `<span class="bz-stat-card__change bz-stat-card__change--${dir}">${bzE(c.change)}</span>` : ''}
+    </div>`;
+  }).join('');
+  return `<div class="bz-block">${title}<div class="bz-stat-cards">${items}</div></div>`;
+}
+
+let _bzChartN = 0;
+function bzBlockChart(d) {
+  const title   = d.title   ? `<h3 class="bz-block-title">${bzE(d.title)}</h3>` : '';
+  const caption = d.caption ? `<p class="bz-chart-caption">${bzE(d.caption)}</p>` : '';
+  const cfg = JSON.stringify({
+    chartType:  d.chartType  || 'bar',
+    labels:     d.labels     || [],
+    datasets:   d.datasets   || [],
+    showLegend: !!d.showLegend,
+  }).replace(/'/g, '&#39;');
+  const id = 'bz-chart-' + (++_bzChartN);
+  return `<div class="bz-block">${title}<div class="bz-chart-wrap">
+    <div class="bz-chart-canvas-wrap"><canvas id="${id}" class="bz-chart-canvas" data-chart='${cfg}'></canvas></div>
+    ${caption}</div></div>`;
+}
+
+function bzBlockTimeline(d) {
+  const title = d.title ? `<h3 class="bz-block-title">${bzE(d.title)}</h3>` : '';
+  const rows = (Array.isArray(d.items) ? d.items : []).map(it => `
+    <div class="bz-timeline-item">
+      ${it.date  ? `<div class="bz-timeline-date">${bzE(it.date)}</div>` : ''}
+      ${it.title ? `<div class="bz-timeline-title">${bzE(it.title)}</div>` : ''}
+      ${it.body  ? `<div class="bz-timeline-body">${bzE(it.body)}</div>` : ''}
+    </div>`).join('');
+  return `<div class="bz-block">${title}<div class="bz-timeline">${rows}</div></div>`;
+}
+
+function bzBlockInsightCards(d) {
+  const cards = Array.isArray(d.cards) ? d.cards : [];
+  if (!cards.length) return '';
+  const title = d.title ? `<h3 class="bz-block-title">${bzE(d.title)}</h3>` : '';
+  const items = cards.map(c => `<div class="bz-insight-card${bzToneClass(c.tone, 'bz-insight-card')}">
+    ${c.icon  ? `<div class="bz-insight-card__icon">${bzE(c.icon)}</div>` : ''}
+    ${c.title ? `<div class="bz-insight-card__title">${bzE(c.title)}</div>` : ''}
+    ${c.body  ? `<div class="bz-insight-card__body">${bzE(c.body)}</div>` : ''}
+  </div>`).join('');
+  return `<div class="bz-block">${title}<div class="bz-insight-cards">${items}</div></div>`;
+}
+
+function bzBlockComparisonTable(d) {
+  const title = d.title ? `<h3 class="bz-block-title">${bzE(d.title)}</h3>` : '';
+  const cols  = Array.isArray(d.columns) ? d.columns : [];
+  const rows  = Array.isArray(d.rows)    ? d.rows    : [];
+  const thead = cols.length ? `<thead><tr>${cols.map(c => `<th>${bzE(c)}</th>`).join('')}</tr></thead>` : '';
+  const tbody = rows.map(row => {
+    const cells = Array.isArray(row)
+      ? row
+      : cols.map(c => row[c] ?? '');
+    return `<tr>${cells.map(cell => `<td>${bzE(cell)}</td>`).join('')}</tr>`;
+  }).join('');
+  return `<div class="bz-block">${title}<div class="bz-comparison-wrap"><table class="bz-comparison-table">${thead}<tbody>${tbody}</tbody></table></div></div>`;
+}
+
+function bzBlockMethodNote(d) {
+  const tc   = bzToneClass(d.tone, 'bz-method-note');
+  const icon = d.icon  ? `<div class="bz-method-note__icon">${bzE(d.icon)}</div>` : '';
+  const ht   = d.title ? `<div class="bz-method-note__title">${bzE(d.title)}</div>` : '';
+  return `<div class="bz-block"><div class="bz-method-note${tc}">
+    ${icon}<div class="bz-method-note__content">${ht}<div class="bz-method-note__body">${bzE(d.body ?? '')}</div></div>
+  </div></div>`;
+}
+
+function bzBlockSourceBox(d) {
+  const boxTitle = d.title || (Lang.cur === 'ar' ? 'المصادر والمراجع' : 'Sources & References');
+  const items = (Array.isArray(d.items) ? d.items : []).map(it => {
+    const label = bzE(it.label ?? it.title ?? '');
+    const url   = bzSafeUrl(it.url ?? '');
+    return `<li class="bz-source-box__item">${url ? `<a href="${bzE(url)}" target="_blank" rel="noopener noreferrer">${label}</a>` : label}</li>`;
+  }).join('');
+  return `<div class="bz-block"><div class="bz-source-box">
+    <div class="bz-source-box__title">${bzE(boxTitle)}</div>
+    <ul class="bz-source-box__list">${items}</ul>
+  </div></div>`;
+}
+
+let _bzAccN = 0;
+function bzBlockAccordion(d) {
+  const title = d.title ? `<h3 class="bz-block-title">${bzE(d.title)}</h3>` : '';
+  const groups = (Array.isArray(d.items) ? d.items : []).map(it => {
+    const pid = 'bz-acc-panel-' + (++_bzAccN);
+    const bid = 'bz-acc-btn-'   + _bzAccN;
+    return `<div class="bz-accordion-item">
+      <button class="bz-accordion-trigger" id="${bid}" aria-expanded="false" aria-controls="${pid}">
+        <span>${bzE(it.question ?? it.title ?? '')}</span>
+        <i class="bz-accordion-icon" aria-hidden="true">+</i>
+      </button>
+      <div class="bz-accordion-panel" id="${pid}" role="region" aria-labelledby="${bid}" hidden>
+        ${bzE(it.answer ?? it.body ?? '')}
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="bz-block">${title}<div class="bz-accordion">${groups}</div></div>`;
+}
+
+const BZ_BLOCK_RENDERERS = {
+  stat_cards:       bzBlockStatCards,
+  chart:            bzBlockChart,
+  timeline:         bzBlockTimeline,
+  insight_cards:    bzBlockInsightCards,
+  comparison_table: bzBlockComparisonTable,
+  method_note:      bzBlockMethodNote,
+  source_box:       bzBlockSourceBox,
+  accordion:        bzBlockAccordion,
+};
+
+function renderInteractiveBlocks(article) {
+  const blocks = Array.isArray(article.blocks) ? article.blocks : [];
+  const type   = article.article_type || 'standard';
+  if (!blocks.length || type === 'standard') return '';
+  const wrapClass = type === 'report' ? 'bz-interactive-report' : 'bz-interactive-article';
+  const sorted = [...blocks].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  const html = sorted.map(blk => {
+    const fn = BZ_BLOCK_RENDERERS[blk.type];
+    if (!fn) return '';
+    try { return fn(blk.data || {}); } catch(e) { return ''; }
+  }).join('');
+  return html ? `<div class="${wrapClass}">${html}</div>` : '';
+}
+
+let _bzInteractiveLoaded = false;
+function bzLoadInteractiveScript() {
+  if (_bzInteractiveLoaded) {
+    if (typeof window.initInteractiveBlocks === 'function') window.initInteractiveBlocks();
+    return;
+  }
+  const s = document.createElement('script');
+  s.src = '/js/interactive-articles.js';
+  s.onload = () => {
+    _bzInteractiveLoaded = true;
+    if (typeof window.initInteractiveBlocks === 'function') window.initInteractiveBlocks();
+  };
+  document.head.appendChild(s);
 }
 
 /* ── Boot ────────────────────────────────────── */
