@@ -2082,8 +2082,8 @@ function renderArticleSingle(id) {
       </div>
       ${(a.featured_image || a.image) ? `<figure class="art-hero-frame"><img class="art-hero" src="${imgSrc(a.featured_image || a.image)}" alt="${t}"></figure>` : ''}
       ${youtubeEmbedHtml(a.youtube_url)}
-      <div class="art-body">${_conHtml}</div>
-      ${_autoHtml}
+      <div class="art-body" id="art-body-${a.id}">${_conHtml}</div>
+      <div id="art-auto-${a.id}">${_autoHtml}</div>
       ${sourcesAccordionHtml(a)}
       ${related.length ? `
         <section class="related-articles">
@@ -2097,6 +2097,10 @@ function renderArticleSingle(id) {
   initReveal();
   if (artBlocks.length) {
     bzLoadInteractiveScript();
+  } else if (/\{\{bz_block:[a-z0-9][a-z0-9-]*\}\}/.test(con)) {
+    // Blocks missing from content snapshot (e.g. migration not yet run on server):
+    // fetch them lazily and re-render the body without a full page reload.
+    bzFetchAndRenderBlocks(a.id, artType, con);
   }
   updatePageMeta(
     `${t} — ${CMS.s('site_name_en', 'BajoZone')}`,
@@ -4309,6 +4313,26 @@ function bzRenderAutoBlocks(blocks, usedKeys, articleType) {
     try { return fn ? fn(blk.data || {}) : ''; } catch(e) { return ''; }
   }).filter(Boolean).join('');
   return html ? `<div class="${wrapClass}">${html}</div>` : '';
+}
+
+/* Lazy fallback: fetch blocks from the API and re-render body/auto sections in-place.
+   Called when a.blocks was empty in the content snapshot but shortcodes are present. */
+async function bzFetchAndRenderBlocks(articleId, articleType, rawContent) {
+  try {
+    const r = await fetch('/api/blocks.php?article_id=' + encodeURIComponent(articleId), { cache: 'no-store' });
+    if (!r.ok) return;
+    const j = await r.json();
+    const blocks = j.blocks || [];
+    if (!blocks.length) return;
+    const type = j.article_type || articleType;
+    const { contentHtml: freshHtml, usedKeys: freshUsed } = bzProcessContentBlocks(rawContent, blocks, type);
+    const autoHtml = bzRenderAutoBlocks(blocks, freshUsed, type);
+    const bodyEl = document.getElementById('art-body-' + articleId);
+    const autoEl = document.getElementById('art-auto-' + articleId);
+    if (bodyEl) bodyEl.innerHTML = freshHtml;
+    if (autoEl) autoEl.innerHTML = autoHtml;
+    bzLoadInteractiveScript();
+  } catch(_) {}
 }
 
 /* Legacy: render all blocks (auto-mode, ignoring placement) after content.

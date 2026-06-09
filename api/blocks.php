@@ -13,7 +13,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
-requireAdminAuth();
+/* Auth is required for writes (POST/DELETE) but NOT for GET.
+   Block data is already rendered publicly; the GET endpoint is safe to expose.
+   unauthenticated GET is restricted to published articles only. */
 
 /* ── Allowed block types ─────────────────────────────────────── */
 const BZ_BLOCK_TYPES = [
@@ -158,6 +160,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         exit;
     }
 
+    // Unauthenticated callers may only read blocks of published articles.
+    // Admin token grants access to any article (including drafts).
+    $isAdmin = verifyAdminToken($_SERVER['HTTP_X_ADMIN_TOKEN'] ?? '') !== null;
+    if (!$isAdmin) {
+        try {
+            $artPublished = contentFetchOne(
+                "SELECT id FROM articles WHERE id = ? AND status = 'published' LIMIT 1",
+                [$articleId]
+            );
+        } catch (Throwable $e) {
+            $artPublished = null;
+        }
+        if ($artPublished === null) {
+            http_response_code(404);
+            echo json_encode(['error' => 'Article not found']);
+            exit;
+        }
+    }
+
     try {
         /* article_type — falls back to 'standard' if column missing (pre-migration) */
         $articleType = 'standard';
@@ -230,6 +251,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 /* ── POST — save blocks for article ─────────────────────────── */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireAdminAuth();
     $body = json_decode((string) file_get_contents('php://input'), true);
 
     if (!is_array($body)) {
