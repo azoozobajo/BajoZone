@@ -247,38 +247,53 @@ function attachArticleBlocks(array $articles): array
         return [];
     }
 
-    $interactiveIds = [];
-    foreach ($articles as $article) {
-        if (($article['article_type'] ?? 'standard') !== 'standard') {
-            $interactiveIds[] = (string) $article['id'];
-        }
-    }
-
-    if (!$interactiveIds) {
+    // Load blocks for ALL articles regardless of article_type, so blocks appear even
+    // when the admin has not yet changed the type, or when the migration added the
+    // article_type column but the value is still the default 'standard'.
+    $ids = array_values(array_filter(array_map(fn($a) => (string) ($a['id'] ?? ''), $articles)));
+    if (!$ids) {
         return $articles;
     }
 
     try {
-        $placeholders = implode(',', array_fill(0, count($interactiveIds), '?'));
-        $rows = contentFetchAll(
-            "SELECT article_id, block_type, block_order, block_data
-             FROM article_blocks
-             WHERE article_id IN ($placeholders)
-             ORDER BY block_order ASC, id ASC",
-            $interactiveIds
-        );
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        // Try with placement columns (requires add_block_placement_fields migration).
+        // Falls back to basic SELECT if those columns do not yet exist.
+        try {
+            $rows = contentFetchAll(
+                "SELECT id, article_id, block_type, block_order, block_data,
+                        block_key, admin_label, placement_mode
+                 FROM article_blocks
+                 WHERE article_id IN ($placeholders)
+                 ORDER BY block_order ASC, id ASC",
+                $ids
+            );
+        } catch (Throwable $colErr) {
+            $rows = contentFetchAll(
+                "SELECT id, article_id, block_type, block_order, block_data
+                 FROM article_blocks
+                 WHERE article_id IN ($placeholders)
+                 ORDER BY block_order ASC, id ASC",
+                $ids
+            );
+        }
     } catch (Throwable $e) {
+        // article_blocks table does not exist yet
         return $articles;
     }
 
     $blocksByArticle = [];
     foreach ($rows as $row) {
-        $aid = (string) $row['article_id'];
+        $aid  = (string) $row['article_id'];
         $data = json_decode((string) $row['block_data'], true);
         $blocksByArticle[$aid][] = [
-            'type'  => (string) $row['block_type'],
-            'order' => (int)    $row['block_order'],
-            'data'  => is_array($data) ? $data : [],
+            'id'             => (string) $row['id'],
+            'type'           => (string) $row['block_type'],
+            'order'          => (int)    $row['block_order'],
+            'key'            => (string) ($row['block_key']      ?? ''),
+            'admin_label'    => (string) ($row['admin_label']    ?? ''),
+            'placement_mode' => (string) ($row['placement_mode'] ?? 'auto'),
+            'data'           => is_array($data) ? $data : [],
         ];
     }
 

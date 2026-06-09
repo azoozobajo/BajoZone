@@ -16,6 +16,17 @@
   direction: rtl;
 }
 
+/* When a block is rendered inline (inside article body via shortcode) */
+.bz-block-inline {
+  margin-top: 0;
+  margin-bottom: 0;
+  display: block;
+}
+
+.bz-block-inline .bz-block {
+  margin: 1.5rem 0;
+}
+
 .bz-interactive-report {
   border-top: 2px solid var(--gold);
   padding-top: 2rem;
@@ -94,6 +105,30 @@
 .bz-stat-card__change--down { background: #f8d7da; color: #721c24; }
 .bz-stat-card__change--flat { background: var(--line, #e5e5e5); color: var(--warm-dark, #444); }
 
+/* Per-card tone: overrides the top bar colour */
+.bz-stat-card--danger  { --_card-accent: #dc3545; }
+.bz-stat-card--success { --_card-accent: #28a745; }
+.bz-stat-card--warning { --_card-accent: #ffc107; }
+.bz-stat-card--info    { --_card-accent: #17a2b8; }
+.bz-stat-card--gold    { --_card-accent: var(--gold); }
+.bz-stat-card--dark    { --_card-accent: var(--ink); }
+.bz-stat-card[class*="bz-stat-card--"]::before { background: var(--_card-accent, var(--gold)); }
+
+.bz-stat-card__note {
+  font-size: 0.72rem;
+  color: var(--warm-mid, #888);
+  margin-top: 0.3rem;
+  line-height: 1.4;
+}
+
+/* ── Block subtitle (shared) ──────────────────────────────── */
+.bz-block-subtitle {
+  font-size: 0.85rem;
+  color: var(--warm-mid, #666);
+  margin: -0.5rem 0 1rem;
+  line-height: 1.6;
+}
+
 /* ══════════════════════════════════════════════════════════
    CHART
    ══════════════════════════════════════════════════════════ */
@@ -104,11 +139,35 @@
   padding: 1.5rem;
 }
 
+.bz-chart-description {
+  font-size: 0.875rem;
+  color: var(--warm-dark, #444);
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
 .bz-chart-caption {
   font-size: 0.8rem;
   color: var(--warm-mid, #666);
   margin-top: 0.75rem;
   text-align: center;
+}
+
+.bz-chart-source {
+  font-size: 0.75rem;
+  color: var(--warm-mid, #888);
+  margin-top: 0.5rem;
+  text-align: start;
+}
+
+/* Accessible data table — visually hidden, readable by screen readers */
+.bz-chart-table {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 .bz-chart-canvas-wrap {

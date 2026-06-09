@@ -115,6 +115,24 @@ body { font-family: var(--ff); background: var(--off-white); color: var(--ink); 
 
 .empty-state { color:var(--warm-mid); font-size:.8rem; text-align:center; padding:1.5rem 0; }
 
+/* ── Block key / mode chips ── */
+.block-key-chip { font-family:var(--ff-mono); font-size:.7rem; color:var(--warm-mid); background:var(--off-white); border:1px solid var(--line); border-radius:4px; padding:.1rem .4rem; }
+.block-mode-chip { font-size:.68rem; font-weight:600; border-radius:4px; padding:.1rem .45rem; }
+.block-mode-chip--auto      { background:#e8f5e9; color:#2e7d32; }
+.block-mode-chip--shortcode { background:#e3f2fd; color:#1565c0; }
+.block-mode-chip--hidden    { background:#fafafa; color:var(--warm-mid); }
+.block-info { display:flex; align-items:center; gap:.4rem; flex:1; flex-wrap:wrap; min-width:0; }
+
+/* ── Standard-type warning ── */
+.type-warning { background:#fff3cd; border:1px solid #ffc107; border-radius:6px; padding:.6rem .875rem; font-size:.8rem; color:#856404; margin-top:.5rem; }
+
+/* ── Help note ── */
+.help-note { background:var(--off-white); border:1px solid var(--line); border-radius:6px; padding:.75rem 1rem; font-size:.78rem; color:var(--warm-mid); margin-top:.75rem; line-height:1.65; }
+.help-note code { font-family:var(--ff-mono); background:var(--line); padding:.05rem .3rem; border-radius:3px; font-size:.85em; }
+
+/* ── Flash toast ── */
+#bz-flash { position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%); background:var(--ink); color:#fff; padding:.6rem 1.25rem; border-radius:8px; font-size:.82rem; z-index:9999; opacity:0; transition:opacity .2s; pointer-events:none; white-space:nowrap; }
+
 /* ── Drag placeholder ── */
 .drag-placeholder { border:2px dashed var(--gold); border-radius:8px; height:44px; opacity:.4; background:color-mix(in srgb, var(--gold) 5%, transparent); }
 
@@ -188,6 +206,9 @@ body { font-family: var(--ff); background: var(--off-white); color: var(--ink); 
                 <button class="type-btn"             data-type="interactive" onclick="setArticleType('interactive')">تفاعلية</button>
                 <button class="type-btn"             data-type="report"    onclick="setArticleType('report')">تقرير</button>
               </div>
+              <div id="standard-type-warning" class="type-warning" style="display:none;">
+                ⚠️ توجد بلوكات تفاعلية لهذا المقال، لكن نوع المقال لا يزال «عادية». يُفضّل تغييره إلى «تفاعلية» أو «تقرير» لضمان الظهور الصحيح على الموقع.
+              </div>
             </div>
 
             <!-- Add block bar -->
@@ -218,6 +239,12 @@ body { font-family: var(--ff); background: var(--off-white); color: var(--ink); 
                 <button class="btn btn-ghost btn-sm" onclick="closeBlockEditor()">✕ إغلاق</button>
               </div>
               <div id="block-editor-body"></div>
+            </div>
+
+            <!-- Shortcode help -->
+            <div class="help-note">
+              لإدراج بلوك في مكان محدد داخل نص المقال، انسخ كود الإدراج من قائمة البلوكات أعلاه وضعه في محرر المقال الرئيسي. مثال: <code>{{bz_block:key-numbers}}</code><br>
+              البلوكات بطريقة «تلقائي» تظهر بعد نص المقال بالترتيب. البلوكات بطريقة «كود إدراج» تظهر فقط حيث وضعت الكود. البلوكات «مخفية» لا تظهر للزوار.
             </div>
 
             <!-- Save button + status -->
@@ -251,6 +278,8 @@ body { font-family: var(--ff); background: var(--off-white); color: var(--ink); 
   </div>
 </div>
 
+<div id="bz-flash"></div>
+
 <script>
 /* ── State ──────────────────────────────────────────────────────── */
 let token      = sessionStorage.getItem('bzt') || '';
@@ -259,9 +288,42 @@ let selectedId    = null;
 let selectedSlug  = null;
 let selectedTitle = null;
 let articleType = 'standard';
-let blocks      = [];        // [{id, type, order, data}]
+let blocks      = [];        // [{id, type, order, key, admin_label, placement_mode, data}]
 let editingIdx  = null;      // index in blocks[]
 let dragSrcIdx  = null;
+
+/* ── Flash toast ─────────────────────────────────────────────── */
+function showFlash(msg) {
+  const el = document.getElementById('bz-flash');
+  el.textContent = msg;
+  el.style.opacity = '1';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.style.opacity = '0'; }, 2600);
+}
+
+/* ── Block key helpers ───────────────────────────────────────── */
+function uniqueBlockKey(base) {
+  const used = new Set(blocks.map(b => b.key).filter(Boolean));
+  if (!used.has(base)) return base;
+  let n = 2;
+  while (used.has(base + '-' + n)) n++;
+  return base + '-' + n;
+}
+
+function copyShortcode(key) {
+  const code = '{{bz_block:' + key + '}}';
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(code).then(() => showFlash('تم نسخ: ' + code)).catch(() => prompt('انسخ الكود:', code));
+  } else {
+    prompt('انسخ الكود:', code);
+  }
+}
+
+/* ── Standard-type warning ───────────────────────────────────── */
+function checkTypeWarning() {
+  const el = document.getElementById('standard-type-warning');
+  if (el) el.style.display = (blocks.length > 0 && articleType === 'standard') ? 'block' : 'none';
+}
 
 /* ── Auth ────────────────────────────────────────────────────────── */
 async function doLogin() {
@@ -389,8 +451,17 @@ async function selectArticle(id) {
     if (r.status === 401) { showAuthScreen('انتهت الجلسة. الرجاء تسجيل الدخول مجدداً.'); return; }
     const j = await r.json();
     articleType = j.article_type || 'standard';
-    blocks = (j.blocks || []).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    blocks = (j.blocks || []).sort((a, b) => (a.order ?? 0) - (b.order ?? 0)).map(blk => ({
+      id:             blk.id             || 'blk_' + Date.now(),
+      type:           blk.type,
+      order:          blk.order          ?? 0,
+      key:            blk.key            || '',
+      admin_label:    blk.admin_label    || '',
+      placement_mode: blk.placement_mode || 'auto',
+      data:           blk.data           || {},
+    }));
     updateTypeButtons();
+    checkTypeWarning();
     renderBlockList();
   } catch(e) {
     setStatus('فشل تحميل البلوكات: ' + e.message, true);
@@ -401,6 +472,7 @@ async function selectArticle(id) {
 function setArticleType(t) {
   articleType = t;
   updateTypeButtons();
+  checkTypeWarning();
 }
 
 function updateTypeButtons() {
@@ -422,7 +494,10 @@ function renderBlockList() {
   if (!blocks.length) { el.innerHTML = `<div class="empty-state">لا توجد بلوكات — أضف بلوكًا أو استورد JSON</div>`; return; }
 
   el.innerHTML = blocks.map((blk, i) => {
-    const label = blk.data.title || blk.data.body?.slice(0, 40) || BLOCK_LABELS[blk.type] || blk.type;
+    const displayLabel = blk.admin_label || blk.data?.title || blk.data?.body?.slice(0, 35) || BLOCK_LABELS[blk.type] || blk.type;
+    const mode      = blk.placement_mode || 'auto';
+    const modeLabel = { auto: 'تلقائي', shortcode: 'كود إدراج', hidden: 'مخفي' }[mode] || mode;
+    const key       = blk.key || '';
     return `<div class="block-row" draggable="true"
       data-idx="${i}"
       ondragstart="onDragStart(event,${i})"
@@ -430,12 +505,17 @@ function renderBlockList() {
       ondrop="onDrop(event,${i})"
       ondragend="onDragEnd(event)">
       <span class="block-handle">⠿</span>
-      <span class="block-badge">${escHtml(blk.type)}</span>
-      <span class="block-label">${escHtml(label)}</span>
+      <div class="block-info">
+        <span class="block-badge">${escHtml(blk.type)}</span>
+        <span class="block-label">${escHtml(displayLabel)}</span>
+        ${key ? `<span class="block-key-chip">${escHtml(key)}</span>` : ''}
+        <span class="block-mode-chip block-mode-chip--${mode}">${modeLabel}</span>
+      </div>
       <div class="block-actions">
-        <button class="btn btn-ghost btn-icon btn-sm" title="تحرير"    onclick="openBlockEditor(${i})">✎</button>
-        <button class="btn btn-ghost btn-icon btn-sm" title="تكرار"    onclick="duplicateBlock(${i})">⧉</button>
-        <button class="btn btn-danger btn-icon btn-sm" title="حذف"    onclick="deleteBlock(${i})">✕</button>
+        ${key ? `<button class="btn btn-ghost btn-icon btn-sm" title="نسخ كود الإدراج" onclick="copyShortcode('${esc(key)}')">⧉</button>` : ''}
+        <button class="btn btn-ghost btn-icon btn-sm" title="تحرير"  onclick="openBlockEditor(${i})">✎</button>
+        <button class="btn btn-ghost btn-icon btn-sm" title="تكرار"  onclick="duplicateBlock(${i})">⊕</button>
+        <button class="btn btn-danger btn-icon btn-sm" title="حذف"  onclick="deleteBlock(${i})">✕</button>
       </div>
     </div>`;
   }).join('');
@@ -477,15 +557,35 @@ function addBlock(type) {
     source_box:       { title: '', items: [{ label: '', url: '' }] },
     accordion:        { title: '', items: [{ question: '', answer: '' }] },
   };
-  const blk = { id: 'new_' + Date.now(), type, order: blocks.length, data: JSON.parse(JSON.stringify(defaults[type])) };
+  const sameType = blocks.filter(b => b.type === type).length + 1;
+  const autoKey  = uniqueBlockKey(type.replace(/_/g, '-') + '-' + sameType);
+  const blk = {
+    id:             'new_' + Date.now(),
+    type,
+    order:          blocks.length,
+    key:            autoKey,
+    admin_label:    (BLOCK_LABELS[type] || type) + ' ' + sameType,
+    placement_mode: 'auto',
+    data:           JSON.parse(JSON.stringify(defaults[type])),
+  };
   blocks.push(blk);
   renderBlockList();
+  checkTypeWarning();
   openBlockEditor(blocks.length - 1);
 }
 
 function duplicateBlock(idx) {
   const orig = blocks[idx];
-  const copy = { id: 'new_' + Date.now(), type: orig.type, order: blocks.length, data: JSON.parse(JSON.stringify(orig.data)) };
+  const baseKey = (orig.key || orig.type.replace(/_/g, '-')) + '-copy';
+  const copy = {
+    id:             'new_' + Date.now(),
+    type:           orig.type,
+    order:          blocks.length,
+    key:            uniqueBlockKey(baseKey),
+    admin_label:    (orig.admin_label || BLOCK_LABELS[orig.type] || orig.type) + ' (نسخة)',
+    placement_mode: orig.placement_mode || 'auto',
+    data:           JSON.parse(JSON.stringify(orig.data)),
+  };
   blocks.push(copy);
   renderBlockList();
 }
@@ -496,6 +596,7 @@ function deleteBlock(idx) {
   blocks.forEach((b, i) => b.order = i);
   if (editingIdx === idx) closeBlockEditor();
   renderBlockList();
+  checkTypeWarning();
 }
 
 /* ── Block editor ────────────────────────────────────────────────── */
@@ -517,56 +618,101 @@ function buildEditorForm(type, data, idx) {
   const inp = (field, val, label) => fg(label, `<input class="form-input" type="text" value="${escAttr(val)}" oninput="updateField(${idx},'${field}',this.value)">`);
   const sel = (field, val, label, opts) => fg(label, `<select class="form-select" onchange="updateField(${idx},'${field}',this.value)">${opts.map(([v,t]) => `<option value="${v}" ${val===v?'selected':''}>${t}</option>`).join('')}</select>`);
 
+  const blk = blocks[idx] || {};
+  const adminFields = `
+    <div style="border:1px solid var(--line);border-radius:8px;padding:.875rem;margin-bottom:.875rem;background:var(--off-white);">
+      <div style="font-size:.72rem;font-weight:700;color:var(--warm-mid);margin-bottom:.6rem;letter-spacing:.04em;">⚙️ إعدادات البلوك</div>
+      <div class="form-group">
+        <label class="form-label">اسم البلوك الداخلي</label>
+        <input class="form-input" type="text" value="${escAttr(blk.admin_label || '')}" oninput="blocks[${idx}].admin_label=this.value;renderBlockList();">
+      </div>
+      <div class="form-group">
+        <label class="form-label">مفتاح البلوك <span style="font-family:var(--ff-mono);font-size:.8em;color:var(--warm-mid);">(للكود القصير)</span></label>
+        <div style="display:flex;gap:.4rem;align-items:center;">
+          <input class="form-input" type="text" style="direction:ltr;flex:1" value="${escAttr(blk.key || '')}" oninput="updateBlockKey(${idx},this.value)" placeholder="مثال: key-numbers">
+          ${blk.key ? `<button class="btn btn-ghost btn-sm" type="button" onclick="copyShortcode('${esc(blk.key)}')">نسخ كود الإدراج</button>` : ''}
+        </div>
+        ${blk.key ? `<div style="font-size:.72rem;color:var(--warm-mid);margin-top:.2rem;font-family:var(--ff-mono);">{{bz_block:${escHtml(blk.key)}}}</div>` : ''}
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">طريقة العرض</label>
+        <select class="form-select" onchange="blocks[${idx}].placement_mode=this.value;renderBlockList();checkTypeWarning();">
+          <option value="auto"      ${(blk.placement_mode||'auto')==='auto'      ? 'selected' : ''}>تلقائي بعد المقال</option>
+          <option value="shortcode" ${(blk.placement_mode||'auto')==='shortcode' ? 'selected' : ''}>داخل المقال بواسطة كود قصير</option>
+          <option value="hidden"    ${(blk.placement_mode||'auto')==='hidden'    ? 'selected' : ''}>مخفي</option>
+        </select>
+      </div>
+    </div>`;
+
   switch(type) {
     case 'stat_cards':
-      return inp('title', data.title||'', 'العنوان (اختياري)') + buildArrayEditor(idx, 'cards', data.cards||[], [
-        {f:'value', l:'القيمة'},{f:'label',l:'الوسم'},{f:'change',l:'التغيّر'},{f:'change_dir',l:'الاتجاه (up/down/flat)'}
+      return adminFields + inp('title', data.title||'', 'العنوان (اختياري)') + buildArrayEditor(idx, 'cards', data.cards||[], [
+        {f:'number', l:'الرقم / القيمة'},{f:'label',l:'الوسم'},{f:'note',l:'ملاحظة (اختياري)'},{f:'tone',l:'اللون (success/danger/gold...)'},{f:'change',l:'التغيّر'},{f:'change_dir',l:'up / down / flat'}
       ]);
 
     case 'chart':
-      return inp('title',data.title||'','العنوان') +
+      return adminFields + inp('title',data.title||'','العنوان') +
+        inp('subtitle',data.subtitle||'','الوصف المختصر (اختياري)') +
         sel('chartType',data.chartType||'bar','نوع الرسم',[['bar','أعمدة'],['line','خطي'],['doughnut','دائري مجوف'],['pie','فطيرة']]) +
         fg('التسميات (مفصولة بفاصلة)', `<input class="form-input" type="text" value="${escAttr((data.labels||[]).join(','))}" oninput="updateLabels(${idx},this.value)">`) +
         fg('البيانات (مفصولة بفاصلة)', `<input class="form-input" type="text" value="${escAttr(((data.datasets||[{}])[0]?.data||[]).join(','))}" oninput="updateChartData(${idx},this.value)">`) +
         fg('وسم المجموعة', `<input class="form-input" type="text" value="${escAttr((data.datasets||[{}])[0]?.label||'')}" oninput="updateChartLabel(${idx},this.value)">`) +
+        inp('description',data.description||'','الوصف التحليلي (اختياري)') +
+        inp('source',data.source||'','المصدر (اختياري)') +
         inp('caption',data.caption||'','التعليق أسفل الرسم') +
         fg('إظهار الأسطورة', `<input type="checkbox" ${data.showLegend?'checked':''} onchange="updateField(${idx},'showLegend',this.checked)">`);
 
     case 'timeline':
-      return inp('title',data.title||'','العنوان') + buildArrayEditor(idx,'items',data.items||[],[
+      return adminFields + inp('title',data.title||'','العنوان') + buildArrayEditor(idx,'items',data.items||[],[
         {f:'date',l:'التاريخ'},{f:'title',l:'العنوان'},{f:'body',l:'النص'}
       ]);
 
     case 'insight_cards':
-      return inp('title',data.title||'','العنوان') + buildArrayEditor(idx,'cards',data.cards||[],[
+      return adminFields + inp('title',data.title||'','العنوان') + buildArrayEditor(idx,'cards',data.cards||[],[
         {f:'icon',l:'الأيقونة'},{f:'title',l:'العنوان'},{f:'body',l:'النص'},{f:'tone',l:'اللون (success/warning/danger/info/gold/dark)'}
       ]);
 
     case 'comparison_table':
-      return inp('title',data.title||'','العنوان') +
+      return adminFields + inp('title',data.title||'','العنوان') +
         fg('الأعمدة (مفصولة بفاصلة)',`<input class="form-input" type="text" value="${escAttr((data.columns||[]).join(','))}" oninput="updateColumns(${idx},this.value)">`) +
         `<div class="form-group"><label class="form-label">الصفوف (كل صف = JSON مصفوفة)</label>
           <div id="table-rows-${idx}">${buildTableRows(idx,data)}</div>
           <button class="add-item-btn" onclick="addTableRow(${idx})">+ إضافة صف</button></div>`;
 
     case 'method_note':
-      return inp('title',data.title||'','العنوان') +
+      return adminFields + inp('title',data.title||'','العنوان') +
         fg('النص',`<textarea class="form-textarea" oninput="updateField(${idx},'body',this.value)">${escHtml(data.body||'')}</textarea>`) +
         sel('tone',data.tone||'gold','النبرة',[['default','افتراضي'],['success','نجاح'],['warning','تحذير'],['danger','خطأ'],['info','معلومة'],['gold','ذهبي'],['dark','داكن']]) +
         inp('icon',data.icon||'','الأيقونة (emoji)');
 
     case 'source_box':
-      return inp('title',data.title||'','العنوان') + buildArrayEditor(idx,'items',data.items||[],[
+      return adminFields + inp('title',data.title||'','العنوان') + buildArrayEditor(idx,'items',data.items||[],[
         {f:'label',l:'النص'},{f:'url',l:'الرابط'}
       ]);
 
     case 'accordion':
-      return inp('title',data.title||'','العنوان') + buildArrayEditor(idx,'items',data.items||[],[
+      return adminFields + inp('title',data.title||'','العنوان') + buildArrayEditor(idx,'items',data.items||[],[
         {f:'question',l:'السؤال'},{f:'answer',l:'الجواب'}
       ]);
 
-    default: return `<div class="form-group"><label class="form-label">بيانات JSON</label>
+    default: return adminFields + `<div class="form-group"><label class="form-label">بيانات JSON</label>
       <textarea class="form-textarea" oninput="updateRaw(${idx},this.value)">${escHtml(JSON.stringify(data,null,2))}</textarea></div>`;
+  }
+}
+
+function updateBlockKey(idx, val) {
+  /* Sanitize: lowercase, letters/digits/hyphens, max 80 chars */
+  const clean = val.toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/^-+|-+$/g, '').slice(0, 80);
+  blocks[idx].key = clean;
+  renderBlockList();
+  /* Re-render editor so the shortcode preview updates without losing focus */
+  const body = document.getElementById('block-editor-body');
+  if (body) {
+    const focused = document.activeElement;
+    body.innerHTML = buildEditorForm(blocks[idx].type, blocks[idx].data, idx);
+    /* Restore focus to the key input */
+    const keyInp = body.querySelector('input[style*="ltr"]');
+    if (keyInp) { keyInp.focus(); keyInp.setSelectionRange(keyInp.value.length, keyInp.value.length); }
   }
 }
 
@@ -648,7 +794,14 @@ async function saveBlocks() {
   const payload = {
     article_id:   selectedId,
     article_type: articleType,
-    blocks: blocks.map((blk, i) => ({ type: blk.type, order: i, data: blk.data })),
+    blocks: blocks.map((blk, i) => ({
+      type:           blk.type,
+      order:          i,
+      key:            blk.key            || '',
+      admin_label:    blk.admin_label    || '',
+      placement_mode: blk.placement_mode || 'auto',
+      data:           blk.data,
+    })),
   };
   try {
     const r = await fetch('/api/blocks.php', {
@@ -660,11 +813,16 @@ async function saveBlocks() {
     const j = await r.json();
     if (!r.ok) {
       const msg = j.errors ? j.errors.join(' · ') : (j.error || 'فشل الحفظ');
-      setStatus(msg, true);
+      setStatus('✕ ' + msg, true);
     } else {
       const typeLabel = { standard: 'عادية', interactive: 'تفاعلية', report: 'تقرير' }[j.article_type] || j.article_type;
-      const title = selectedTitle ? ` — "${selectedTitle.slice(0, 35)}"` : '';
-      setStatus(`✔ تم الحفظ${title} · ${j.blocks_saved} بلوك · نوع: ${typeLabel}`, false);
+      const title = selectedTitle ? `"${selectedTitle.slice(0, 30)}" · ` : '';
+      let msg = `✔ تم الحفظ — ${title}${j.blocks_saved} بلوك · نوع: ${typeLabel} · معرّف: ${j.article_id}`;
+      if (j.article_type === 'standard' && j.blocks_saved > 0) {
+        msg += ' · ⚠️ نوع المقال عادي — يُفضل تغييره لعرض البلوكات';
+      }
+      setStatus(msg, false);
+      checkTypeWarning();
     }
   } catch(e) {
     setStatus('خطأ: ' + e.message, true);
@@ -762,13 +920,28 @@ function validateImportJson() {
   }
 }
 
+function importBlkObj(b, i, orderOffset) {
+  const rawKey = (b.key || b.block_key || '').toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/^-+|-+$/g, '');
+  const baseKey = rawKey || b.type.replace(/_/g, '-') + '-' + (orderOffset + i + 1);
+  return {
+    id:             'new_' + Date.now() + '_' + i,
+    type:           b.type,
+    order:          b.order ?? (orderOffset + i),
+    key:            uniqueBlockKey(baseKey),
+    admin_label:    b.admin_label || b.block_label || BLOCK_LABELS[b.type] || b.type,
+    placement_mode: ['auto','shortcode','hidden'].includes(b.placement_mode) ? b.placement_mode : 'auto',
+    data:           b.data || {},
+  };
+}
+
 function importJsonReplace() {
   const result = parseImportJson();
   const msg = document.getElementById('import-msg');
   if (!result.ok) { msg.className='import-msg err'; msg.textContent='✕ '+result.error; return; }
   if (result.parsed.article_type) setArticleType(result.parsed.article_type);
-  blocks = result.blks.map((b, i) => ({ id: 'new_'+Date.now()+'_'+i, type: b.type, order: b.order ?? i, data: b.data || {} }));
-  closeBlockEditor(); renderBlockList();
+  blocks = [];
+  result.blks.forEach((b, i) => blocks.push(importBlkObj(b, i, 0)));
+  closeBlockEditor(); renderBlockList(); checkTypeWarning();
   msg.className='import-msg ok'; msg.textContent=`✔ تم استبدال البلوكات — ${blocks.length} بلوك`;
 }
 
@@ -777,8 +950,8 @@ function importJsonAppend() {
   const msg = document.getElementById('import-msg');
   if (!result.ok) { msg.className='import-msg err'; msg.textContent='✕ '+result.error; return; }
   const start = blocks.length;
-  result.blks.forEach((b, i) => blocks.push({ id: 'new_'+Date.now()+'_'+i, type: b.type, order: start+i, data: b.data || {} }));
-  renderBlockList();
+  result.blks.forEach((b, i) => blocks.push(importBlkObj(b, i, start)));
+  renderBlockList(); checkTypeWarning();
   msg.className='import-msg ok'; msg.textContent=`✔ تمت الإضافة — الإجمالي: ${blocks.length} بلوك`;
 }
 

@@ -181,20 +181,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         /* blocks — falls back to [] if table missing (pre-migration) */
         $blocks = [];
         try {
-            $rows = contentFetchAll(
-                'SELECT id, block_type, block_order, block_data
-                 FROM article_blocks
-                 WHERE article_id = ?
-                 ORDER BY block_order ASC, id ASC',
-                [$articleId]
-            );
+            /* Try with placement columns; fall back if they don't exist yet */
+            try {
+                $rows = contentFetchAll(
+                    'SELECT id, block_type, block_order, block_data, block_key, admin_label, placement_mode
+                     FROM article_blocks
+                     WHERE article_id = ?
+                     ORDER BY block_order ASC, id ASC',
+                    [$articleId]
+                );
+            } catch (Throwable $colErr) {
+                $rows = contentFetchAll(
+                    'SELECT id, block_type, block_order, block_data
+                     FROM article_blocks
+                     WHERE article_id = ?
+                     ORDER BY block_order ASC, id ASC',
+                    [$articleId]
+                );
+            }
             $blocks = array_map(function (array $r): array {
                 $data = json_decode((string) $r['block_data'], true);
                 return [
-                    'id'    => (string) $r['id'],
-                    'type'  => (string) $r['block_type'],
-                    'order' => (int)    $r['block_order'],
-                    'data'  => is_array($data) ? $data : [],
+                    'id'             => (string) $r['id'],
+                    'type'           => (string) $r['block_type'],
+                    'order'          => (int)    $r['block_order'],
+                    'key'            => (string) ($r['block_key']      ?? ''),
+                    'admin_label'    => (string) ($r['admin_label']    ?? ''),
+                    'placement_mode' => (string) ($r['placement_mode'] ?? 'auto'),
+                    'data'           => is_array($data) ? $data : [],
                 ];
             }, $rows);
         } catch (Throwable $tblErr) {
@@ -274,10 +288,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             continue;
         }
 
+        /* Block key: lowercase letters, digits, hyphens; auto-generate if empty */
+        $rawKey = strtolower(trim(preg_replace('/[^a-z0-9-]/', '', (string) ($block['key'] ?? ''))));
+        $rawKey = trim($rawKey, '-');
+        if ($rawKey === '' || !preg_match('/^[a-z][a-z0-9-]*$/', $rawKey)) {
+            $rawKey = str_replace('_', '-', $blockType) . '-' . ($idx + 1);
+        }
+
+        $adminLabel    = bzSanitizeString((string) ($block['admin_label'] ?? ''));
+        $placementMode = in_array(($block['placement_mode'] ?? ''), ['auto', 'shortcode', 'hidden'], true)
+            ? (string) $block['placement_mode']
+            : 'auto';
+
         $validatedBlocks[] = [
-            'type'  => $blockType,
-            'order' => (int) ($block['order'] ?? $idx),
-            'data'  => $sanitized,
+            'type'           => $blockType,
+            'order'          => (int) ($block['order'] ?? $idx),
+            'data'           => $sanitized,
+            'key'            => $rawKey,
+            'admin_label'    => $adminLabel,
+            'placement_mode' => $placementMode,
         ];
     }
 
@@ -314,18 +343,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->prepare('DELETE FROM article_blocks WHERE article_id = ?')->execute([$articleId]);
 
         if ($validatedBlocks) {
-            $ins = $pdo->prepare(
-                'INSERT INTO article_blocks (id, article_id, block_type, block_order, block_data)
-                 VALUES (?, ?, ?, ?, ?)'
-            );
-            foreach ($validatedBlocks as $blk) {
-                $ins->execute([
-                    'blk_' . bin2hex(random_bytes(8)),
-                    $articleId,
-                    $blk['type'],
-                    $blk['order'],
-                    json_encode($blk['data'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-                ]);
+            /* Deduplicate block_key values within this save */
+            $usedKeys = [];
+            foreach ($validatedBlocks as &$vblk) {
+                $k = $vblk['key'];
+                $orig = $k;
+                $n = 2;
+                while (isset($usedKeys[$k])) {
+                    $k = $orig . '-' . $n++;
+                }
+                $vblk['key'] = $k;
+                $usedKeys[$k] = true;
+            }
+            unset($vblk);
+
+            /* Try INSERT with placement columns; fall back if migration not run yet */
+            try {
+                $ins = $pdo->prepare(
+                    'INSERT INTO article_blocks (id, article_id, block_type, block_order, block_data, block_key, admin_label, placement_mode)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+                );
+                foreach ($validatedBlocks as $blk) {
+                    $ins->execute([
+                        'blk_' . bin2hex(random_bytes(8)),
+                        $articleId,
+                        $blk['type'],
+                        $blk['order'],
+                        json_encode($blk['data'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                        $blk['key'] ?: null,
+                        $blk['admin_label'] ?: null,
+                        $blk['placement_mode'],
+                    ]);
+                }
+            } catch (PDOException $colErr) {
+                /* Placement columns not yet created — insert without them */
+                $ins = $pdo->prepare(
+                    'INSERT INTO article_blocks (id, article_id, block_type, block_order, block_data)
+                     VALUES (?, ?, ?, ?, ?)'
+                );
+                foreach ($validatedBlocks as $blk) {
+                    $ins->execute([
+                        'blk_' . bin2hex(random_bytes(8)),
+                        $articleId,
+                        $blk['type'],
+                        $blk['order'],
+                        json_encode($blk['data'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                    ]);
+                }
             }
         }
 
@@ -336,6 +400,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'article_id'   => $articleId,
             'article_type' => $articleType,
             'blocks_saved' => count($validatedBlocks),
+            'block_keys'   => array_column($validatedBlocks, 'key'),
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     } catch (Throwable $e) {
         if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {

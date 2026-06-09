@@ -2008,6 +2008,10 @@ function renderArticleSingle(id) {
   const isAr = Lang.cur === 'ar';
   const t   = Lang.str({ ar: a.title_ar, en: a.title_en });
   const con = parseCallouts(Lang.str({ ar: a.content_ar, en: a.content_en }));
+  const artBlocks = Array.isArray(a.blocks) ? a.blocks : [];
+  const artType   = a.article_type || 'standard';
+  const { contentHtml: _conHtml, usedKeys: _usedKeys } = bzProcessContentBlocks(con, artBlocks, artType);
+  const _autoHtml = bzRenderAutoBlocks(artBlocks, _usedKeys, artType);
   const articleImage = a.featured_image || a.image || 'assets/images/story/research-desk.png';
   const titleArg = jsArg(t);
   const prog = getProgramForArticle(a);
@@ -2078,8 +2082,8 @@ function renderArticleSingle(id) {
       </div>
       ${(a.featured_image || a.image) ? `<figure class="art-hero-frame"><img class="art-hero" src="${imgSrc(a.featured_image || a.image)}" alt="${t}"></figure>` : ''}
       ${youtubeEmbedHtml(a.youtube_url)}
-      <div class="art-body">${con}</div>
-      ${renderInteractiveBlocks(a)}
+      <div class="art-body">${_conHtml}</div>
+      ${_autoHtml}
       ${sourcesAccordionHtml(a)}
       ${related.length ? `
         <section class="related-articles">
@@ -2091,7 +2095,7 @@ function renderArticleSingle(id) {
       <button type="button" class="focus-exit" onclick="toggleFocusReading()">${isAr ? 'الخروج من وضع القراءة' : 'Exit focus mode'}</button>
     </div>`;
   initReveal();
-  if (Array.isArray(a.blocks) && a.blocks.length && (a.article_type || 'standard') !== 'standard') {
+  if (artBlocks.length) {
     bzLoadInteractiveScript();
   }
   updatePageMeta(
@@ -4128,22 +4132,29 @@ function bzToneClass(tone, prefix) {
 function bzBlockStatCards(d) {
   const cards = Array.isArray(d.cards) ? d.cards : [];
   if (!cards.length) return '';
-  const title = d.title ? `<h3 class="bz-block-title">${bzE(d.title)}</h3>` : '';
+  const title    = d.title    ? `<h3 class="bz-block-title">${bzE(d.title)}</h3>` : '';
+  const subtitle = d.subtitle ? `<p class="bz-block-subtitle">${bzE(d.subtitle)}</p>` : '';
   const items = cards.map(c => {
-    const dir = c.change_dir === 'up' ? 'up' : c.change_dir === 'down' ? 'down' : 'flat';
-    return `<div class="bz-stat-card">
-      <div class="bz-stat-card__value">${bzE(c.value ?? '')}</div>
+    const val  = c.number ?? c.value ?? '';   // support both field names
+    const dir  = c.change_dir === 'up' ? 'up' : c.change_dir === 'down' ? 'down' : 'flat';
+    const tone = BZ_TONE_SET.has(c.tone) ? ` bz-stat-card--${c.tone}` : '';
+    return `<div class="bz-stat-card${tone}">
+      <div class="bz-stat-card__value">${bzE(val)}</div>
       <div class="bz-stat-card__label">${bzE(c.label ?? '')}</div>
+      ${c.note   ? `<div class="bz-stat-card__note">${bzE(c.note)}</div>` : ''}
       ${c.change ? `<span class="bz-stat-card__change bz-stat-card__change--${dir}">${bzE(c.change)}</span>` : ''}
     </div>`;
   }).join('');
-  return `<div class="bz-block">${title}<div class="bz-stat-cards">${items}</div></div>`;
+  return `<div class="bz-block">${title}${subtitle}<div class="bz-stat-cards">${items}</div></div>`;
 }
 
 let _bzChartN = 0;
 function bzBlockChart(d) {
-  const title   = d.title   ? `<h3 class="bz-block-title">${bzE(d.title)}</h3>` : '';
-  const caption = d.caption ? `<p class="bz-chart-caption">${bzE(d.caption)}</p>` : '';
+  const title    = d.title       ? `<h3 class="bz-block-title">${bzE(d.title)}</h3>` : '';
+  const subtitle = d.subtitle    ? `<p class="bz-block-subtitle">${bzE(d.subtitle)}</p>` : '';
+  const desc     = d.description ? `<p class="bz-chart-description">${bzE(d.description)}</p>` : '';
+  const caption  = d.caption     ? `<p class="bz-chart-caption">${bzE(d.caption)}</p>` : '';
+  const src      = d.source      ? `<p class="bz-chart-source">${bzE(d.source)}</p>` : '';
   const cfg = JSON.stringify({
     chartType:  d.chartType  || 'bar',
     labels:     d.labels     || [],
@@ -4151,9 +4162,21 @@ function bzBlockChart(d) {
     showLegend: !!d.showLegend,
   }).replace(/'/g, '&#39;');
   const id = 'bz-chart-' + (++_bzChartN);
-  return `<div class="bz-block">${title}<div class="bz-chart-wrap">
-    <div class="bz-chart-canvas-wrap"><canvas id="${id}" class="bz-chart-canvas" data-chart='${cfg}'></canvas></div>
-    ${caption}</div></div>`;
+  /* Accessible data table (visible to screen readers; hidden visually) */
+  const labels   = Array.isArray(d.labels)   ? d.labels   : [];
+  const datasets = Array.isArray(d.datasets) ? d.datasets : [];
+  let tblHtml = '';
+  if (labels.length && datasets.length) {
+    const thead = `<tr><th scope="col"></th>${labels.map(l => `<th scope="col">${bzE(l)}</th>`).join('')}</tr>`;
+    const tbody = datasets.map(ds =>
+      `<tr><th scope="row">${bzE(ds.label || '')}</th>${(ds.data || []).map(v => `<td>${bzE(String(v ?? ''))}</td>`).join('')}</tr>`
+    ).join('');
+    tblHtml = `<table class="bz-chart-table" aria-label="${bzE(d.title || 'بيانات الرسم البياني')}"><thead>${thead}</thead><tbody>${tbody}</tbody></table>`;
+  }
+  return `<div class="bz-block">${title}${subtitle}<div class="bz-chart-wrap">
+    ${desc}
+    <div class="bz-chart-canvas-wrap"><canvas id="${id}" class="bz-chart-canvas" data-chart='${cfg}' role="img" aria-label="${bzE(d.title || 'رسم بياني')}"></canvas></div>
+    ${tblHtml}${caption}${src}</div></div>`;
 }
 
 function bzBlockTimeline(d) {
@@ -4245,13 +4268,58 @@ const BZ_BLOCK_RENDERERS = {
   accordion:        bzBlockAccordion,
 };
 
+/* ── Shortcode processing ────────────────────────────────────── */
+/* Replace {{bz_block:key}} in article content with rendered block HTML.
+   Returns { contentHtml, usedKeys } where usedKeys is a Set of already-rendered keys. */
+function bzProcessContentBlocks(rawContent, blocks, articleType) {
+  if (!Array.isArray(blocks) || !blocks.length || !rawContent) {
+    return { contentHtml: rawContent || '', usedKeys: new Set() };
+  }
+  const blockMap = {};
+  blocks.forEach(blk => { if (blk.key) blockMap[blk.key] = blk; });
+  const usedKeys = new Set();
+  const wrapClass = articleType === 'report' ? 'bz-interactive-report' : 'bz-interactive-article';
+
+  const contentHtml = rawContent.replace(/\{\{bz_block:([a-z0-9][a-z0-9-]*)\}\}/g, (_, key) => {
+    const blk = blockMap[key];
+    if (!blk || (blk.placement_mode || 'auto') === 'hidden') return '';
+    if (usedKeys.has(key)) return ''; // prevent duplicate rendering (SEO)
+    usedKeys.add(key);
+    const fn = BZ_BLOCK_RENDERERS[blk.type];
+    try { return fn ? `<div class="${wrapClass} bz-block-inline">${fn(blk.data || {})}</div>` : ''; }
+    catch(e) { return ''; }
+  });
+
+  return { contentHtml, usedKeys };
+}
+
+/* Render blocks with placement_mode='auto' that were NOT placed via shortcodes. */
+function bzRenderAutoBlocks(blocks, usedKeys, articleType) {
+  if (!Array.isArray(blocks) || !blocks.length) return '';
+  const wrapClass = articleType === 'report' ? 'bz-interactive-report' : 'bz-interactive-article';
+  const sorted = [...blocks].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  const html = sorted.filter(blk => {
+    const mode = blk.placement_mode || 'auto';
+    if (mode === 'hidden') return false;
+    if (mode === 'shortcode') return false;   // shortcode-only blocks skip auto zone
+    if (blk.key && usedKeys.has(blk.key)) return false; // already rendered inline
+    return true;
+  }).map(blk => {
+    const fn = BZ_BLOCK_RENDERERS[blk.type];
+    try { return fn ? fn(blk.data || {}) : ''; } catch(e) { return ''; }
+  }).filter(Boolean).join('');
+  return html ? `<div class="${wrapClass}">${html}</div>` : '';
+}
+
+/* Legacy: render all blocks (auto-mode, ignoring placement) after content.
+   Used as a fallback; renderArticleSingle uses the two-step approach above. */
 function renderInteractiveBlocks(article) {
   const blocks = Array.isArray(article.blocks) ? article.blocks : [];
-  const type   = article.article_type || 'standard';
-  if (!blocks.length || type === 'standard') return '';
+  if (!blocks.length) return '';
+  const type = article.article_type || 'standard';
   const wrapClass = type === 'report' ? 'bz-interactive-report' : 'bz-interactive-article';
   const sorted = [...blocks].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-  const html = sorted.map(blk => {
+  const html = sorted.filter(blk => (blk.placement_mode || 'auto') !== 'hidden').map(blk => {
     const fn = BZ_BLOCK_RENDERERS[blk.type];
     if (!fn) return '';
     try { return fn(blk.data || {}); } catch(e) { return ''; }
