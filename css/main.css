@@ -1622,41 +1622,104 @@ body.has-new-bar .hero-typewriter {
 @media (max-width: 600px) {
   .hero-typewriter {
     min-height: calc(100svh - var(--ht-header));
-    padding: 0 14px;
+    padding: 0 16px;
+  }
+  body.has-new-bar .hero-typewriter {
+    min-height: calc(100svh - var(--ht-header));
   }
   .ht-copy {
-    inset-inline-start: 22px;
-    top: 132px;
+    left: auto;
+    right: 16px;
+    top: 72px;
+    bottom: auto;
+    width: min(43vw, 170px);
+    max-width: 170px;
+    text-align: right;
   }
   .ht-bg {
-    background-position: center top;
-    filter: saturate(.86) contrast(1.06) brightness(.58);
+    background-size: auto min(56vh, 360px);
+    background-position: 45% top;
+    filter: saturate(.86) contrast(1.05) brightness(.78);
   }
   .ht-overlay {
     background:
-      linear-gradient(180deg, rgba(0,0,0,.6) 0%, rgba(0,0,0,.15) 38%, rgba(0,0,0,.88) 100%),
-      linear-gradient(90deg, rgba(0,0,0,.62), rgba(0,0,0,.22));
+      linear-gradient(180deg, rgba(0,0,0,.18) 0%, rgba(0,0,0,.08) 34%, rgba(0,0,0,.82) 66%, rgba(0,0,0,.96) 100%),
+      linear-gradient(90deg, rgba(0,0,0,.38), rgba(0,0,0,.16), rgba(0,0,0,.38));
+  }
+  .ht-brand {
+    top: 22px;
+    inset-inline-start: 16px;
+    font-size: .58rem;
+    letter-spacing: .22em;
   }
   .ht-title {
-    min-height: 2.65em;
-    font-size: 1.62rem;
+    min-height: 2.35em;
+    font-size: clamp(.98rem, 4.8vw, 1.18rem);
     line-height: 1.16;
+    text-wrap: normal;
   }
   .ht-sub {
-    min-height: 8.8em;
-    font-size: .8rem;
-    line-height: 1.7;
-    margin-top: 10px;
+    min-height: 7em;
+    max-width: 100%;
+    font-size: clamp(.56rem, 2.75vw, .66rem);
+    line-height: 1.5;
+    margin-top: 7px;
   }
   .ht-label {
-    font-size: .62rem;
-    margin-bottom: 13px;
+    gap: 7px;
+    font-size: .48rem;
+    margin-bottom: 7px;
+    letter-spacing: .14em;
   }
   .ht-label::before {
-    width: 38px;
+    width: 24px;
   }
   .ht-scroll-hint {
     display: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .ht-copy {
+    right: 14px;
+    top: 68px;
+    width: min(43vw, 154px);
+    max-width: 154px;
+  }
+  .ht-bg {
+    background-size: auto min(52vh, 320px);
+    background-position: 44% top;
+  }
+  .ht-title {
+    min-height: 2.3em;
+    font-size: .94rem;
+  }
+  .ht-sub {
+    min-height: 6.6em;
+    font-size: .54rem;
+    line-height: 1.46;
+  }
+}
+
+@media (max-height: 640px) and (max-width: 600px) {
+  .ht-copy {
+    top: 62px;
+  }
+  .ht-bg {
+    background-size: auto min(50vh, 300px);
+    background-position: 44% top;
+  }
+  .ht-title {
+    min-height: 2.2em;
+    font-size: .9rem;
+  }
+  .ht-sub {
+    min-height: 5.9em;
+    font-size: .52rem;
+    line-height: 1.42;
+  }
+  .ht-label {
+    margin-bottom: 7px;
   }
 }
 

@@ -1478,7 +1478,8 @@ function renderHomeStory() {
   const articles = pubArts();
   const featured = articles.filter(a => a.featured).slice(0, 3);
   const latest   = articles.slice(0, 6);
-  const heroBg = 'images/Hero_Bajozone1.png';
+  const heroBg = 'public/images/Hero_Bajozone1.png';
+  const heroBgFallback = 'images/Hero_Bajozone1.png';
 
   const heroScenes = [
     {
@@ -1531,7 +1532,7 @@ function renderHomeStory() {
 
   document.getElementById('app').innerHTML = `
     <section id="hero-typewriter" class="hero-typewriter" aria-label="${isAr ? 'قسم الترحيب' : 'Welcome section'}">
-      <div class="ht-bg" style="background-image:url('${heroBg}')" aria-hidden="true"></div>
+      <div class="ht-bg" style="background-image:url('${heroBg}'),url('${heroBgFallback}')" aria-hidden="true"></div>
       <div class="ht-overlay" aria-hidden="true"></div>
       <div class="ht-grain" aria-hidden="true"></div>
       <div class="ht-brand" aria-hidden="true">BAJOZONE</div>
