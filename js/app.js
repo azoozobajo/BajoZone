@@ -3361,25 +3361,33 @@ function renderAboutPremium() {
     if (!src) return;
     const img = new Image(); img.decoding = 'async'; img.src = src;
   });
+  const PAGE_SIZE = 9;
+  const totalPages = filmItems.length ? Math.ceil(filmItems.length / PAGE_SIZE) : 0;
+  const firstPage = filmItems.slice(0, PAGE_SIZE);
+  const displayCount = firstPage.length;
+  const buildGalleryGrid = (items) => {
+    if (!items.length) return `<div class="ap-gp-empty">${isAr ? 'أضف صوراً من لوحة التحكم' : 'ADD PHOTOS FROM ADMIN'}</div>`;
+    return items.map((item, i) => `<div class="ap-gp ap-reveal ap-reveal-delay-${(i % 4) + 1}" data-gp="${i}">
+      <img src="${aboutEsc(item.src)}" alt="${aboutEsc(item.title || (isAr ? 'لقطة من الرحلة' : 'Journey moment'))}" loading="${i < 4 ? 'eager' : 'lazy'}" decoding="async">${item.title ? `<span class="ap-gp-cap">${aboutEsc(item.title)}</span>` : ''}
+    </div>`).join('');
+  };
   /* ── Logos ── */
   const savedLogos = CMS.s('about_journey_logos', null);
   let logos = (Array.isArray(savedLogos) && savedLogos.length ? savedLogos : AboutPremium.logos)
     .filter(logo => logo && (logo.src || logo.abbr || logo.alt_ar || logo.alt_en || logo.label));
   if (!logos.length) logos = AboutPremium.logos;
-  const logoItemsFor = copy => logos.map((logo, idx) => {
+  const logoItems = logos.map((logo, idx) => {
     const rawLabel = (isAr ? logo.alt_ar : logo.alt_en) || logo.alt_ar || logo.alt_en || logo.label || `Logo ${idx + 1}`;
     const label = aboutEsc(rawLabel);
     const rawAbbr = logo.abbr || (logo.alt_en || '').split(/\s+/).slice(0, 4).map(w => w[0]).join('').toUpperCase() || String(idx + 1);
     const abbr = aboutEsc(rawAbbr);
     const uploadedSrc = logo.src ? mediaSrc(logo.src) : '';
-    return `<div class="ap-logo-item" data-logo-copy="${copy}">\
+    return `<div class="ap-logo-item">\
 ${!uploadedSrc ? `<div class="ap-logo-card"><span class="ap-logo-abbr">${abbr}</span><span class="ap-logo-name">${label}</span></div>` : ''}\
 ${uploadedSrc ? `<img class="ap-logo-img" src="${uploadedSrc}" alt="${label}" onerror="this.style.display='none';this.insertAdjacentHTML('beforebegin','<div class=\\'ap-logo-card\\'><span class=\\'ap-logo-abbr\\'>${abbr}</span><span class=\\'ap-logo-name\\'>${label}</span></div>')">` : ''}\
 <div class="ap-logo-hover-name">${label}</div>\
 </div>`;
   }).join('');
-  const logoItems = logoItemsFor('primary');
-  const logoItemsClone = logoItemsFor('clone');
 
   /* ── Social links ── */
   const SVG = {
@@ -3496,20 +3504,17 @@ ${uploadedSrc ? `<img class="ap-logo-img" src="${uploadedSrc}" alt="${label}" on
       <h2 class="ap-heading ap-reveal">${aboutEsc(c.fragments.title)}</h2>
       <div class="ap-divider ap-reveal" aria-hidden="true"></div>
       <p class="ap-intro ap-reveal">${aboutEsc(c.fragments.text)}</p>
-      <div class="dg-root" id="dg-root">
-        <div class="dg-main">
-          <div class="dg-stage" id="dg-stage">
-            <div class="dg-sphere" id="dg-sphere"></div>
+      <div class="ap-gallery" id="ap-gallery" data-page="0" data-total-pages="${totalPages}">
+        <div class="ap-gallery-grid" id="ap-gallery-grid" data-count="${displayCount}">
+          ${buildGalleryGrid(firstPage)}
+        </div>
+        ${totalPages > 1 ? `<div class="ap-gallery-nav">
+          <span class="ap-gallery-counter" id="ap-gallery-counter">01 / ${String(totalPages).padStart(2,'0')}</span>
+          <div class="ap-gallery-btns">
+            <button class="ap-gallery-btn" id="ap-gallery-prev" aria-label="${isAr ? 'السابق' : 'Previous'}" disabled>&#8592;</button>
+            <button class="ap-gallery-btn" id="ap-gallery-next" aria-label="${isAr ? 'التالي' : 'Next'}">&#8594;</button>
           </div>
-          <div class="dg-edge dg-edge-s" aria-hidden="true"></div>
-          <div class="dg-edge dg-edge-e" aria-hidden="true"></div>
-        </div>
-        <p class="dg-hint">${isAr ? 'اسحب لتدوير · اضغط لتكبير' : 'Drag to rotate · Tap to enlarge'}</p>
-        <div class="dg-viewer" id="dg-viewer" role="dialog" aria-modal="true" tabindex="-1">
-          <div class="dg-scrim" id="dg-scrim"></div>
-          <div class="dg-frame" id="dg-frame"></div>
-          <button class="dg-close" id="dg-close" aria-label="${isAr ? 'إغلاق' : 'Close'}">&#10005;</button>
-        </div>
+        </div>` : ''}
       </div>
     </div>
   </section>
@@ -3517,11 +3522,7 @@ ${uploadedSrc ? `<img class="ap-logo-img" src="${uploadedSrc}" alt="${label}" on
   <!-- 05 LOGOS BAND -->
   <section class="ap-logos-band" aria-label="${isAr ? 'جهات وتجارب' : 'Institutions'}">
     <p class="ap-logos-label">${isAr ? 'جهات وتجارب أكاديمية ومهنية وكروية' : 'Academic, Professional & Football Institutions'}</p>
-    <div class="ap-logos-loop">
-      <div class="ap-logos-track" style="--ll-dur:${Math.max(18, logos.length * 2.8)}s" aria-hidden="false">
-        ${logoItems}${logoItemsClone}
-      </div>
-    </div>
+    <div class="ap-logos-grid">${logoItems}</div>
   </section>
 
   <!-- 06 VAR CHECK -->
@@ -3577,193 +3578,75 @@ ${uploadedSrc ? `<img class="ap-logo-img" src="${uploadedSrc}" alt="${label}" on
 
   requestAnimationFrame(() => {
     if (varEnabled !== false) initVarCheck(varData);
-    initDomeGallery(filmItems);
+    initApGallery(filmItems, PAGE_SIZE);
     initApReveal();
   });
 }
 
-/* ── Dome Gallery (3-D sphere) ── */
-function initDomeGallery(filmItems) {
-  const root    = document.getElementById('dg-root');
-  const sphere  = document.getElementById('dg-sphere');
-  const viewer  = document.getElementById('dg-viewer');
-  const scrim   = document.getElementById('dg-scrim');
-  const frame   = document.getElementById('dg-frame');
-  const closeBtn = document.getElementById('dg-close');
-  const stage   = document.getElementById('dg-stage');
-  if (!root || !sphere || !stage) return;
+/* ── Gallery pagination + 7s auto-advance ── */
+function initApGallery(filmItems, PAGE_SIZE) {
+  const gallery = document.getElementById('ap-gallery');
+  const grid = document.getElementById('ap-gallery-grid');
+  const counter = document.getElementById('ap-gallery-counter');
+  const prevBtn = document.getElementById('ap-gallery-prev');
+  const nextBtn = document.getElementById('ap-gallery-next');
+  if (!gallery || !grid) return;
+  const photos = Array.isArray(filmItems) ? filmItems.filter(it => it && it.src) : [];
+  const ps = PAGE_SIZE || 9;
+  const totalPages = photos.length ? Math.ceil(photos.length / ps) : 0;
+  if (totalPages <= 1) return;
 
   const isAr = Lang && Lang.cur === 'ar';
+  let curPage = 0;
+  let autoTimer = null;
 
-  /* ── Empty state ── */
-  if (!filmItems || !filmItems.length) {
-    root.innerHTML = `<div class="dg-empty">${isAr ? 'أضف صوراً من لوحة التحكم' : 'ADD PHOTOS FROM ADMIN'}</div>`;
-    return;
-  }
-
-  /* ── Config ── */
-  const CFG = {
-    minRadius:   200,
-    maxRadius:   320,
-    maxVertR:    18,    /* max vertical rotation degrees */
-    friction:    0.92,  /* inertia damping per frame    */
-    autoSpeed:   0.10,  /* auto-rotate deg/frame        */
-    sensitivity: 0.34   /* drag → rotation multiplier   */
-  };
-
-  const N = filmItems.length;
-
-  /* ── Radius (responsive) ── */
-  const getRadius = () =>
-    Math.max(CFG.minRadius, Math.min(CFG.maxRadius, root.offsetWidth * 0.28));
-  let radius = getRadius();
-
-  /* ── Fibonacci sphere distribution ── */
-  const GOLDEN = Math.PI * (3 - Math.sqrt(5));
-  const positions = Array.from({ length: N }, (_, i) => {
-    const y      = 1 - (i / Math.max(N - 1, 1)) * 2;          /* 1 → -1   */
-    const r      = Math.sqrt(Math.max(0, 1 - y * y));
-    const theta  = GOLDEN * i;
-    const latDeg = Math.asin(Math.max(-1, Math.min(1, y))) * (180 / Math.PI);
-    const lonDeg = Math.atan2(Math.sin(theta) * r, Math.cos(theta) * r) * (180 / Math.PI);
-    return { latDeg, lonDeg };
-  });
-
-  /* ── Build tile elements ── */
   const esc = v => String(v || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  positions.forEach((pos, i) => {
-    const it  = filmItems[i];
-    const el  = document.createElement('div');
-    el.className   = 'dg-item';
-    el.dataset.idx = String(i);
-    el.style.transform = `rotateY(${pos.lonDeg}deg) rotateX(${-pos.latDeg}deg) translateZ(${radius}px)`;
-    const img = document.createElement('img');
-    img.src        = it.src;
-    img.alt        = esc(it.title || (isAr ? 'لقطة' : 'Moment'));
-    img.loading    = i < 8 ? 'eager' : 'lazy';
-    img.decoding   = 'async';
-    img.draggable  = false;
-    el.appendChild(img);
-    sphere.appendChild(el);
-  });
 
-  /* ── State ── */
-  const staticMobile = window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
-  if (staticMobile) root.classList.add('dg-static-mobile');
-  let rotX = 0, rotY = 0;
-  let velX = 0, velY = 0;
-  let dragging = false;
-  let moved    = false;
-  let lastX    = 0, lastY = 0;
-  let autoOn   = true;
-  let rafId    = null;
-
-  const clamp   = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-  const applyRot = () => {
-    rotX = clamp(rotX, -CFG.maxVertR, CFG.maxVertR);
-    sphere.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
-  };
-
-  /* ── Animation loop ── */
-  const tick = () => {
-    if (!dragging) {
-      if (autoOn)                          rotY += CFG.autoSpeed;
-      if (Math.abs(velX) > 0.005 || Math.abs(velY) > 0.005) {
-        rotX += velX; rotY += velY;
-        velX *= CFG.friction; velY *= CFG.friction;
-      }
-      applyRot();
-    }
-    rafId = requestAnimationFrame(tick);
-  };
-  if (!staticMobile) rafId = requestAnimationFrame(tick);
-
-  /* ── Pointer / drag ── */
-  if (!staticMobile) {
-    stage.addEventListener('pointerdown', e => {
-      dragging = true;
-      moved    = false;
-      lastX    = e.clientX;
-      lastY    = e.clientY;
-      velX     = velY = 0;
-      try { stage.setPointerCapture(e.pointerId); } catch (_) {}
-      e.preventDefault();
-    }, { passive: false });
-
-    stage.addEventListener('pointermove', e => {
-      if (!dragging) return;
-      const dx = e.clientX - lastX;
-      const dy = e.clientY - lastY;
-      if (Math.abs(dx) > 2 || Math.abs(dy) > 2) moved = true;
-      velY = dx * CFG.sensitivity;
-      velX = dy * CFG.sensitivity;
-      rotY += velY;
-      rotX += velX;
-      lastX = e.clientX;
-      lastY = e.clientY;
-      applyRot();
+  const renderPage = (page) => {
+    const slice = photos.slice(page * ps, (page + 1) * ps);
+    grid.innerHTML = slice.map((item, i) => `<div class="ap-gp" data-gp="${i}"><img src="${esc(item.src)}" alt="${esc(item.title || (isAr ? 'لقطة من الرحلة' : 'Journey moment'))}" loading="${i < 6 ? 'eager' : 'lazy'}" decoding="async">${item.title ? `<span class="ap-gp-cap">${esc(item.title)}</span>` : ''}</div>`).join('');
+    if (counter) counter.textContent = `${String(page + 1).padStart(2,'0')} / ${String(totalPages).padStart(2,'0')}`;
+    if (prevBtn) prevBtn.disabled = page === 0;
+    if (nextBtn) nextBtn.disabled = page === totalPages - 1;
+    grid.querySelectorAll('.ap-gp img').forEach(img => {
+      const card = img.closest('.ap-gp');
+      if (!card) return;
+      const check = () => { if (img.naturalHeight > img.naturalWidth * 1.3) card.classList.add('is-portrait'); };
+      if (img.complete) check(); else img.addEventListener('load', check, { once: true });
     });
-
-    const endDrag = () => { dragging = false; };
-    stage.addEventListener('pointerup',     endDrag);
-    stage.addEventListener('pointercancel', endDrag);
-
-    /* ── Hover: pause auto-rotate ── */
-    stage.addEventListener('pointerenter', () => { autoOn = false; });
-    stage.addEventListener('pointerleave', () => { autoOn = !dragging; });
-  }
-
-  /* ── Click to enlarge ── */
-  sphere.addEventListener('click', e => {
-    if (moved) return;
-    const el = e.target.closest('.dg-item');
-    if (!el || !viewer || !frame) return;
-    const idx = parseInt(el.dataset.idx, 10);
-    const it  = filmItems[idx];
-    if (!it) return;
-    frame.innerHTML = '';
-    const img = document.createElement('img');
-    img.src = it.src;
-    img.alt = esc(it.title || '');
-    frame.appendChild(img);
-    if (it.title) {
-      const cap = document.createElement('p');
-      cap.className = 'dg-caption';
-      cap.textContent = it.title;
-      frame.appendChild(cap);
-    }
-    viewer.classList.add('is-open');
-    document.body.style.overflow = 'hidden';
-    viewer.focus();
-  });
-
-  /* ── Close viewer ── */
-  const closeViewer = () => {
-    if (!viewer) return;
-    viewer.classList.remove('is-open');
-    document.body.style.overflow = '';
-    setTimeout(() => { if (frame) frame.innerHTML = ''; }, 350);
   };
-  if (scrim)    scrim.addEventListener('click', closeViewer);
-  if (closeBtn) closeBtn.addEventListener('click', closeViewer);
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && viewer && viewer.classList.contains('is-open')) closeViewer();
-  });
 
-  /* ── Responsive radius ── */
-  if (typeof ResizeObserver !== 'undefined') {
-    const ro = new ResizeObserver(() => {
-      const nr = getRadius();
-      if (Math.abs(nr - radius) < 15) return;
-      radius = nr;
-      sphere.querySelectorAll('.dg-item').forEach((el, i) => {
-        const pos = positions[i];
-        if (!pos) return;
-        el.style.transform = `rotateY(${pos.lonDeg}deg) rotateX(${-pos.latDeg}deg) translateZ(${radius}px)`;
-      });
-    });
-    ro.observe(root);
-  }
+  const goNext = () => {
+    curPage = (curPage + 1) % totalPages;
+    renderPage(curPage);
+  };
+  const goPrev = () => {
+    curPage = (curPage - 1 + totalPages) % totalPages;
+    renderPage(curPage);
+  };
+
+  const startAuto = () => {
+    if (autoTimer) return;
+    autoTimer = window.setInterval(goNext, 7000);
+  };
+  const stopAuto = () => {
+    if (!autoTimer) return;
+    window.clearInterval(autoTimer);
+    autoTimer = null;
+  };
+
+  if (prevBtn) prevBtn.addEventListener('click', () => { stopAuto(); goPrev(); startAuto(); });
+  if (nextBtn) nextBtn.addEventListener('click', () => { stopAuto(); goNext(); startAuto(); });
+  gallery.addEventListener('mouseenter', stopAuto);
+  gallery.addEventListener('mouseleave', startAuto);
+  /* detect portrait on first (already-rendered) page */
+  grid.querySelectorAll('.ap-gp img').forEach(img => {
+    const card = img.closest('.ap-gp');
+    if (!card) return;
+    const check = () => { if (img.naturalHeight > img.naturalWidth * 1.3) card.classList.add('is-portrait'); };
+    if (img.complete) check(); else img.addEventListener('load', check, { once: true });
+  });
+  startAuto();
 }
 
 /* ── IntersectionObserver scroll-reveal ── */
