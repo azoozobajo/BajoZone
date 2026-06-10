@@ -3382,7 +3382,7 @@ function renderAboutPremium() {
     const rawAbbr = logo.abbr || (logo.alt_en || '').split(/\s+/).slice(0, 4).map(w => w[0]).join('').toUpperCase() || String(idx + 1);
     const abbr = aboutEsc(rawAbbr);
     const uploadedSrc = logo.src ? mediaSrc(logo.src) : '';
-    return `<div class="ap-logo-item">\
+    return `<div class="ap-logo-item" tabindex="0" aria-label="${label}">\
 ${!uploadedSrc ? `<div class="ap-logo-card"><span class="ap-logo-abbr">${abbr}</span><span class="ap-logo-name">${label}</span></div>` : ''}\
 ${uploadedSrc ? `<img class="ap-logo-img" src="${uploadedSrc}" alt="${label}" onerror="this.style.display='none';this.insertAdjacentHTML('beforebegin','<div class=\\'ap-logo-card\\'><span class=\\'ap-logo-abbr\\'>${abbr}</span><span class=\\'ap-logo-name\\'>${label}</span></div>')">` : ''}\
 <div class="ap-logo-hover-name">${label}</div>\
@@ -3583,7 +3583,7 @@ ${uploadedSrc ? `<img class="ap-logo-img" src="${uploadedSrc}" alt="${label}" on
   });
 }
 
-/* ── Gallery pagination + 7s auto-advance ── */
+/* ── Gallery pagination ── */
 function initApGallery(filmItems, PAGE_SIZE) {
   const gallery = document.getElementById('ap-gallery');
   const grid = document.getElementById('ap-gallery-grid');
@@ -3598,7 +3598,6 @@ function initApGallery(filmItems, PAGE_SIZE) {
 
   const isAr = Lang && Lang.cur === 'ar';
   let curPage = 0;
-  let autoTimer = null;
 
   const esc = v => String(v || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
@@ -3608,45 +3607,28 @@ function initApGallery(filmItems, PAGE_SIZE) {
     if (counter) counter.textContent = `${String(page + 1).padStart(2,'0')} / ${String(totalPages).padStart(2,'0')}`;
     if (prevBtn) prevBtn.disabled = page === 0;
     if (nextBtn) nextBtn.disabled = page === totalPages - 1;
-    grid.querySelectorAll('.ap-gp img').forEach(img => {
-      const card = img.closest('.ap-gp');
-      if (!card) return;
-      const check = () => { if (img.naturalHeight > img.naturalWidth * 1.3) card.classList.add('is-portrait'); };
-      if (img.complete) check(); else img.addEventListener('load', check, { once: true });
-    });
+  };
+
+  const setPage = (page) => {
+    const nextPage = Math.max(0, Math.min(totalPages - 1, page));
+    if (nextPage === curPage) return;
+    curPage = nextPage;
+    grid.classList.add('is-switching');
+    window.setTimeout(() => {
+      renderPage(curPage);
+      requestAnimationFrame(() => grid.classList.remove('is-switching'));
+    }, 180);
   };
 
   const goNext = () => {
-    curPage = (curPage + 1) % totalPages;
-    renderPage(curPage);
+    setPage(curPage + 1);
   };
   const goPrev = () => {
-    curPage = (curPage - 1 + totalPages) % totalPages;
-    renderPage(curPage);
+    setPage(curPage - 1);
   };
 
-  const startAuto = () => {
-    if (autoTimer) return;
-    autoTimer = window.setInterval(goNext, 7000);
-  };
-  const stopAuto = () => {
-    if (!autoTimer) return;
-    window.clearInterval(autoTimer);
-    autoTimer = null;
-  };
-
-  if (prevBtn) prevBtn.addEventListener('click', () => { stopAuto(); goPrev(); startAuto(); });
-  if (nextBtn) nextBtn.addEventListener('click', () => { stopAuto(); goNext(); startAuto(); });
-  gallery.addEventListener('mouseenter', stopAuto);
-  gallery.addEventListener('mouseleave', startAuto);
-  /* detect portrait on first (already-rendered) page */
-  grid.querySelectorAll('.ap-gp img').forEach(img => {
-    const card = img.closest('.ap-gp');
-    if (!card) return;
-    const check = () => { if (img.naturalHeight > img.naturalWidth * 1.3) card.classList.add('is-portrait'); };
-    if (img.complete) check(); else img.addEventListener('load', check, { once: true });
-  });
-  startAuto();
+  if (prevBtn) prevBtn.addEventListener('click', goPrev);
+  if (nextBtn) nextBtn.addEventListener('click', goNext);
 }
 
 /* ── IntersectionObserver scroll-reveal ── */
