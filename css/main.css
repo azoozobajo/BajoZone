@@ -1621,11 +1621,12 @@ body.has-new-bar .hero-typewriter {
 
 @media (max-width: 600px) {
   .hero-typewriter {
-    min-height: calc(100svh - var(--ht-header));
+    --ht-mobile-visual: min(56svh, 360px);
+    min-height: var(--ht-mobile-visual);
     padding: 0 16px;
   }
   body.has-new-bar .hero-typewriter {
-    min-height: calc(100svh - var(--ht-header));
+    min-height: var(--ht-mobile-visual);
   }
   .ht-copy {
     left: auto;
@@ -1637,7 +1638,7 @@ body.has-new-bar .hero-typewriter {
     text-align: right;
   }
   .ht-bg {
-    background-size: auto min(56vh, 360px);
+    background-size: auto var(--ht-mobile-visual);
     background-position: 45% top;
     filter: saturate(.86) contrast(1.05) brightness(.78);
   }
@@ -1687,7 +1688,6 @@ body.has-new-bar .hero-typewriter {
     max-width: 154px;
   }
   .ht-bg {
-    background-size: auto min(52vh, 320px);
     background-position: 44% top;
   }
   .ht-title {
@@ -1702,11 +1702,13 @@ body.has-new-bar .hero-typewriter {
 }
 
 @media (max-height: 640px) and (max-width: 600px) {
+  .hero-typewriter {
+    --ht-mobile-visual: min(50svh, 300px);
+  }
   .ht-copy {
     top: 62px;
   }
   .ht-bg {
-    background-size: auto min(50vh, 300px);
     background-position: 44% top;
   }
   .ht-title {
