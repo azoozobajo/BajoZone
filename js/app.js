@@ -1410,11 +1410,75 @@ function initMobileHeroSlide(scenes) {
   hero.dataset.slideTimer = timer;
 }
 
+function initHeroTypewriter(scenes) {
+  const hero = document.getElementById('hero-typewriter');
+  if (!hero || !Array.isArray(scenes) || !scenes.length) return;
+
+  const label = hero.querySelector('[data-ht-label]');
+  const title = hero.querySelector('[data-ht-title]');
+  const sub = hero.querySelector('[data-ht-sub]');
+  if (!label || !title || !sub) return;
+
+  const total = scenes.length;
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+    label.textContent = `01 / ${String(total).padStart(2, '0')}`;
+    title.textContent = scenes[0].title;
+    sub.textContent = scenes[0].sub;
+    return;
+  }
+
+  const runId = String(Date.now());
+  hero.dataset.typewriterRun = runId;
+
+  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+  const alive = () => document.getElementById('hero-typewriter') === hero && hero.dataset.typewriterRun === runId;
+  const chars = text => Array.from(text || '');
+
+  async function typeInto(el, text, delay) {
+    const letters = chars(text);
+    el.textContent = '';
+    for (let i = 0; i < letters.length; i += 1) {
+      if (!alive()) return false;
+      el.textContent += letters[i];
+      await sleep(delay);
+    }
+    return true;
+  }
+
+  async function eraseFrom(el, delay) {
+    const letters = chars(el.textContent);
+    for (let i = letters.length; i >= 0; i -= 1) {
+      if (!alive()) return false;
+      el.textContent = letters.slice(0, i).join('');
+      await sleep(delay);
+    }
+    return true;
+  }
+
+  (async function loop() {
+    let index = 0;
+    while (alive()) {
+      const scene = scenes[index];
+      label.textContent = `${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
+      if (!await typeInto(title, scene.title, 42)) break;
+      await sleep(180);
+      if (!await typeInto(sub, scene.sub, 18)) break;
+      await sleep(3000);
+      if (!await eraseFrom(sub, 10)) break;
+      await sleep(120);
+      if (!await eraseFrom(title, 20)) break;
+      await sleep(260);
+      index = (index + 1) % total;
+    }
+  })();
+}
+
 function renderHomeStory() {
   const isAr = Lang.cur === 'ar';
   const articles = pubArts();
   const featured = articles.filter(a => a.featured).slice(0, 3);
   const latest   = articles.slice(0, 6);
+  const heroBg = 'images/Hero_Bajozone1.png';
 
   const heroScenes = [
     {
@@ -1466,53 +1530,21 @@ function renderHomeStory() {
   ];
 
   document.getElementById('app').innerHTML = `
-    <div id="hero-mobile" aria-label="${isAr ? 'قسم الترحيب' : 'Welcome section'}">
-      <div class="hm-bg" style="background-image:url('${heroScenes[0].poster}')" aria-hidden="true"></div>
-      <div class="hm-overlay" aria-hidden="true"></div>
-      <div class="hm-brand" aria-hidden="true">BAJOZONE</div>
-      <div class="hm-content" dir="${isAr ? 'rtl' : 'ltr'}">
-        <span class="hm-label">01 / 05</span>
-        <h1 class="hm-h1">${heroScenes[0].title}</h1>
-        <p class="hm-sub">${heroScenes[0].sub}</p>
+    <section id="hero-typewriter" class="hero-typewriter" aria-label="${isAr ? 'قسم الترحيب' : 'Welcome section'}">
+      <div class="ht-bg" style="background-image:url('${heroBg}')" aria-hidden="true"></div>
+      <div class="ht-overlay" aria-hidden="true"></div>
+      <div class="ht-grain" aria-hidden="true"></div>
+      <div class="ht-brand" aria-hidden="true">BAJOZONE</div>
+      <div class="ht-copy" dir="${isAr ? 'rtl' : 'ltr'}">
+        <span class="ht-label" data-ht-label>01 / 05</span>
+        <h1 class="ht-title"><span data-ht-title></span><i class="ht-caret" aria-hidden="true"></i></h1>
+        <p class="ht-sub" data-ht-sub></p>
       </div>
-      <div class="hm-scroll-hint" aria-hidden="true">
+      <div class="ht-scroll-hint" aria-hidden="true">
         <span>${isAr ? 'مرر' : 'SCROLL'}</span>
-        <div class="hm-scroll-line"></div>
+        <div class="ht-scroll-line"></div>
       </div>
-    </div>
-
-    <div id="hc-wrapper">
-      <div id="hero-cinema" style="--hc-mx:0;--hc-my:0;--hc-pointer-x:50%;--hc-pointer-y:50%;">
-        <div class="hc-video-stack" aria-hidden="true">
-          ${heroScenes.map((s, i) => `<video class="hc-video" data-hc-video
-            src="${s.video}"
-            poster="${s.poster}"
-            ${i === 0 ? 'autoplay preload="auto"' : 'preload="none"'}
-            muted playsinline></video>`).join('')}
-        </div>
-        <div class="hc-vignette" aria-hidden="true"></div>
-        <div class="hc-grain" aria-hidden="true"></div>
-        <div class="hc-right-gradient" aria-hidden="true"></div>
-        <div class="hc-brand-mark">BAJOZONE</div>
-        <div class="hc-copy-wrap" dir="${isAr ? 'rtl' : 'ltr'}">
-          ${heroScenes.map((s, i) => `
-            <article class="hc-copy ${i === 0 ? 'is-active' : ''}" data-hc-copy>
-              <span class="hc-label">${String(i + 1).padStart(2,'0')} / 05</span>
-              <h1 class="hc-h1">${s.title}</h1>
-              <p class="hc-sub">${s.sub}</p>
-            </article>`).join('')}
-        </div>
-        <div class="hc-hud" aria-hidden="true">
-          <span id="hc-scene-label">01 / 05</span>
-          <span id="hc-progress-text">00%</span>
-        </div>
-        <div class="hc-progress-bar"><div id="hc-progress-fill"></div></div>
-        <div class="hc-scroll-hint" id="hc-scroll-hint" aria-hidden="true">
-          <span>${isAr ? 'مرر' : 'SCROLL'}</span>
-          <div class="hc-scroll-line"></div>
-        </div>
-      </div>
-    </div>
+    </section>
 
     <div class="home-transition-line">
       <div class="htl-inner reveal"></div>
@@ -1677,11 +1709,7 @@ function renderHomeStory() {
       </div>
     </section>`;
 
-  if (!window.matchMedia('(orientation: portrait)').matches) {
-    initHeroCinema();
-  } else {
-    initMobileHeroSlide(heroScenes);
-  }
+  initHeroTypewriter(heroScenes);
   initReveal();
   initTopicsSplit(featured.length, latest.length);
   maybeShowPopup();
