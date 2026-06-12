@@ -1478,8 +1478,16 @@ function renderHomeStory() {
   const articles = pubArts();
   const featured = articles.filter(a => a.featured).slice(0, 3);
   const latest   = articles.slice(0, 6);
-  const heroBg = 'public/images/Hero_Bajozone1.png';
-  const heroBgFallback = 'images/Hero_Bajozone1.png';
+  const heroBg = 'public/images/Hero_Bajozone2.png';
+  const heroBgFallback = 'images/Hero_Bajozone2.png';
+
+  const hpIcons = [
+    `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 24s7-13 18-13 18 13 18 13-7 13-18 13S6 24 6 24z"/><circle cx="24" cy="24" r="5"/><circle cx="24" cy="24" r="2" fill="currentColor" stroke="none"/></svg>`,
+    `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="11" y="8" width="26" height="32" rx="2"/><line x1="17" y1="18" x2="31" y2="18"/><line x1="17" y1="24" x2="29" y2="24"/><line x1="17" y1="30" x2="25" y2="30"/></svg>`,
+    `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="24" cy="13" rx="13" ry="5"/><path d="M11 13v8c0 2.76 5.82 5 13 5s13-2.24 13-5v-8"/><path d="M11 21v8c0 2.76 5.82 5 13 5s13-2.24 13-5v-8"/></svg>`,
+    `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polyline points="7,38 18,24 26,30 41,12"/><circle cx="41" cy="12" r="2.5" fill="currentColor" stroke="none"/><line x1="7" y1="42" x2="41" y2="42"/></svg>`,
+    `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="10" width="8" height="26" rx="1"/><rect x="20" y="14" width="8" height="22" rx="1"/><rect x="33" y="8" width="8" height="30" rx="1"/><line x1="5" y1="40" x2="43" y2="40"/></svg>`
+  ];
 
   const heroScenes = [
     {
@@ -1531,40 +1539,36 @@ function renderHomeStory() {
   ];
 
   document.getElementById('app').innerHTML = `
-    <section id="hero-typewriter" class="hero-typewriter" aria-label="${isAr ? 'قسم الترحيب' : 'Welcome section'}">
-      <div class="ht-bg" style="background-image:url('${heroBg}'),url('${heroBgFallback}')" aria-hidden="true"></div>
-      <div class="ht-overlay" aria-hidden="true"></div>
-      <div class="ht-grain" aria-hidden="true"></div>
-      <div class="ht-brand" aria-hidden="true">BAJOZONE</div>
-      <div class="ht-copy" dir="${isAr ? 'rtl' : 'ltr'}">
-        <span class="ht-label" data-ht-label>01 / 05</span>
-        <h1 class="ht-title"><span data-ht-title></span><i class="ht-caret" aria-hidden="true"></i></h1>
-        <p class="ht-sub" data-ht-sub></p>
-      </div>
-      <div class="ht-scroll-hint" aria-hidden="true">
-        <span>${isAr ? 'مرر' : 'SCROLL'}</span>
-        <div class="ht-scroll-line"></div>
+    <section class="home-hero-static" id="home-hero" aria-label="${isAr ? 'قسم الترحيب' : 'Welcome section'}">
+      <img class="hhs-bg-img" src="${heroBg}" onerror="this.src='${heroBgFallback}'" alt="" aria-hidden="true">
+      <div class="hhs-overlay" aria-hidden="true"></div>
+      <div class="hhs-copy">
+        <p class="hhs-pre">${isAr ? 'مرحباً بك في' : 'Welcome to'}</p>
+        <h1 class="hhs-title">${isAr ? 'مدونتي الكروية' : 'My Football Blog'}</h1>
+        <p class="hhs-sub">${isAr ? 'هنا أدون كل ما يخص مواهب كرة القدم' : 'Here I document everything about football talent'}</p>
+        <a class="hhs-btn" href="#/programs" onclick="Router.go('/programs');return false;">
+          <span>${isAr ? 'استكشف المحتوى' : 'Explore Content'}</span>
+          <span class="hhs-arrow">${isAr ? '←' : '→'}</span>
+        </a>
       </div>
     </section>
 
-    <div class="home-transition-line">
-      <div class="htl-inner reveal"></div>
-    </div>
-
-    <section class="home-intro-section" aria-label="${isAr ? 'عن باجو زون' : 'About BajoZone'}">
+    <section class="home-principles" id="home-principles" aria-label="${isAr ? 'مبادئنا' : 'Our Principles'}">
       <div class="container">
-        <div class="home-intro-content reveal">
-          <div class="section-label">${isAr ? 'من نحن' : 'About'}</div>
-          <h2 class="home-intro-title">
-            ${isAr
-              ? '<span class="gold-text">باجوزون</span> .. نناقش <span class="gold-text">الموهبة الكروية</span> بعمق'
-              : '<span class="gold-text">BajoZone</span> .. We Discuss <span class="gold-text">Football Talent</span> In Depth'}
-          </h2>
-          <p class="home-intro-text">
-            ${isAr
-              ? 'مدونة شخصية'
-              : 'A personal space that combines research, experience, and analysis to discuss talent identification and development, presented as clear content for football enthusiasts.'}
-          </p>
+        <div class="hp-header reveal">
+          <div class="section-label">${isAr ? 'ماذا تجد هنا' : 'What You Find Here'}</div>
+          <h2 class="hp-title">${isAr ? '<span class="gold-text">5</span> مبادئ نؤمن بها في باجوزون' : '<span class="gold-text">5</span> Principles We Believe In'}</h2>
+        </div>
+        <div class="hp-grid" id="hp-grid">
+          ${heroScenes.map((s, i) => `<div class="hp-card${i===0?' hp-card-active':''}" data-hpi="${i}">
+            <div class="hp-card-num">0${i+1}</div>
+            <div class="hp-card-icon" aria-hidden="true">${hpIcons[i]}</div>
+            <h3 class="hp-card-title">${s.title}</h3>
+            <p class="hp-card-desc">${s.sub}</p>
+          </div>`).join('')}
+        </div>
+        <div class="hp-dots" id="hp-dots" aria-hidden="true">
+          ${heroScenes.map((_,i) => `<span class="hp-dot${i===0?' hp-dot-active':''}" data-hpi="${i}"></span>`).join('')}
         </div>
       </div>
     </section>
@@ -1710,19 +1714,10 @@ function renderHomeStory() {
       </div>
     </section>`;
 
-  initHeroTypewriter(heroScenes);
+  initPrinciples();
   initReveal();
   initTopicsSplit(featured.length, latest.length);
   maybeShowPopup();
-
-  // Animate the gold transition line on scroll-into-view
-  const htlLine = document.querySelector('.htl-inner');
-  if (htlLine) {
-    const htlObs = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting) { htlLine.classList.add('htl-visible'); htlObs.disconnect(); }
-    }, { threshold: 0.5 });
-    htlObs.observe(htlLine);
-  }
 
   updatePageMeta(
     `${Lang.t('home')} — ${CMS.s('site_name_en', 'BajoZone')}`,
@@ -1730,6 +1725,36 @@ function renderHomeStory() {
     CMS.s('logo', 'assets/images/logo-bajo.png'),
     location.origin + '/'
   );
+}
+
+function initPrinciples() {
+  const grid = document.getElementById('hp-grid');
+  if (!grid) return;
+  const cards = Array.from(grid.querySelectorAll('.hp-card'));
+  const dots  = Array.from(document.querySelectorAll('#hp-dots .hp-dot'));
+  const section = grid.closest('.home-principles');
+
+  function setActive(i) {
+    cards.forEach((c, j) => c.classList.toggle('hp-card-active', j === i));
+    dots.forEach((d, j) => d.classList.toggle('hp-dot-active', j === i));
+  }
+
+  cards.forEach((card, i) => {
+    card.addEventListener('mouseenter', () => setActive(i));
+  });
+  grid.addEventListener('mouseleave', () => setActive(0));
+
+  dots.forEach((dot, i) => {
+    dot.addEventListener('click', () => setActive(i));
+  });
+
+  if (section) {
+    section.addEventListener('mousemove', e => {
+      const r = section.getBoundingClientRect();
+      section.style.setProperty('--hp-mx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%');
+      section.style.setProperty('--hp-my', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%');
+    });
+  }
 }
 
 /* /articles redirects to /programs for backward compat */
